@@ -1,0 +1,9 @@
+{
+  "app": "npx ts-node bin/account-assessment-solution.ts",
+  "context": {
+    "solution_id": "SO0217",
+    "solution_name": "account-assessment-for-aws-organizations",
+    "solution_version": "%%VERSION%%"
+  },
+  "versionReporting": false
+}

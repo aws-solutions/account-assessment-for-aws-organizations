@@ -1,0 +1,106 @@
+account-assessment-for-aws-organizations
+Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Licensed under the Apache License Version 2.0 (the "License"). You may not use this file except
+in compliance with the License. A copy of the License is located at http://www.apache.org/licenses/
+or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License for the
+specific language governing permissions and limitations under the License.
+
+**********************
+THIRD PARTY COMPONENTS
+**********************
+This software includes third party software subject to the following copyrights:
+
+npm packages:
+@aws-amplify/api under Apache-2.0
+@aws-amplify/auth under Apache-2.0
+@aws-amplify/core under Apache-2.0
+@cloudscape-design/collection-hooks under Apache-2.0
+@cloudscape-design/components under Apache-2.0
+@cloudscape-design/design-tokens under Apache-2.0
+@cloudscape-design/global-styles under Apache-2.0
+@types/node under MIT
+@types/react under MIT
+@types/react-dom under MIT
+bootstrap under MIT
+date-fns under MIT
+react under MIT
+react-dom under MIT
+react-router-dom under MIT
+react-scripts under MIT
+typescript under Apache-2.0
+web-vitals under Apache-2.0
+@babel/core under MIT
+@babel/preset-env under MIT
+@babel/preset-react under MIT
+@babel/preset-typescript under MIT
+@testing-library/jest-dom under MIT
+@testing-library/react under MIT
+@testing-library/user-event under MIT
+@types/jest under MIT
+babel-jest under MIT
+msw under MIT
+renamer under MIT
+@aws-solutions-constructs/aws-cloudfront-s3 under Apache-2.0
+aws-cdk-lib under Apache-2.0
+constructs under Apache-2.0
+@aws-cdk/assert under Apache-2.0
+@types/jest under MIT
+@types/node under MIT
+@types/sinon under MIT
+aws-cdk under Apache-2.0
+jest under MIT
+sinon under BSD-3-Clause
+ts-jest under MIT
+ts-node under MIT
+typescript under Apache-2.0
+
+pip packages:
+ aws-xray-sdk               2.10.0         Apache Software License
+ boto3                      1.24.89        Apache Software License
+ botocore                   1.27.89        Apache Software License
+ cfnresponse                1.1.2          Apache Software License
+ s3transfer                 0.6.0          Apache Software License
+ requests                   2.28.1         Apache Software License
+ python-dateutil            2.8.2          Apache Software License; BSD License
+ fastjsonschema             2.16.2         BSD License
+ wrapt                      1.14.1         BSD License
+ boto3-stubs                1.24.89        MIT License
+ botocore-stubs             1.27.89        MIT License
+ jmespath                   1.0.1          MIT License
+ mypy-boto3-apigateway      1.24.36.post1  MIT License
+ mypy-boto3-backup          1.24.36.post1  MIT License
+ mypy-boto3-cloudformation  1.24.36.post1  MIT License
+ mypy-boto3-codeartifact    1.24.36.post1  MIT License
+ mypy-boto3-codebuild       1.24.36.post1  MIT License
+ mypy-boto3-config          1.24.59        MIT License
+ mypy-boto3-dynamodb        1.24.74        MIT License
+ mypy-boto3-ec2             1.24.86        MIT License
+ mypy-boto3-ecr             1.24.36.post1  MIT License
+ mypy-boto3-efs             1.24.36.post1  MIT License
+ mypy-boto3-events          1.24.36.post1  MIT License
+ mypy-boto3-glacier         1.24.36.post1  MIT License
+ mypy-boto3-glue            1.24.87        MIT License
+ mypy-boto3-iam             1.24.59        MIT License
+ mypy-boto3-iot             1.24.46        MIT License
+ mypy-boto3-kms             1.24.36.post1  MIT License
+ mypy-boto3-lambda          1.24.54        MIT License
+ mypy-boto3-mediastore      1.24.36.post1  MIT License
+ mypy-boto3-opensearch      1.24.40        MIT License
+ mypy-boto3-organizations   1.24.36.post1  MIT License
+ mypy-boto3-rds             1.24.76        MIT License
+ mypy-boto3-s3              1.24.76        MIT License
+ mypy-boto3-secretsmanager  1.24.83        MIT License
+ mypy-boto3-serverlessrepo  1.24.36.post1  MIT License
+ mypy-boto3-sesv2           1.24.36.post1  MIT License
+ mypy-boto3-sns             1.24.68        MIT License
+ mypy-boto3-sqs             1.24.60        MIT License
+ mypy-boto3-ssm-incidents   1.24.36.post1  MIT License
+ mypy-boto3-stepfunctions   1.24.36.post1  MIT License
+ mypy-boto3-sts             1.24.36.post1  MIT License
+ six                        1.16.0         MIT License
+ types-awscrt               0.14.7         MIT License
+ types-s3transfer           0.6.0.post4    MIT License
+ urllib3                    1.26.12        MIT License
+ aws-lambda-powertools      1.30.0         MIT No Attribution
+ typing-extensions          4.4.0          Python Software Foundation License
