@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Updated 3rd party library versions to address vulnerabilities
+- Updated 3rd party library versions
+- Mitigated [vulnerability in py library](https://www.cvedetails.com/cve/CVE-2022-42969/) by updating pytest version
 
 ## [1.0.0] - 2022-11-14
 
