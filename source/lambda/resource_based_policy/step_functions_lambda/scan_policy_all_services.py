@@ -67,12 +67,26 @@ from utils.string_manipulation import trim_string_split_to_list_get_last_item as
     trim_string_from_front
 
 
+# obtain all regions enabled for this specific account
+def get_regions_for_account( account_id ):
+    #ec2_client = boto3.client('ec2')
+    ec2_client = EC2( account_id, getenv['AWS_REGION'] )
+    resp = ec2_client.describe_regions( AllRegions=False )
+    region_list = []
+    for r in resp['Regions']:
+        region_list.append( r['RegionName'] )
+    return region_list
+
 def scan_regions(event: model.ScanServiceRequestModel,
                  scan_single_region: Callable[[str], Iterable[model.ResourceBasedPolicyResponseModel]]) -> \
         list[model.ResourceBasedPolicyResponseModel]:
     logger = Logger(service='scan_regions', level=getenv('LOG_LEVEL'))
+    region_list = event.get( 'Regions', [] )
+    # if 'Regions' is an empty array or has a single entry = 'ALL', obtain all regions enabled for this specific account
+    if len(region_list) <= 0 or ( 1 == len(region_list) and 'ALL' == region_list[0] ):
+        region_list = get_regions_for_account( event['AccountId'] )
     resources_in_all_regions = []
-    for region in event['Regions']:
+    for region in region_list:
         try:
             resources_for_region = scan_single_region(region)
             resources_in_all_regions.extend(resources_for_region)
@@ -1141,7 +1155,7 @@ class CodeBuildResourcePolicy:
         return scan_regions(self.event, self.scan_single_region)
 
     def scan_single_region(self, region: str) -> Iterable[model.ResourceBasedPolicyResponseModel]:
-        self.logger.info(f"Scanning Code Build Resource Policies in {region}")
+        self.logger.info(f"Scanning Code Build Resource Policies in {region} for account {self.account_id}")
         code_build_client = CodeBuild(self.account_id, region)
         code_build_project_names = code_build_client.list_projects()
         code_build_project_data: list[model.CodeBuildData] = self._get_project_data(
