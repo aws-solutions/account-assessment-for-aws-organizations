@@ -1155,7 +1155,7 @@ class CodeBuildResourcePolicy:
         return scan_regions(self.event, self.scan_single_region)
 
     def scan_single_region(self, region: str) -> Iterable[model.ResourceBasedPolicyResponseModel]:
-        self.logger.info(f"Scanning Code Build Resource Policies in {region} for account {self.account_id}")
+        self.logger.info(f"Scanning Code Build Resource Policies in {region}")
         code_build_client = CodeBuild(self.account_id, region)
         code_build_project_names = code_build_client.list_projects()
         code_build_project_data: list[model.CodeBuildData] = self._get_project_data(
