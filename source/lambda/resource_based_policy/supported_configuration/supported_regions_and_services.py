@@ -132,7 +132,10 @@ SUPPORTED_SERVICES = [
 ]
 
 SUPPORTED_REGIONS = [
-
+    {
+        "Region": "ALL",
+        "RegionName": "Autodetect all enabled regions for each account"
+    },
     {
         "Region": "us-east-1",
         "RegionName": "US East (N. Virginia)"
