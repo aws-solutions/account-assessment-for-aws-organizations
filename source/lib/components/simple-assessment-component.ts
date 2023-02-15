@@ -1,9 +1,9 @@
-import {Construct} from "constructs";
-import {AttributeType, BillingMode, Table} from "aws-cdk-lib/aws-dynamodb";
-import {CfnParameter, Duration} from "aws-cdk-lib";
+import { Construct } from "constructs";
+import { AttributeType, BillingMode, Table, TableEncryption } from "aws-cdk-lib/aws-dynamodb";
+import { CfnParameter, Duration } from "aws-cdk-lib";
 import * as lambda from "aws-cdk-lib/aws-lambda";
-import {AssetCode, Runtime} from "aws-cdk-lib/aws-lambda";
-import {CfnPolicy, CfnRole, PolicyStatement} from "aws-cdk-lib/aws-iam";
+import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
+import { CfnPolicy, CfnRole, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import {
   AuthorizationType,
   LambdaIntegration,
@@ -12,9 +12,9 @@ import {
   RequestValidator,
   RestApi
 } from "aws-cdk-lib/aws-apigateway";
-import {CognitoAuthenticationResources} from "./cognito-authenticator";
-import {addCfnSuppressRules} from "@aws-solutions-constructs/core";
-import {ORG_MANAGEMENT_ROLE_NAME} from "../org-management-account-stack";
+import { CognitoAuthenticationResources } from "./cognito-authenticator";
+import { addCfnSuppressRules } from "@aws-solutions-constructs/core";
+import { ORG_MANAGEMENT_ROLE_NAME } from "../org-management-account-stack";
 
 export interface AssessmentComponentProps {
   cognitoAuthenticationResources: CognitoAuthenticationResources,
@@ -77,6 +77,7 @@ export class SimpleAssessmentComponent extends Construct {
         name: 'SortKey',
         type: AttributeType.STRING
       },
+      encryption: TableEncryption.AWS_MANAGED,
       billingMode: BillingMode.PAY_PER_REQUEST,
       pointInTimeRecovery: true,
       timeToLiveAttribute: 'ExpiresAt',
@@ -94,7 +95,7 @@ export class SimpleAssessmentComponent extends Construct {
     const readFunction = new lambda.Function(this, 'Read', {
       runtime: Runtime.PYTHON_3_9,
       tracing: lambda.Tracing.ACTIVE,
-      timeout: Duration.seconds(20),
+      timeout: Duration.minutes(1),
       code: assetCode,
       handler: readHandlerPath,
       environment: {
@@ -110,7 +111,7 @@ export class SimpleAssessmentComponent extends Construct {
     const scanFunction = new lambda.Function(this, 'StartScan', {
       runtime: Runtime.PYTHON_3_9,
       tracing: lambda.Tracing.ACTIVE,
-      timeout: Duration.minutes(1),
+      timeout: Duration.minutes(2),
       code: assetCode,
       handler: scanHandlerPath,
       environment: {

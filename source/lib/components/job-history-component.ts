@@ -1,10 +1,10 @@
-import {Construct} from "constructs";
-import {AttributeType, BillingMode, Table} from "aws-cdk-lib/aws-dynamodb";
-import {CfnParameter, Duration} from "aws-cdk-lib";
+import { Construct } from "constructs";
+import { AttributeType, BillingMode, Table, TableEncryption } from "aws-cdk-lib/aws-dynamodb";
+import { CfnParameter, Duration } from "aws-cdk-lib";
 import * as lambda from "aws-cdk-lib/aws-lambda";
-import {AssetCode, Runtime} from "aws-cdk-lib/aws-lambda";
-import {AuthorizationType, LambdaIntegration, RestApi} from "aws-cdk-lib/aws-apigateway";
-import {CognitoAuthenticationResources} from "./cognito-authenticator";
+import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
+import { AuthorizationType, LambdaIntegration, RestApi } from "aws-cdk-lib/aws-apigateway";
+import { CognitoAuthenticationResources } from "./cognito-authenticator";
 
 type JobHistoryComponentProps = {
   cognitoAuthenticationResources: CognitoAuthenticationResources,
@@ -34,6 +34,7 @@ export class JobHistoryComponent extends Construct {
         name: 'SortKey',
         type: AttributeType.STRING
       },
+      encryption: TableEncryption.AWS_MANAGED,
       billingMode: BillingMode.PAY_PER_REQUEST,
       pointInTimeRecovery: true,
       timeToLiveAttribute: 'ExpiresAt',
@@ -43,7 +44,7 @@ export class JobHistoryComponent extends Construct {
     const jobsApiHandler = new lambda.Function(this, 'JobsHandler', {
       runtime: Runtime.PYTHON_3_9,
       tracing: lambda.Tracing.ACTIVE,
-      timeout: Duration.seconds(20),
+      timeout: Duration.minutes(1),
       code: assetCode,
       handler: 'assessment_runner/api_router.lambda_handler',
       environment: {

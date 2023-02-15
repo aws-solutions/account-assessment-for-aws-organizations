@@ -6,7 +6,7 @@ from moto import mock_sts
 
 from aws.services.security_token_service import SecurityTokenService
 
-logger = Logger(loglevel="info")
+logger = Logger(level="info")
 
 
 @mock_sts

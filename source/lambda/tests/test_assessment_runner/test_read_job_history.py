@@ -12,7 +12,7 @@ from tests.test_utils.testdata_factory import job_create_request
 
 item1 = job_create_request()
 item2 = job_create_request(job_status='FINISHED')
-logger = Logger(loglevel="info")
+logger = Logger(level="info")
 
 
 def describe_read_job_history():

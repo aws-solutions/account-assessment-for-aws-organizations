@@ -28,7 +28,7 @@ def test_replace_dict_key():
 
 def test_replace_datetime_to_str_in_dict():
     old_mapping = {
-        'Arn': 'arn:aws:organizations::123456789012:account/o-6d3y5hgnah/823024189466',
+        'Arn': 'arn:aws:organizations::999999999999:account/o-6d3y5hgnah/823024189466',
         'Email': 'dev@mock',
         'Name': 'Developer1',
         'Status': 'ACTIVE',

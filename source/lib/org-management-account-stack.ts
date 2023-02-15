@@ -8,7 +8,7 @@ import {addCfnSuppressRules} from '@aws-solutions-constructs/core';
 import {DELEGATED_ADMIN_SCAN, RESOURCE_BASED_POLICY_SCAN, TRUSTED_ACCESS_SCAN} from "./account-assessment-hub-stack";
 
 
-export const ORG_MANAGEMENT_ROLE_NAME = 'AccountAssessment-OrgManagementStackRole';
+export const ORG_MANAGEMENT_ROLE_NAME = 'AccountAssessment-OrgMgmtStackRole';
 
 interface OrgManagementAccountStackProps extends StackProps {
 

@@ -4,12 +4,12 @@ import json
 
 import boto3
 from aws_lambda_powertools import Logger
-
-from resource_based_policy.step_functions_lambda.scan_policy_all_services import VPCEndpointsPolicy
 from moto import mock_sts, mock_ec2
+
+from resource_based_policy.step_functions_lambda.scan_vpc_endpoints_policy import VPCEndpointsPolicy
 from tests.test_resource_based_policy.mock_data import event, mock_policies
 
-logger = Logger(loglevel="info")
+logger = Logger(level="info")
 
 
 @mock_sts

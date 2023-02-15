@@ -93,7 +93,7 @@ class SuppressCfnNagW12ForLambdaFunctions implements IAspect {
 
 cdk.Aspects.of(app).add(new SuppressCfnNagW12ForLambdaFunctions());
 
-const appRegister = new AppRegister({
+export const APP_REGISTER = new AppRegister({
   solutionId: SOLUTION_ID,
   solutionName: SOLUTION_NAME.replace(/\s/g, ''),
   solutionDomain: "CloudFoundations",
@@ -102,6 +102,7 @@ const appRegister = new AppRegister({
   applicationType: "AWS-Solutions",
 });
 
-appRegister.applyAppRegistryToStacks(accountAssessmentHubStack, [spokeStack, orgManagementAccountStack], []);
+APP_REGISTER.applyAppRegistryToStacks(accountAssessmentHubStack, [spokeStack, orgManagementAccountStack], []);
 
 app.synth();
+

@@ -1,6 +1,5 @@
 # Copyright Amazon.com,Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
-
 # !/bin/python
 
 from os import getenv
@@ -39,8 +38,17 @@ class CloudFormation:
             self.logger.info("Extending Stack Summaries")
             stack_summaries.extend(response.get('StackSummaries', []))
             next_token = response.get('NextToken', None)
+        self.logger.debug(stack_summaries)
 
-        return stack_summaries
+        filtered_undeleted_stacks = list(
+            filter(
+                lambda stack: "DELETE" not in stack['StackStatus'],
+                stack_summaries
+            )
+        )
+        self.logger.debug(filtered_undeleted_stacks)
+
+        return filtered_undeleted_stacks
 
     @resource_not_found_exception_handler
     def get_stack_policy(self, stack_name: str) -> GetStackPolicyOutputTypeDef:

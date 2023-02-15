@@ -15,10 +15,10 @@ import {
   Tags,
 } from "aws-cdk-lib";
 import * as appreg from "@aws-cdk/aws-servicecatalogappregistry-alpha";
-import {CfnApplication} from "aws-cdk-lib/aws-applicationinsights";
-import {CfnAttributeGroupAssociation, CfnResourceAssociation,} from "aws-cdk-lib/aws-servicecatalogappregistry";
-import {CfnResourceShare} from "aws-cdk-lib/aws-ram";
-import {IConstruct} from "constructs";
+import { CfnApplication } from "aws-cdk-lib/aws-applicationinsights";
+import { CfnAttributeGroupAssociation, CfnResourceAssociation, } from "aws-cdk-lib/aws-servicecatalogappregistry";
+import { CfnResourceShare } from "aws-cdk-lib/aws-ram";
+import { IConstruct } from "constructs";
 
 export interface AppRegisterProps {
   solutionId: string;
@@ -78,7 +78,10 @@ export class AppRegister {
       stack,
       "DefaultApplicationAttributes",
       {
-        attributeGroupName: Aws.STACK_NAME,
+        attributeGroupName: Fn.join("-", [
+          Aws.REGION,
+          Aws.STACK_NAME
+        ]),
         description: "Attribute group for solution information",
         attributes: {
           applicationType: map.findInMap("Data", "ApplicationType"),
@@ -269,7 +272,10 @@ export class AppRegister {
       spokeStack,
       "DefaultApplicationAttributes",
       {
-        attributeGroupName: Aws.STACK_NAME,
+        attributeGroupName: Fn.join("-", [
+          Aws.REGION,
+          Aws.STACK_NAME
+        ]),
         description: "Attribute group for solution information",
         attributes: {
           applicationType: map.findInMap("Data", "ApplicationType"),

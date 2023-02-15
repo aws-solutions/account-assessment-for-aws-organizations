@@ -56,51 +56,52 @@ ts-node under MIT
 typescript under Apache-2.0
 
 pip packages:
- aws-xray-sdk               2.10.0         Apache Software License
- boto3                      1.24.89        Apache Software License
- botocore                   1.27.89        Apache Software License
- cfnresponse                1.1.2          Apache Software License
- s3transfer                 0.6.0          Apache Software License
- requests                   2.28.1         Apache Software License
- python-dateutil            2.8.2          Apache Software License; BSD License
- fastjsonschema             2.16.2         BSD License
- wrapt                      1.14.1         BSD License
- boto3-stubs                1.24.89        MIT License
- botocore-stubs             1.27.89        MIT License
- jmespath                   1.0.1          MIT License
- mypy-boto3-apigateway      1.24.36.post1  MIT License
- mypy-boto3-backup          1.24.36.post1  MIT License
- mypy-boto3-cloudformation  1.24.36.post1  MIT License
- mypy-boto3-codeartifact    1.24.36.post1  MIT License
- mypy-boto3-codebuild       1.24.36.post1  MIT License
- mypy-boto3-config          1.24.59        MIT License
- mypy-boto3-dynamodb        1.24.74        MIT License
- mypy-boto3-ec2             1.24.86        MIT License
- mypy-boto3-ecr             1.24.36.post1  MIT License
- mypy-boto3-efs             1.24.36.post1  MIT License
- mypy-boto3-events          1.24.36.post1  MIT License
- mypy-boto3-glacier         1.24.36.post1  MIT License
- mypy-boto3-glue            1.24.87        MIT License
- mypy-boto3-iam             1.24.59        MIT License
- mypy-boto3-iot             1.24.46        MIT License
- mypy-boto3-kms             1.24.36.post1  MIT License
- mypy-boto3-lambda          1.24.54        MIT License
- mypy-boto3-mediastore      1.24.36.post1  MIT License
- mypy-boto3-opensearch      1.24.40        MIT License
- mypy-boto3-organizations   1.24.36.post1  MIT License
- mypy-boto3-rds             1.24.76        MIT License
- mypy-boto3-s3              1.24.76        MIT License
- mypy-boto3-secretsmanager  1.24.83        MIT License
- mypy-boto3-serverlessrepo  1.24.36.post1  MIT License
- mypy-boto3-sesv2           1.24.36.post1  MIT License
- mypy-boto3-sns             1.24.68        MIT License
- mypy-boto3-sqs             1.24.60        MIT License
- mypy-boto3-ssm-incidents   1.24.36.post1  MIT License
- mypy-boto3-stepfunctions   1.24.36.post1  MIT License
- mypy-boto3-sts             1.24.36.post1  MIT License
- six                        1.16.0         MIT License
- types-awscrt               0.14.7         MIT License
- types-s3transfer           0.6.0.post4    MIT License
- urllib3                    1.26.12        MIT License
- aws-lambda-powertools      1.30.0         MIT No Attribution
- typing-extensions          4.4.0          Python Software Foundation License
+ aws-xray-sdk               Apache Software License
+ boto3                      Apache Software License
+ botocore                   Apache Software License
+ cfnresponse                Apache Software License
+ s3transfer                 Apache Software License
+ requests                   Apache Software License
+ python-dateutil            Apache Software License; BSD License
+ fastjsonschema             BSD License
+ wrapt                      BSD License
+ boto3-stubs                MIT License
+ botocore-stubs             MIT License
+ jmespath                   MIT License
+ mypy-boto3-apigateway      MIT License
+ mypy-boto3-backup          MIT License
+ mypy-boto3-cloudformation  MIT License
+ mypy-boto3-codeartifact    MIT License
+ mypy-boto3-codebuild       MIT License
+ mypy-boto3-config          MIT License
+ mypy-boto3-dynamodb        MIT License
+ mypy-boto3-ec2             MIT License
+ mypy-boto3-ecr             MIT License
+ mypy-boto3-efs             MIT License
+ mypy-boto3-events          MIT License
+ mypy-boto3-glacier         MIT License
+ mypy-boto3-glue            MIT License
+ mypy-boto3-iam             MIT License
+ mypy-boto3-iot             MIT License
+ mypy-boto3-kms             MIT License
+ mypy-boto3-lambda          MIT License
+ mypy-boto3-mediastore      MIT License
+ mypy-boto3-opensearch      MIT License
+ mypy-boto3-organizations   MIT License
+ mypy-boto3-rds             MIT License
+ mypy-boto3-s3              MIT License
+ mypy-boto3-secretsmanager  MIT License
+ mypy-boto3-serverlessrepo  MIT License
+ mypy-boto3-sesv2           MIT License
+ mypy-boto3-sns             MIT License
+ mypy-boto3-sqs             MIT License
+ mypy-boto3-ssm-incidents   MIT License
+ mypy-boto3-stepfunctions   MIT License
+ mypy-boto3-sts             MIT License
+ six                        MIT License
+ types-awscrt               MIT License
+ types-s3transfer           MIT License
+ urllib3                    MIT License
+ pyparsing                  MIT License
+ aws-lambda-powertools      MIT No Attribution
+ typing-extensions          Python Software Foundation License

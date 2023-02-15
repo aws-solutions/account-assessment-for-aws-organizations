@@ -1,18 +1,17 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 import io
-import json
 import zipfile
 
 import boto3
 from aws_lambda_powertools import Logger
 from botocore.exceptions import ClientError
-
-from resource_based_policy.step_functions_lambda.scan_policy_all_services import LambdaFunctionPolicy
 from moto import mock_lambda, mock_sts
+
+from resource_based_policy.step_functions_lambda.scan_lambda_function_policy import LambdaFunctionPolicy
 from tests.test_resource_based_policy.mock_data import event
 
-logger = Logger(loglevel="info")
+logger = Logger(level="info")
 
 
 @mock_sts
@@ -69,7 +68,7 @@ def test_lambda_function_organization_policy_scan(iam_client):
             FunctionName=function_name,
             StatementId="1",
             Action="lambda:ListTags",
-            Principal="arn:aws:iam::123456789012:user/SomeUser",
+            Principal="arn:aws:iam::999999999999:user/SomeUser",
             PrincipalOrgID='o-a1b2c3d4e5'
         )
 

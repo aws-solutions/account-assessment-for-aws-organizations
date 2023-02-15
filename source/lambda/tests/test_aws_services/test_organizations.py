@@ -6,7 +6,7 @@ from moto import mock_sts
 
 from aws.services.organizations import Organizations
 
-logger = Logger(loglevel="info")
+logger = Logger(level="info")
 
 
 @mock_sts

@@ -11,7 +11,7 @@ from aws.services.organizations import Organizations
 from resource_based_policy.step_functions_lambda.validate_account_access import \
     ValidateAccountAccess, ValidationType
 
-logger = Logger(loglevel="info")
+logger = Logger(level="info")
 
 
 @mock_sts
@@ -21,7 +21,7 @@ def test_valid_account(organizations_setup):
     all_accounts = Organizations().list_accounts()
     logger.info(all_accounts)
     event = {
-        "AccountId": '123456789012',
+        "AccountId": '999999999999',
         "Regions": ['us-east-1', 'us-east-2'],
         "ServiceNames": ['s3', 'config'],
         "JobId": job_id

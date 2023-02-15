@@ -1,6 +1,7 @@
 # Account Assessment for AWS Organizations
 
-Account Assessment for AWS Organizations programmatically scans all AWS accounts in an AWS Organization for identity-based and resource-based policies with Organization-based conditions.
+Account Assessment for AWS Organizations programmatically scans all AWS accounts in an AWS Organization for
+identity-based and resource-based policies with Organization-based conditions.
 
 **[🚀Solution Landing Page](https://aws.amazon.com/solutions/implementations/account-assessment-for-aws-organizations)**
 

@@ -8,7 +8,7 @@ from resource_based_policy.step_functions_lambda.check_policy_for_organizations_
 from resource_based_policy.resource_based_policy_model import PolicyDocumentModel, PolicyAnalyzerRequest, \
     PolicyAnalyzerResponse
 
-logger = Logger(loglevel="info")
+logger = Logger(level="info")
 principal_org_id_policy = {
     "Version": "2012-10-17",
     "Statement": {

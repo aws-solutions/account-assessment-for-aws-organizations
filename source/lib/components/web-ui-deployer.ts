@@ -1,11 +1,11 @@
-import {Construct} from "constructs";
+import { Construct } from "constructs";
 import * as cdk from "aws-cdk-lib";
-import {CustomResource} from "aws-cdk-lib";
+import { CustomResource } from "aws-cdk-lib";
 import * as lambda from "aws-cdk-lib/aws-lambda";
-import {AssetCode, Runtime} from "aws-cdk-lib/aws-lambda";
-import {CognitoAuthenticationResources} from "./cognito-authenticator";
-import {Bucket, IBucket} from "aws-cdk-lib/aws-s3";
-import {Distribution} from "aws-cdk-lib/aws-cloudfront";
+import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
+import { CognitoAuthenticationResources } from "./cognito-authenticator";
+import { Bucket, IBucket } from "aws-cdk-lib/aws-s3";
+import { Distribution } from "aws-cdk-lib/aws-cloudfront";
 
 type WebUIDeployerProps = {
   region: string,
@@ -79,7 +79,7 @@ export class WebUIDeployer extends Construct {
       tracing: lambda.Tracing.ACTIVE,
       code: assetCode,
       handler: 'deploy_webui/deploy_webui.lambda_handler',
-      timeout: cdk.Duration.seconds(300),
+      timeout: cdk.Duration.minutes(5),
       environment: {
         LOG_LEVEL: 'INFO',
         CONFIG: JSON.stringify(webUiDeploymentConfig),

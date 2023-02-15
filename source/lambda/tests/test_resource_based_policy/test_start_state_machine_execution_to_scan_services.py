@@ -18,7 +18,7 @@ from resource_based_policy.supported_configuration.supported_regions_and_service
 from utils.api_gateway_lambda_handler import ClientException
 from utils.base_repository import BaseRepository
 
-logger = Logger(loglevel="info")
+logger = Logger(level="info")
 
 
 def describe_parse_request():

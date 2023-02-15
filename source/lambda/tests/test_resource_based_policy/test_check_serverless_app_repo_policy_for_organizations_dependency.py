@@ -6,7 +6,7 @@ from resource_based_policy.step_functions_lambda.check_policy_for_organizations_
     CheckServerlessAppRepoForOrganizationsDependency
 from resource_based_policy.resource_based_policy_model import PolicyAnalyzerResponse
 
-logger = Logger(loglevel="info")
+logger = Logger(level="info")
 
 principal_org_id_policy = {'ResourceName': 'test-application-1',
                            'Policy': '[{\"Actions\": [\"GetApplication\", \"ListApplicationVersions\", \"ListApplicationDependencies\",\"SearchApplications\", \"UnshareApplication\"], \"PrincipalOrgIDs\": [\"o-a1b1c3d4e5\"], \"Principals\": [\"*\"], \"StatementId\": \"b90708e4-8b1d-4147-ad13-63929c3432f3\"}]'
