@@ -2,13 +2,14 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 
-from aws_lambda_powertools import Logger
-from resource_based_policy.step_functions_lambda.scan_policy_all_services import IAMPolicy
 import pytest
+from aws_lambda_powertools import Logger
 from moto import mock_iam, mock_sts
+
+from resource_based_policy.step_functions_lambda.scan_iam_policy import IAMPolicy
 from tests.test_resource_based_policy.mock_data import mock_policies, event
 
-logger = Logger(loglevel="info")
+logger = Logger(level="info")
 
 
 @mock_sts

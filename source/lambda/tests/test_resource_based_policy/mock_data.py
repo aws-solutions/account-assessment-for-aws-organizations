@@ -178,7 +178,7 @@ mock_policies = [
                     "Action": "sqs:TagQueue",
                     "Resource": "arn:aws:sqs:us-east-1:999999999999:test-queue-for-org",
                     "Condition": {
-                        "ArnEquals": {
+                        "StringEquals": {
                             "aws:PrincipalOrgID": "o-abcd1234"
                         }
                     }

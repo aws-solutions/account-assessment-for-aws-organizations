@@ -4,11 +4,12 @@ import json
 
 import boto3
 from aws_lambda_powertools import Logger
-from resource_based_policy.step_functions_lambda.scan_policy_all_services import CloudFormationStackPolicy
 from moto import mock_cloudformation, mock_sts
+
+from resource_based_policy.step_functions_lambda.scan_cloudformation_stack_policy import CloudFormationStackPolicy
 from tests.test_resource_based_policy.mock_data import mock_policies, event
 
-logger = Logger(loglevel="info")
+logger = Logger(level="info")
 
 
 @mock_sts
@@ -65,6 +66,46 @@ def test_cloudformation_policy_scan():
 
     # ASSERT
     assert len(list(response)) == 12
+    for resource in response:
+        assert resource['DependencyType'] in [
+            'aws:PrincipalOrgID',
+            'aws:PrincipalOrgPaths',
+            'aws:ResourceOrgID',
+            'aws:ResourceOrgPaths'
+        ]
+
+
+@mock_sts
+@mock_cloudformation
+def test_cloudformation_policy_scan_with_filter_deleted_stacks():
+    # ARRANGE
+    for region in event['Regions']:
+        cloudformation_client = boto3.client("cloudformation", region_name=region)
+        delete_count = 3
+        count = 0
+        for policy_object in mock_policies:
+            if policy_object.get('MockResourceName'):
+                cloudformation_client.create_stack(
+                    StackName=policy_object.get('MockResourceName'),
+                    TemplateBody=json.dumps(MOCK_TEMPLATE)
+                )
+                if policy_object.get('MockPolicy'):
+                    cloudformation_client.set_stack_policy(
+                        StackName=policy_object.get('MockResourceName'),
+                        StackPolicyBody=json.dumps(policy_object.get('MockPolicy')))
+
+            if count < delete_count:
+                cloudformation_client.delete_stack(
+                    StackName=policy_object.get('MockResourceName')
+                )
+            count += 1
+
+    # ACT
+    response = CloudFormationStackPolicy(event).scan()
+    logger.info(response)
+
+    # ASSERT
+    assert len(list(response)) == 6
     for resource in response:
         assert resource['DependencyType'] in [
             'aws:PrincipalOrgID',

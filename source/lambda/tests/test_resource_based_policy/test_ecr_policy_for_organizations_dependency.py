@@ -4,11 +4,13 @@ import json
 
 import boto3
 from aws_lambda_powertools import Logger
-from resource_based_policy.step_functions_lambda.scan_policy_all_services import EC2ContainerRegistryRepositoryPolicy
 from moto import mock_ecr, mock_sts
+
+from resource_based_policy.step_functions_lambda.scan_ec2_container_registry_repository_policy import \
+    EC2ContainerRegistryRepositoryPolicy
 from tests.test_resource_based_policy.mock_data import mock_policies, event
 
-logger = Logger(loglevel="info")
+logger = Logger(level="info")
 
 
 @mock_sts

@@ -4,12 +4,13 @@ import json
 
 import boto3
 from aws_lambda_powertools import Logger
-from resource_based_policy.step_functions_lambda.scan_policy_all_services import SQSQueuePolicy
 from moto import mock_sts, mock_sqs
-from tests.test_resource_based_policy.mock_data import event, mock_policies
 from mypy_boto3_sqs.literals import QueueAttributeNameType
 
-logger = Logger(loglevel="info")
+from resource_based_policy.step_functions_lambda.scan_sqs_queue_policies import SQSQueuePolicy
+from tests.test_resource_based_policy.mock_data import event, mock_policies
+
+logger = Logger(level="info")
 
 
 @mock_sts

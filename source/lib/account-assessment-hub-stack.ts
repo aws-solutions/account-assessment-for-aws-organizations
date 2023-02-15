@@ -64,6 +64,13 @@ export class AccountAssessmentHubStack extends cdk.Stack {
       type: 'String'
     });
 
+    const multiFactorAuthentication = new CfnParameter(this, 'MultiFactorAuthentication', {
+      description: "Set to 'ON' or 'OPTIONAL' to enable multi factor authentication for Cognito User Pool.",
+      default: 'OPTIONAL',
+      allowedValues: ['ON', 'OPTIONAL'],
+      type: 'String'
+    });
+
     const userEmail = new CfnParameter(this, 'UserEmail', {
       allowedPattern: '^(([^<>()\\[\\]\\\\.,;:\\s@"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@"]+)*)|(".+"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$', // source: http://emailregex.com/
       description: 'Admin user will be created at deployment time. Provide an email address to create this initial Cognito user.',
@@ -77,6 +84,7 @@ export class AccountAssessmentHubStack extends cdk.Stack {
       emailTitle: "Account Assessment for AWS Organizations",
       emailSubject: "WebUI Credentials - Account Assessment for AWS Organizations",
       cognitoDomainPrefix,
+      multiFactorAuthentication,
       userEmail
     }).cognitoAuthenticationResources
 
@@ -94,7 +102,7 @@ export class AccountAssessmentHubStack extends cdk.Stack {
           },
           {
             Label: {default: "Web UI Configuration"},
-            Parameters: [userEmail.logicalId, cognitoDomainPrefix.logicalId]
+            Parameters: [userEmail.logicalId, cognitoDomainPrefix.logicalId, multiFactorAuthentication.logicalId]
           },
           {
             Label: {default: "Security Configuration"},
@@ -113,6 +121,9 @@ export class AccountAssessmentHubStack extends cdk.Stack {
           },
           [cognitoDomainPrefix.logicalId]: {
             default: "Provide a prefix for the hosted Amazon Cognito domain",
+          },
+          [multiFactorAuthentication.logicalId]: {
+            default: "Set MFA for Cognito to 'ON' or 'OPTIONAL'",
           },
           [allowListedIPRanges.logicalId]: {
             default: "Provide CIDR ranges that allow to console to access the API.",

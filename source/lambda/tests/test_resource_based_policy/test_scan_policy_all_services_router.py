@@ -6,7 +6,7 @@ from resource_based_policy.step_functions_lambda.scan_policy_all_services_router
 from moto import mock_sts, mock_dynamodb, mock_s3
 from tests.test_resource_based_policy.mock_data import event
 
-logger = Logger(loglevel="info")
+logger = Logger(level="info")
 event['ServiceName'] = 's3'
 context = {}
 

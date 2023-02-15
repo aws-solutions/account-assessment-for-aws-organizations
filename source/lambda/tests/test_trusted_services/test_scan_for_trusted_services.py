@@ -8,7 +8,7 @@ from moto import mock_sts
 from trusted_access_enabled_services.scan_for_trusted_services import \
     TrustedAccessStrategy
 
-logger = Logger(loglevel="info")
+logger = Logger(level="info")
 
 
 @mock_sts

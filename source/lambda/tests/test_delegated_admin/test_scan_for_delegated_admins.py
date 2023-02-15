@@ -8,7 +8,7 @@ from moto import mock_sts
 from delegated_admins.scan_for_delegated_admins import \
     DelegatedAdminsStrategy
 
-logger = Logger(loglevel="info")
+logger = Logger(level="info")
 
 
 @mock_sts

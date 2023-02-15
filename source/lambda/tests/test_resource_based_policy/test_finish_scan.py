@@ -11,7 +11,7 @@ from tests.test_utils.testdata_factory import job_create_request
 
 request1: JobCreateRequest = job_create_request()
 request2 = job_create_request()
-logger = Logger(loglevel="info")
+logger = Logger(level="info")
 
 
 def describe_finish_scan():

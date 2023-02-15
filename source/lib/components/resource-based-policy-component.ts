@@ -1,11 +1,11 @@
-import {Construct} from "constructs";
-import {AssessmentComponentProps, SimpleAssessmentComponent} from "./simple-assessment-component";
+import { Construct } from "constructs";
+import { AssessmentComponentProps, SimpleAssessmentComponent } from "./simple-assessment-component";
 import * as lambda from "aws-cdk-lib/aws-lambda";
-import {Runtime} from "aws-cdk-lib/aws-lambda";
-import {CfnRole, PolicyStatement} from "aws-cdk-lib/aws-iam";
-import {AuthorizationType, JsonSchemaType, LambdaIntegration} from "aws-cdk-lib/aws-apigateway";
-import {createStateMachine} from "./resource-based-policy-state-machine";
-import {Duration} from "aws-cdk-lib";
+import { Runtime } from "aws-cdk-lib/aws-lambda";
+import { CfnRole, PolicyStatement } from "aws-cdk-lib/aws-iam";
+import { AuthorizationType, JsonSchemaType, LambdaIntegration } from "aws-cdk-lib/aws-apigateway";
+import { createStateMachine } from "./resource-based-policy-state-machine";
+import { Duration } from "aws-cdk-lib";
 
 export const SPOKE_EXECUTION_ROLE_NAME = "AccountAssessment-Spoke-ExecutionRole";
 export const VALIDATION_ACCOUNT_ACCESS_ROLE_NAME = 'ValidateSpokeAccountAccess'
@@ -61,7 +61,8 @@ export class ResourceBasedPolicyComponent extends SimpleAssessmentComponent {
     const validateAccountAccessFunction = new lambda.Function(this, 'ValidateSpokeAccountAccess', {
       runtime: lambda.Runtime.PYTHON_3_9,
       tracing: lambda.Tracing.ACTIVE,
-      timeout: Duration.minutes(5),
+      timeout: Duration.minutes(15),
+      memorySize: 1024,
       code: assetCode,
       handler: `${componentSubDirectoryInLambdaCode}/step_functions_lambda/validate_account_access.lambda_handler`,
       environment: {
@@ -91,6 +92,7 @@ export class ResourceBasedPolicyComponent extends SimpleAssessmentComponent {
       runtime: lambda.Runtime.PYTHON_3_9,
       tracing: lambda.Tracing.ACTIVE,
       timeout: Duration.minutes(15),
+      memorySize: 512,
       code: assetCode,
       handler: `${componentSubDirectoryInLambdaCode}/step_functions_lambda/scan_policy_all_services_router.lambda_handler`,
       environment: {
@@ -119,7 +121,7 @@ export class ResourceBasedPolicyComponent extends SimpleAssessmentComponent {
     const finishScan = new lambda.Function(this, 'FinishAsyncJob', {
       runtime: Runtime.PYTHON_3_9,
       tracing: lambda.Tracing.ACTIVE,
-      timeout: Duration.seconds(20),
+      timeout: Duration.minutes(1),
       code: assetCode,
       handler: `${componentSubDirectoryInLambdaCode}/finish_scan.lambda_handler`,
       environment: {

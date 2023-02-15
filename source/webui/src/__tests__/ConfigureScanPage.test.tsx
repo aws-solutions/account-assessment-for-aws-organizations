@@ -92,7 +92,7 @@ describe('the ConfigureScanPage', () => {
       const accountSelectionStrategyOption = within(editConfigCard).getByRole('radio', {name: 'Accounts IDs specified below'});
 
       await userEvent.click(accountSelectionStrategyOption);
-      const accountIdTextArea = await within(editConfigCard).findByPlaceholderText("111111222222,123456789012");
+      const accountIdTextArea = await within(editConfigCard).findByPlaceholderText("111111222222,999999999999");
 
       // ACT
       await userEvent.click(accountIdTextArea);
@@ -127,7 +127,7 @@ describe('the ConfigureScanPage', () => {
 
 
       await userEvent.click(accountSelectionStrategyOption);
-      const accountIdTextArea = await within(editConfigCard).findByPlaceholderText("111111222222,123456789012");
+        const accountIdTextArea = await within(editConfigCard).findByPlaceholderText("111111222222,999999999999");
 
       // ACT
       await userEvent.click(accountIdTextArea);

@@ -340,9 +340,9 @@ export const ConfigureScanPage = () => {
                 errorText={accountIdValidationError}
               >
                 <Textarea
-                  placeholder="111111222222,123456789012"
-                  value={accountIdsToScan}
-                  onChange={({detail}) => {
+                    placeholder="111111222222,999999999999"
+                    value={accountIdsToScan}
+                    onChange={({detail}) => {
                     setAccountIdsToScan(detail.value);
                     if (accountIdValidationError) parseAccountIds(detail.value)
                   }}

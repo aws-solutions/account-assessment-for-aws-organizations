@@ -15,7 +15,7 @@ from utils.api_gateway_lambda_handler import ClientException
 
 item1 = job_create_request()
 item2 = job_create_request(job_status='FINISHED')
-logger = Logger(loglevel="info")
+logger = Logger(level="info")
 
 
 def describe_assessment_runner():

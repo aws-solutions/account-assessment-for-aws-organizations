@@ -1,16 +1,15 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
-import json
 
 import boto3
 from aws_lambda_powertools import Logger
+from moto import mock_sts, mock_events
 
 from resource_based_policy.resource_based_policy_model import ResourceBasedPolicyResponseModel
-from resource_based_policy.step_functions_lambda.scan_policy_all_services import EventBusPolicy
-from moto import mock_sts, mock_events
+from resource_based_policy.step_functions_lambda.scan_event_bus_policy import EventBusPolicy
 from tests.test_resource_based_policy.mock_data import event
 
-logger = Logger(loglevel="info")
+logger = Logger(level="info")
 
 
 @mock_sts

@@ -79,3 +79,14 @@ test('spoke stack synth doesnt crash', () => {
   // THEN
   expect(template).toMatchSnapshot();
 });
+
+test('solution doesnt crash', () => {
+  // GIVEN
+  process.env.SOLUTION_VERSION = '1.0.0';
+  process.env.SOLUTION_NAME = 'Account Assessment for AWS Organisations';
+  process.env.DIST_OUTPUT_BUCKET = 'solutions-features';
+  process.env.SOLUTION_TRADEMARKEDNAME = 'account-assessment-for-aws-organizations';
+
+  // THEN
+  expect(require("../bin/account-assessment-solution").APP_REGISTER).toBeTruthy();
+});

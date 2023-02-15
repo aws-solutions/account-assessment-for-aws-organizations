@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2023-02-16
+
+### Added
+
+- Optional Multi-factor authentication (MFA) for Cognito User Pool
+
+### Changed
+
+- Shortened the role name in OrgManagementStack to avoid name length constraints in some
+  regions. [#3](https://github.com/aws-solutions/account-assessment-for-aws-organizations/issues/3)
+- Encryption of DynamoDB tables from AWS owned to AWS managed key. Allows customers to view key metadata and audit key
+  use in AWS CloudTrail logs.
+- Increase Lambda function memory size to scan large number of accounts in AWS Organizations
+- Ignore deleted CloudFormation stacks in the Resource-based policy scan.
+- Fix typo to process next marker when listing IoT policies.
+
 ## [1.0.1] - 2022-01-11
 
 ### Changed

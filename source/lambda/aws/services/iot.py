@@ -34,9 +34,9 @@ class IoT:
 
         while marker is not None:
             self.logger.debug(f"Marker Returned: {marker})")
-            response = self.iot_client.list_policies(
+            response: ListPoliciesResponseTypeDef = self.iot_client.list_policies(
                 ascendingOrder=True,
-                Marker=marker
+                marker=marker
             )
             self.logger.info("Extending IoT Policies")
             iot_policies.extend(response.get('policies', []))

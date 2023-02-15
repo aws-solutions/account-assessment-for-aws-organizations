@@ -9,7 +9,7 @@ from trusted_access_enabled_services.trusted_services_repository import TrustedS
 
 
 def describe_read_trusted_services():
-    logger = Logger(loglevel="info")
+    logger = Logger(level="info")
 
     item1 = trusted_access_create_request('config.amazonaws.com')
     item2 = trusted_access_create_request('ram.amazonaws.com')

@@ -1,16 +1,17 @@
 import {Construct} from "constructs";
-import { aws_cognito as cognito, CfnOutput, CfnParameter, Duration } from "aws-cdk-lib";
-import {OAuthScope, UserPool, UserPoolClient} from "aws-cdk-lib/aws-cognito";
+import {aws_cognito as cognito, CfnOutput, CfnParameter, Duration} from "aws-cdk-lib";
+import {Mfa, OAuthScope, UserPool, UserPoolClient} from "aws-cdk-lib/aws-cognito";
 import {CfnAuthorizer} from "aws-cdk-lib/aws-apigateway";
 
 type CognitoAuthenticationProps = {
-    domainName: string,
-    region: string,
-    restApiId: string,
-    emailTitle: string,
-    emailSubject: string,
-    cognitoDomainPrefix: CfnParameter,
-    userEmail: CfnParameter
+  domainName: string,
+  region: string,
+  restApiId: string,
+  emailTitle: string,
+  emailSubject: string,
+  cognitoDomainPrefix: CfnParameter,
+  multiFactorAuthentication: CfnParameter,
+  userEmail: CfnParameter
 };
 
 export type CognitoAuthenticationResources = {
@@ -26,54 +27,60 @@ export class CognitoAuthenticator extends Construct {
     constructor(scope: Construct,
                 id: string,
                 {
-                    region,
-                    domainName,
-                    restApiId,
-                    emailTitle,
-                    emailSubject,
-                    cognitoDomainPrefix,
-                    userEmail
+                  region,
+                  domainName,
+                  restApiId,
+                  emailTitle,
+                  emailSubject,
+                  cognitoDomainPrefix,
+                  multiFactorAuthentication,
+                  userEmail
                 }: CognitoAuthenticationProps) {
         super(scope, id);
 
-        const createInvitationEmailBody = () => {
-            return "<p>" + emailTitle + "</p>" +
-                "<p>Here are your temporary login credentials for the WebUI: https://" + domainName + "</p>\n" +
-                "<p>\n" +
-                "Region: " + region + "<br />\n" +
-                "Username: <strong>{username}</strong><br />\n" +
-                "Temporary Password: <strong>{####}</strong>\n" +
-                "</p>";
-        }
+      const createInvitationEmailBody = () => {
+        return "<p>" + emailTitle + "</p>" +
+          "<p>Here are your temporary login credentials for the WebUI: https://" + domainName + "</p>\n" +
+          "<p>\n" +
+          "Region: " + region + "<br />\n" +
+          "Username: <strong>{username}</strong><br />\n" +
+          "Temporary Password: <strong>{####}</strong>\n" +
+          "</p>";
+      }
 
-        const userPool = new UserPool(this, 'FullAccessUsers', {
-                signInAliases: {
-                    email: true
-                },
-                passwordPolicy: {
-                    minLength: 8    ,
-                    requireLowercase: true,
-                    requireUppercase: true,
-                    requireDigits: true,
-                    requireSymbols: true,
-                    tempPasswordValidity: Duration.days(7)
-                },
-                selfSignUpEnabled: false,
-                userInvitation: {
-                    emailSubject: emailSubject,
-                    emailBody: createInvitationEmailBody()
-                }
-            }
-        );
-        userPool.addDomain('Domain', {
-            cognitoDomain: {
-                domainPrefix: cognitoDomainPrefix.valueAsString
-            }
-        });
-        const cloudFrontUrl = `https://${domainName}/`;
-        const userPoolClient = userPool.addClient('WebUIClient', {
-            authFlows: {
-                userSrp: true
+      const userPool = new UserPool(this, 'FullAccessUsers', {
+          signInAliases: {
+            email: true
+          },
+          passwordPolicy: {
+            minLength: 8,
+            requireLowercase: true,
+            requireUppercase: true,
+            requireDigits: true,
+            requireSymbols: true,
+            tempPasswordValidity: Duration.days(7)
+          },
+          selfSignUpEnabled: false,
+          userInvitation: {
+            emailSubject: emailSubject,
+            emailBody: createInvitationEmailBody()
+          },
+          mfa: multiFactorAuthentication.valueAsString as Mfa,
+          mfaSecondFactor: {
+            sms: false,
+            otp: true,
+          },
+        }
+      );
+      userPool.addDomain('Domain', {
+        cognitoDomain: {
+          domainPrefix: cognitoDomainPrefix.valueAsString
+        }
+      });
+      const cloudFrontUrl = `https://${domainName}/`;
+      const userPoolClient = userPool.addClient('WebUIClient', {
+        authFlows: {
+          userSrp: true
             },
             oAuth: {
                 callbackUrls: ["http://localhost:3000/", cloudFrontUrl],

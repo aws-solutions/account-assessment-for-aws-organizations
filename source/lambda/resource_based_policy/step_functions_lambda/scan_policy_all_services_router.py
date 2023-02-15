@@ -8,10 +8,36 @@ from aws_lambda_powertools import Logger, Tracer
 from aws_lambda_powertools.utilities.typing import LambdaContext
 from botocore.exceptions import ClientError
 
-import resource_based_policy.step_functions_lambda.scan_policy_all_services as service
 from assessment_runner.assessment_runner import write_task_failure
 from resource_based_policy.resource_based_policies_repository import ResourceBasedPoliciesRepository
 from resource_based_policy.resource_based_policy_model import ScanServiceRequestModel, ResourceBasedPolicyResponseModel
+from resource_based_policy.step_functions_lambda.scan_api_gateway_service_policy import APIGatewayPolicy
+from resource_based_policy.step_functions_lambda.scan_backup_vault_access_policy import BackupVaultAccessPolicy
+from resource_based_policy.step_functions_lambda.scan_cloudformation_stack_policy import CloudFormationStackPolicy
+from resource_based_policy.step_functions_lambda.scan_code_artifact_policy import CodeArtifactPolicy
+from resource_based_policy.step_functions_lambda.scan_code_build_resource_policy import CodeBuildResourcePolicy
+from resource_based_policy.step_functions_lambda.scan_config_rule_policy import ConfigRulePolicy
+from resource_based_policy.step_functions_lambda.scan_ec2_container_registry_repository_policy import \
+    EC2ContainerRegistryRepositoryPolicy
+from resource_based_policy.step_functions_lambda.scan_elastic_file_system_policy import ElasticFileSystemPolicy
+from resource_based_policy.step_functions_lambda.scan_event_bus_policy import EventBusPolicy
+from resource_based_policy.step_functions_lambda.scan_glacier_vault_policy import GlacierVaultPolicy
+from resource_based_policy.step_functions_lambda.scan_glue_resource_policy import GlueResourcePolicy
+from resource_based_policy.step_functions_lambda.scan_iam_policy import IAMPolicy
+from resource_based_policy.step_functions_lambda.scan_iot_policy import IoTPolicy
+from resource_based_policy.step_functions_lambda.scan_key_management_service_policy import KeyManagementServicePolicy
+from resource_based_policy.step_functions_lambda.scan_lambda_function_policy import LambdaFunctionPolicy
+from resource_based_policy.step_functions_lambda.scan_media_store_policy import MediaStorePolicy
+from resource_based_policy.step_functions_lambda.scan_open_search_domain_policy import OpenSearchDomainPolicy
+from resource_based_policy.step_functions_lambda.scan_s3_bucket_policy import S3BucketPolicy
+from resource_based_policy.step_functions_lambda.scan_secrets_manager_policy import SecretsManagerPolicy
+from resource_based_policy.step_functions_lambda.scan_serverless_application_policy import ServerlessApplicationPolicy
+from resource_based_policy.step_functions_lambda.scan_ses_identity_policy import SESIdentityPolicy
+from resource_based_policy.step_functions_lambda.scan_sns_topic_policy import SNSTopicPolicy
+from resource_based_policy.step_functions_lambda.scan_sqs_queue_policies import SQSQueuePolicy
+from resource_based_policy.step_functions_lambda.scan_ssm_incidents_response_plan_policy import \
+    SSMIncidentsResponsePlanPolicy
+from resource_based_policy.step_functions_lambda.scan_vpc_endpoints_policy import VPCEndpointsPolicy
 from resource_based_policy.supported_configuration.supported_regions_and_services import SUPPORTED_SERVICES
 
 logger = Logger(getenv('LOG_LEVEL'))
@@ -63,76 +89,76 @@ class ScanPolicyStrategy:
         self.logger = logger
 
     def scan_s3_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.S3BucketPolicy(self.event).scan()
+        return S3BucketPolicy(self.event).scan()
 
     def scan_glacier_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.GlacierVaultPolicy(self.event).scan()
+        return GlacierVaultPolicy(self.event).scan()
 
     def scan_iam_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.IAMPolicy(self.event).scan()
+        return IAMPolicy(self.event).scan()
 
     def scan_sns_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.SNSTopicPolicy(self.event).scan()
+        return SNSTopicPolicy(self.event).scan()
 
     def scan_sqs_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.SQSQueuePolicy(self.event).scan()
+        return SQSQueuePolicy(self.event).scan()
 
     def scan_lambda_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.LambdaFunctionPolicy(self.event).scan()
+        return LambdaFunctionPolicy(self.event).scan()
 
     def scan_elasticfilesystem_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.ElasticFileSystemPolicy(self.event).scan()
+        return ElasticFileSystemPolicy(self.event).scan()
 
     def scan_secretsmanager_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.SecretsManagerPolicy(self.event).scan()
+        return SecretsManagerPolicy(self.event).scan()
 
     def scan_iot_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.IoTPolicy(self.event).scan()
+        return IoTPolicy(self.event).scan()
 
     def scan_kms_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.KeyManagementServicePolicy(self.event).scan()
+        return KeyManagementServicePolicy(self.event).scan()
 
     def scan_apigateway_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.APIGatewayPolicy(self.event).scan()
+        return APIGatewayPolicy(self.event).scan()
 
     def scan_events_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.EventBusPolicy(self.event).scan()
+        return EventBusPolicy(self.event).scan()
 
     def scan_ses_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.SESIdentityPolicy(self.event).scan()
+        return SESIdentityPolicy(self.event).scan()
 
     def scan_ecr_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.EC2ContainerRegistryRepositoryPolicy(self.event).scan()
+        return EC2ContainerRegistryRepositoryPolicy(self.event).scan()
 
     def scan_config_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.ConfigRulePolicy(self.event).scan()
+        return ConfigRulePolicy(self.event).scan()
 
     def scan_ssm_incidents_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.SSMIncidentsResponsePlanPolicy(self.event).scan()
+        return SSMIncidentsResponsePlanPolicy(self.event).scan()
 
     def scan_opensearchservice_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.OpenSearchDomainPolicy(self.event).scan()
+        return OpenSearchDomainPolicy(self.event).scan()
 
     def scan_cloudformation_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.CloudFormationStackPolicy(self.event).scan()
+        return CloudFormationStackPolicy(self.event).scan()
 
     def scan_glue_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.GlueResourcePolicy(self.event).scan()
+        return GlueResourcePolicy(self.event).scan()
 
     def scan_serverlessrepo_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.ServerlessApplicationPolicy(self.event).scan()
+        return ServerlessApplicationPolicy(self.event).scan()
 
     def scan_backup_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.BackupVaultAccessPolicy(self.event).scan()
+        return BackupVaultAccessPolicy(self.event).scan()
 
     def scan_codeartifact_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.CodeArtifactPolicy(self.event).scan()
+        return CodeArtifactPolicy(self.event).scan()
 
     def scan_codebuild_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.CodeBuildResourcePolicy(self.event).scan()
+        return CodeBuildResourcePolicy(self.event).scan()
 
     def scan_mediastore_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.MediaStorePolicy(self.event).scan()
+        return MediaStorePolicy(self.event).scan()
 
     def scan_ec2_policy(self) -> Iterable[ResourceBasedPolicyResponseModel]:
-        return service.VPCEndpointsPolicy(self.event).scan()
+        return VPCEndpointsPolicy(self.event).scan()
