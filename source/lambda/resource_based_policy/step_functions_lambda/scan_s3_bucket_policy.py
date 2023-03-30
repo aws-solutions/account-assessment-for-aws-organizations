@@ -12,6 +12,7 @@ from resource_based_policy.step_functions_lambda.check_policy_for_organizations_
     CheckForOrganizationsDependency
 from resource_based_policy.step_functions_lambda.utils import DenormalizeResourceBasedPolicyResponse, \
     DenormalizePolicyAnalyzerRequest
+from resource_based_policy.supported_configuration.supported_regions_and_services import SupportedRegions
 
 
 class S3BucketPolicy:
@@ -22,7 +23,8 @@ class S3BucketPolicy:
 
     def scan(self) -> Iterable[model.ResourceBasedPolicyResponseModel]:
         bucket_names = self._get_bucket_names()
-        bucket_names_policies = self._get_bucket_policies(bucket_names)
+        bucket_data: list[model.S3Data] = self._get_s3_data(bucket_names)
+        bucket_names_policies = self._get_bucket_policies(bucket_data)
         resources_dependent_on_organizations: list[
             model.PolicyAnalyzerResponse] = CheckForOrganizationsDependency().scan(bucket_names_policies)
         return list(DenormalizeResourceBasedPolicyResponse(self.event).model(resource) for resource in
@@ -32,14 +34,32 @@ class S3BucketPolicy:
         bucket_objects: list[BucketTypeDef] = self.s3_client.list_buckets().get('Buckets', [])
         return [bucket.get('Name') for bucket in bucket_objects]
 
-    def _get_bucket_policies(self, bucket_names) -> list[model.PolicyAnalyzerRequest]:
+    def _get_s3_data(self, bucket_names) -> list[model.S3Data]:
+        return list(self.denormalize_to_s3_data(bucket) for bucket in bucket_names)
+
+    def denormalize_to_s3_data(self, bucket_name: str) -> model.S3Data:
+        data: model.S3Data = {
+            "BucketName": bucket_name,
+            "BucketRegion": self.s3_client.get_bucket_location(bucket_name)
+        }
+        return data
+
+    def _get_bucket_policies(self, s3_data: list[model.S3Data]) -> list[model.PolicyAnalyzerRequest]:
         bucket_names_policies = []
-        for bucket in bucket_names:
-            policy: GetBucketPolicyOutputTypeDef = self.s3_client.get_bucket_policy(bucket)
+        for s3 in s3_data:
+            s3_client = self._get_s3_client_with_regional_endpoint_if_opt_in_region(s3)
+            policy: GetBucketPolicyOutputTypeDef = s3_client.get_bucket_policy(s3['BucketName'])
             if policy.get('Policy'):
                 policy_object: model.PolicyAnalyzerRequest = DenormalizePolicyAnalyzerRequest().model(
-                    bucket,
+                    s3['BucketName'],
                     policy.get('Policy')
                 )
                 bucket_names_policies.append(policy_object)
         return bucket_names_policies
+
+    def _get_s3_client_with_regional_endpoint_if_opt_in_region(self, s3):
+        supported_regions = SupportedRegions().get_supported_region_objects(_event={}, _context={})
+        for supported in supported_regions:
+            if s3['BucketRegion'] == supported['Region'] and "Opt-In" in supported['RegionName']:
+                return S3(self.event['AccountId'], s3['BucketRegion'])
+        return self.s3_client

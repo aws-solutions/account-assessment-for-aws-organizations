@@ -56,6 +56,7 @@ export class SpokeStack extends Stack {
                     actions: [
                         "s3:GetBucketPolicy",
                         "s3:ListAllMyBuckets",
+                        "s3:GetBucketLocation",
                         "glacier:GetVaultAccessPolicy",
                         "glacier:ListVaults",
                         "sns:ListTopics", "sqs:ListQueues",

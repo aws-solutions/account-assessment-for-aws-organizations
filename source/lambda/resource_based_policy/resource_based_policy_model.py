@@ -94,6 +94,11 @@ class IAMPolicyData(TypedDict):
     PolicyName: str
 
 
+class S3Data(TypedDict):
+    BucketName: str
+    BucketRegion: str
+
+
 class LambdaFunctionData(TypedDict):
     FunctionName: str
 

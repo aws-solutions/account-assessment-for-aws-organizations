@@ -1,5 +1,6 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
+from typing import List
 
 from aws_lambda_powertools import Logger
 logger = Logger('info')
@@ -33,3 +34,13 @@ def convert_string_to_sorted_list_with_no_whitespaces(_string, delimiter=',') ->
 
 def remove_none_values_from_the_list(list_with_none_value: list) -> list:
     return list(filter(lambda item: item is not None, list_with_none_value))
+
+
+def split_list_by_batch_size(large_list: list, batch_size) -> List[List]:
+    logger.debug(
+        f"Creating the list of batches for the list"
+        f" {large_list} with batch size as {batch_size}")
+    chunk_start_indexes = range(0, len(large_list), batch_size)
+    chunks = [large_list[chunk_start:chunk_start + batch_size] for chunk_start in chunk_start_indexes]
+    logger.debug(f"Returning following batches: {chunks}")
+    return chunks

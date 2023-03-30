@@ -76,9 +76,10 @@ export class AppRegister {
 
     const attributeGroup = new appreg.AttributeGroup(
       stack,
-      "DefaultApplicationAttributes",
+      "DefaultApplicationAttributeGroup",
       {
         attributeGroupName: Fn.join("-", [
+          "A3O",
           Aws.REGION,
           Aws.STACK_NAME
         ]),
@@ -270,9 +271,10 @@ export class AppRegister {
 
     const attributeGroup = new appreg.AttributeGroup(
       spokeStack,
-      "DefaultApplicationAttributes",
+      "DefaultApplicationAttributeGroup",
       {
         attributeGroupName: Fn.join("-", [
+          "A3O",
           Aws.REGION,
           Aws.STACK_NAME
         ]),
