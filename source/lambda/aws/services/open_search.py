@@ -27,6 +27,7 @@ class OpenSearch:
     @service_exception_handler
     def list_domain_names(self) -> list[DomainInfoTypeDef]:
         response: ListDomainNamesResponseTypeDef = self.opensearch_client.list_domain_names()
+        self.logger.debug(response)
         return response.get('DomainNames', [])
 
     @resource_not_found_exception_handler

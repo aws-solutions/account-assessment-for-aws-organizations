@@ -3,7 +3,8 @@
 
 from aws_lambda_powertools import Logger
 
-from utils.list_utils import compare_lists, convert_string_to_sorted_list_with_no_whitespaces, remove_none_values_from_the_list
+from utils.list_utils import compare_lists, convert_string_to_sorted_list_with_no_whitespaces, \
+    remove_none_values_from_the_list, split_list_by_batch_size
 
 logger = Logger('info')
 
@@ -62,3 +63,17 @@ def test_remove_none_values_from_the_list():
 
     # ASSERT
     assert no_none_value_list == ['a', 'b', 'c']
+
+
+def test_split_list_by_batch_size():
+    # ARRANGE
+    long_list = ['aa', 'bb', 'cc', 'dd', 'ee', 'ff', 'gg', 'hh']
+
+    # ACT
+    chunked_list = split_list_by_batch_size(long_list, 5)
+
+    # ASSERT
+    assert chunked_list == [
+        ['aa', 'bb', 'cc', 'dd', 'ee'],
+        ['ff', 'gg', 'hh']
+    ]

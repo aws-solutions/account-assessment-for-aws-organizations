@@ -29,15 +29,153 @@ def test_mock_opensearch_scan_policy(mocker):
     # ARRANGE
     list_domain_names_response: list[DomainInfoTypeDef] = [
         {
-            "DomainName": "mock_domain_name",
+            "DomainName": "mock_domain_name_1",
+            "EngineType": "OpenSearch"
+        },
+        {
+            "DomainName": "mock_domain_name_2",
+            "EngineType": "OpenSearch"
+        },
+        {
+            "DomainName": "mock_domain_name_3",
+            "EngineType": "OpenSearch"
+        },
+        {
+            "DomainName": "mock_domain_name_4",
+            "EngineType": "OpenSearch"
+        },
+        {
+            "DomainName": "mock_domain_name_5",
+            "EngineType": "OpenSearch"
+        },
+        {
+            "DomainName": "mock_domain_name_6",
             "EngineType": "OpenSearch"
         }
     ]
 
     describe_domains_response: list[DomainStatusTypeDef] = [
         {
-            "DomainId": "mock_domain_id",
-            "DomainName": "mock_domain_name",
+            "DomainId": "mock_domain_id_1",
+            "DomainName": "mock_domain_name_1",
+            "ARN": "arn:mock_domain_name",
+            "ClusterConfig": {
+                "InstanceType": "c4.2xlarge.search",
+                "InstanceCount": 1,
+                "DedicatedMasterEnabled": False,
+                "ZoneAwarenessEnabled": False,
+                "ZoneAwarenessConfig": {
+                    "AvailabilityZoneCount": 1,
+                },
+                "DedicatedMasterType": "c4.2xlarge.search",
+                "DedicatedMasterCount": 1,
+                "WarmEnabled": False,
+                "WarmType": "ultrawarm1.large.search",
+                "WarmCount": 1,
+                "ColdStorageOptions": {
+                    "Enabled": False,
+                }
+            },
+            "AccessPolicies": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{"
+                              "\"AWS\":\"*\"},\"Action\":\"es:ESHttp*\","
+                              "\"Resource\":\"arn:aws:es:us-east-1:999999999999:domain/test-domain-1/*\","
+                              "\"Condition\":{\"StringEquals\":{\"aws:RequestedRegion\":[\"eu-west-1\",\"eu-west-2\","
+                              "\"eu-west-3\"]}}},{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},"
+                              "\"Action\":\"es:ESHttp*\","
+                              "\"Resource\":\"arn:aws:es:us-east-1:999999999999:domain/test-domain-1/*\","
+                              "\"Condition\":{\"StringEquals\":{\"aws:PrincipalOrgID\":\"o-abcd1234\"}}}]}"
+        },
+        {
+            "DomainId": "mock_domain_id_2",
+            "DomainName": "mock_domain_name_2",
+            "ARN": "arn:mock_domain_name",
+            "ClusterConfig": {
+                "InstanceType": "c4.2xlarge.search",
+                "InstanceCount": 1,
+                "DedicatedMasterEnabled": False,
+                "ZoneAwarenessEnabled": False,
+                "ZoneAwarenessConfig": {
+                    "AvailabilityZoneCount": 1,
+                },
+                "DedicatedMasterType": "c4.2xlarge.search",
+                "DedicatedMasterCount": 1,
+                "WarmEnabled": False,
+                "WarmType": "ultrawarm1.large.search",
+                "WarmCount": 1,
+                "ColdStorageOptions": {
+                    "Enabled": False,
+                }
+            }
+        },
+        {
+            "DomainId": "mock_domain_id_3",
+            "DomainName": "mock_domain_name_3",
+            "ARN": "arn:mock_domain_name",
+            "ClusterConfig": {
+                "InstanceType": "c4.2xlarge.search",
+                "InstanceCount": 1,
+                "DedicatedMasterEnabled": False,
+                "ZoneAwarenessEnabled": False,
+                "ZoneAwarenessConfig": {
+                    "AvailabilityZoneCount": 1,
+                },
+                "DedicatedMasterType": "c4.2xlarge.search",
+                "DedicatedMasterCount": 1,
+                "WarmEnabled": False,
+                "WarmType": "ultrawarm1.large.search",
+                "WarmCount": 1,
+                "ColdStorageOptions": {
+                    "Enabled": False,
+                }
+            }
+        },
+        {
+            "DomainId": "mock_domain_id_4",
+            "DomainName": "mock_domain_name_4",
+            "ARN": "arn:mock_domain_name",
+            "ClusterConfig": {
+                "InstanceType": "c4.2xlarge.search",
+                "InstanceCount": 1,
+                "DedicatedMasterEnabled": False,
+                "ZoneAwarenessEnabled": False,
+                "ZoneAwarenessConfig": {
+                    "AvailabilityZoneCount": 1,
+                },
+                "DedicatedMasterType": "c4.2xlarge.search",
+                "DedicatedMasterCount": 1,
+                "WarmEnabled": False,
+                "WarmType": "ultrawarm1.large.search",
+                "WarmCount": 1,
+                "ColdStorageOptions": {
+                    "Enabled": False,
+                }
+            }
+        },
+        {
+            "DomainId": "mock_domain_id_5",
+            "DomainName": "mock_domain_name_5",
+            "ARN": "arn:mock_domain_name",
+            "ClusterConfig": {
+                "InstanceType": "c4.2xlarge.search",
+                "InstanceCount": 1,
+                "DedicatedMasterEnabled": False,
+                "ZoneAwarenessEnabled": False,
+                "ZoneAwarenessConfig": {
+                    "AvailabilityZoneCount": 1,
+                },
+                "DedicatedMasterType": "c4.2xlarge.search",
+                "DedicatedMasterCount": 1,
+                "WarmEnabled": False,
+                "WarmType": "ultrawarm1.large.search",
+                "WarmCount": 1,
+                "ColdStorageOptions": {
+                    "Enabled": False,
+                }
+            }
+        },
+        {
+            "DomainId": "mock_domain_id_6",
+            "DomainName": "mock_domain_name_6",
             "ARN": "arn:mock_domain_name",
             "ClusterConfig": {
                 "InstanceType": "c4.2xlarge.search",
@@ -76,7 +214,7 @@ def test_mock_opensearch_scan_policy(mocker):
     logger.info(response)
 
     # ASSERT
-    assert len(list(response)) == 2
+    assert len(list(response)) == 4
     for resource in response:
         assert resource['DependencyType'] in [
             'aws:PrincipalOrgID',

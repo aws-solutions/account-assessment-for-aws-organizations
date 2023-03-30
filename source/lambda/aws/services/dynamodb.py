@@ -11,6 +11,7 @@ from boto3.dynamodb.conditions import Key
 from mypy_boto3_dynamodb.service_resource import DynamoDBServiceResource, Table
 from mypy_boto3_dynamodb.type_defs import QueryOutputTableTypeDef, ScanOutputTableTypeDef, \
     UpdateItemInputTableUpdateItemTypeDef, GetItemOutputTableTypeDef
+from utils.list_utils import split_list_by_batch_size
 
 MAX_BATCH_SIZE = 25
 
@@ -37,21 +38,11 @@ class DynamoDB:
         self.logger.debug(f"Putting following items in DynamoDB in batches :"
                           f" {items}")
 
-        list_of_chunks = self.split_list_by_batch_size(items)
+        list_of_chunks = split_list_by_batch_size(items, MAX_BATCH_SIZE)
         for chunk in list_of_chunks:
             self.logger.debug(f"Adding {len(chunk)} items to "
                               f"DynamoDB: {chunk}")
             self.put_batch_items(chunk)
-
-    def split_list_by_batch_size(self, large_list: list,
-                                 batch_size=MAX_BATCH_SIZE) -> List[List]:
-        self.logger.debug(f"Creating the list of batches for the list"
-                          f" {large_list} with batch size as {MAX_BATCH_SIZE}")
-        chunk_start_indexes = range(0, len(large_list), batch_size)
-        chunks = [large_list[chunk_start:chunk_start + batch_size]
-                  for chunk_start in chunk_start_indexes]
-        self.logger.debug(f"Returning following batches: {chunks}")
-        return chunks
 
     def put_batch_items(self, chunk: List):
         """

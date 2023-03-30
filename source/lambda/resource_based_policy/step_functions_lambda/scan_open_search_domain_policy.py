@@ -12,6 +12,7 @@ from resource_based_policy.step_functions_lambda.check_policy_for_organizations_
     CheckForOrganizationsDependency
 from resource_based_policy.step_functions_lambda.utils import DenormalizeResourceBasedPolicyResponse, \
     DenormalizePolicyAnalyzerRequest, scan_regions
+from utils.list_utils import split_list_by_batch_size
 
 
 class OpenSearchDomainPolicy:
@@ -55,14 +56,17 @@ class OpenSearchDomainPolicy:
             opensearch_client) -> list[model.PolicyAnalyzerRequest]:
         opensearch_policies = []
         if opensearch_data.get('DomainNames'):
-            domain_policies: list[DomainStatusTypeDef] = opensearch_client.describe_domains(
-                opensearch_data['DomainNames']
-            )
-            for policy in domain_policies:
-                if policy.get('AccessPolicies'):
-                    policy_object: model.PolicyAnalyzerRequest = DenormalizePolicyAnalyzerRequest().model(
-                        policy['DomainName'],
-                        policy['AccessPolicies']
-                    )
-                    opensearch_policies.append(policy_object)
+            # Describe API can process up to five specified OpenSearch Service domains
+            chunked_domain_list = split_list_by_batch_size(opensearch_data.get('DomainNames'), 5)
+            for domain_list in chunked_domain_list:
+                domain_policies: list[DomainStatusTypeDef] = opensearch_client.describe_domains(
+                    domain_list
+                )
+                for policy in domain_policies:
+                    if policy.get('AccessPolicies'):
+                        policy_object: model.PolicyAnalyzerRequest = DenormalizePolicyAnalyzerRequest().model(
+                            policy['DomainName'],
+                            policy['AccessPolicies']
+                        )
+                        opensearch_policies.append(policy_object)
         return opensearch_policies

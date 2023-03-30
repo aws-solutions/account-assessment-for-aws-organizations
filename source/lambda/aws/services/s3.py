@@ -4,35 +4,41 @@ import json
 from os import getenv
 from typing import Dict
 
+from aws_lambda_powertools import Logger
 from botocore.exceptions import ClientError
-from aws.utils.exceptions import resource_not_found_exception_handler, service_exception_handler
+from mypy_boto3_glacier.type_defs import DescribeVaultOutputTypeDef, VaultAccessPolicyTypeDef, ListVaultsOutputTypeDef
+from mypy_boto3_s3.type_defs import GetBucketPolicyOutputTypeDef, ListBucketsOutputTypeDef
+
 from aws.services.security_token_service import SecurityTokenService
 from aws.utils.boto3_session import Boto3Session
-from aws_lambda_powertools import Logger
-from mypy_boto3_s3.type_defs import GetBucketPolicyOutputTypeDef, ListBucketsOutputTypeDef
-from mypy_boto3_glacier.type_defs import DescribeVaultOutputTypeDef, VaultAccessPolicyTypeDef, ListVaultsOutputTypeDef
+from aws.utils.exceptions import resource_not_found_exception_handler, service_exception_handler
 
 
 class S3:
-    def __init__(self, account_id=None):
+    def __init__(self, account_id=None, region=getenv('AWS_REGION')):
         self.logger = Logger(service=self.__class__.__name__, level=getenv('LOG_LEVEL'))
         role_name = getenv('SPOKE_ROLE_NAME')
         if account_id:
-            self.logger.debug(f"Assuming role {role_name} in {account_id} to scan service: {self.__class__.__name__}")
+            self.logger.debug(f"Assuming role {role_name} in {account_id} to scan service: {self.__class__.__name__} "
+                              f"in region: {region}")
             account_credentials = SecurityTokenService().assume_role_by_name(account_id, role_name)
-            boto_session = Boto3Session('s3', credentials=account_credentials)
+            boto_session = Boto3Session('s3', credentials=account_credentials, region=region)
         else:
             boto_session = Boto3Session('s3')
         self.s3_client = boto_session.get_client()
 
+    @service_exception_handler
     def list_buckets(self) -> ListBucketsOutputTypeDef:
-        try:
-            response: ListBucketsOutputTypeDef = self.s3_client.list_buckets()
-            self.logger.debug(f"Buckets: {response}")
-            return response  # returns bucket information in all the regions
-        except ClientError as err:
-            self.logger.error(err)
-            raise
+        response: ListBucketsOutputTypeDef = self.s3_client.list_buckets()
+        self.logger.debug(f"Buckets: {response}")
+        return response  # returns bucket information in all the regions
+
+    @service_exception_handler
+    def get_bucket_location(self, bucket_name) -> str:
+        s3_bucket_region = self.s3_client.get_bucket_location(
+            Bucket=bucket_name
+        ).get('LocationConstraint')
+        return s3_bucket_region
 
     @resource_not_found_exception_handler
     def get_bucket_policy(self, bucket_name) -> GetBucketPolicyOutputTypeDef:
