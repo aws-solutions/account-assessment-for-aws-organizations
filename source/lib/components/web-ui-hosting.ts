@@ -47,16 +47,16 @@ export class WebUIHosting extends Construct {
       },
     });
 
-    const [s3BucketInterface] = defaults.buildS3Bucket(scope, {
+    const {bucket} = defaults.buildS3Bucket(scope, {
       bucketProps: {},
       loggingBucketProps: {},
       logS3AccessLogs: true
     });
-    this.s3BucketInterface = s3BucketInterface;
+    this.s3BucketInterface = bucket;
 
     this.cloudFrontToS3 = new CloudFrontToS3(scope, 'CloudFront',
       {
-        existingBucketObj: s3BucketInterface,
+        existingBucketObj: bucket,
         insertHttpSecurityHeaders: false,
         cloudFrontDistributionProps: {
           errorResponses: [

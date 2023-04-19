@@ -3,7 +3,9 @@
   "context": {
     "solution_id": "SO0217",
     "solution_name": "account-assessment-for-aws-organizations",
-    "solution_version": "%%VERSION%%"
+    "solution_version": "%%VERSION%%",
+    "@aws-cdk/aws-s3:serverAccessLogsUseBucketPolicy": true
+
   },
   "versionReporting": false
 }
