@@ -32,7 +32,7 @@
     "@aws-cdk/aws-servicecatalogappregistry-alpha": "^2.47.0-alpha.0",
     "@aws-solutions-constructs/aws-cloudfront-s3": "^2.38.0",
     "@aws-solutions-constructs/aws-wafwebacl-apigateway": "^2.38.0",
-    "aws-cdk-lib": "^2.74.0",
+    "aws-cdk-lib": "^2.80.0",
     "cdk-nag": "^2.18.38",
     "constructs": "^10.1.313"
   },
