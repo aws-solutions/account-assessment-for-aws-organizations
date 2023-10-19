@@ -72,6 +72,9 @@
     },
     "svgo": {
       "css-select": "~4.3.0"
+    },
+    "resolve-url-loader": {
+      "postcss": "8.4.31"
     }
   },
   "jest": {
