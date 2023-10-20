@@ -4,7 +4,7 @@ from os import getenv
 from typing import Iterable
 
 from aws_lambda_powertools import Logger
-from mypy_boto3_apigateway.type_defs import RestApiResponseMetadataTypeDef
+from mypy_boto3_apigateway.type_defs import RestApiResponseTypeDef
 
 import resource_based_policy.resource_based_policy_model as model
 from aws.services.api_gateway import APIGateway
@@ -35,11 +35,11 @@ class APIGatewayPolicy:
         return apigateway_resources_for_region
 
     def _get_apigateway_names_policies(self, apigateway_client) -> list[model.PolicyAnalyzerRequest]:
-        apigateway_objects: list[RestApiResponseMetadataTypeDef] = apigateway_client.get_rest_apis()
+        apigateway_objects: list[RestApiResponseTypeDef] = apigateway_client.get_rest_apis()
         return list(self.denormalize_to_apigateway_data(apigateway_data) for apigateway_data in apigateway_objects)
 
     @staticmethod
-    def denormalize_to_apigateway_data(apigateway_data: RestApiResponseMetadataTypeDef) -> model.PolicyAnalyzerRequest:
+    def denormalize_to_apigateway_data(apigateway_data: RestApiResponseTypeDef) -> model.PolicyAnalyzerRequest:
         if apigateway_data.get('policy'):
             return DenormalizePolicyAnalyzerRequest().model(
                 apigateway_data['name'],
