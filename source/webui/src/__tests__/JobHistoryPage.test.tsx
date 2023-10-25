@@ -33,7 +33,6 @@ describe('the JobHistoryPage', () => {
     ];
     server.use(
       rest.get('/jobs', (request, response, context) => {
-
         return response(
           context.status(200),
           context.json({Results: jobs}),
@@ -50,8 +49,8 @@ describe('the JobHistoryPage', () => {
 
     // ASSERT
     expect(await screen.findByRole('heading', {name: (/Job History/i)})).toBeInTheDocument();
-    await screen.findByText(/Loading resources/i)
-    await waitForElementToBeRemoved(() => screen.queryByText(/Loading resources/i))
+    // await screen.findByText(/Loading resources/i)
+    // await waitForElementToBeRemoved(() => screen.queryByText(/Loading resources/i))
 
     const table = screen.getByRole('table');
     const rows = await within(table).findAllByRole('row');

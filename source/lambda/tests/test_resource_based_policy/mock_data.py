@@ -187,7 +187,7 @@ mock_policies = [
         }
     },
     {
-        "MockResourceName": "ResourceWithNoPolicy",
+        "MockResourceName": "resource_with_no_policy",
     },
     {
         "MockPolicyName": "S3MockPolicy",

@@ -54,7 +54,7 @@ run_python_tests() {
 	echo "coverage report path set to $coverage_report_path"
 
 	# Use -vv for debugging
-	python3 -m pytest tests --cov "$component_path" --cov-config="$component_path/.coveragerc" --cov-report=term-missing --cov-report "xml:$coverage_report_path" --cov-report "html:$component_path/coverage"
+	python3 -m pytest tests --cov "$component_path" --cov-config="$component_path/.coveragerc" --cov-report=term-missing --cov-report "xml:$coverage_report_path" --cov-report "html:$component_path/coverage" -sv -ra -q -p tests.plugins.env_vars
 
     # The pytest --cov with its parameters and .coveragerc generates a xml cov-report with `coverage/sources` list
     # with absolute path for the source directories. To avoid dependencies of tools (such as SonarQube) on different

@@ -8,6 +8,7 @@ from typing import Dict, List
 import boto3
 from aws_lambda_powertools import Logger
 from boto3.dynamodb.conditions import Key
+from aws.utils.boto3_session import Boto3Session
 from mypy_boto3_dynamodb.service_resource import DynamoDBServiceResource, Table
 from mypy_boto3_dynamodb.type_defs import QueryOutputTableTypeDef, ScanOutputTableTypeDef, \
     UpdateItemInputTableUpdateItemTypeDef, GetItemOutputTableTypeDef
@@ -23,7 +24,7 @@ class DynamoDB:
 
     def __init__(self, table_name: str):
         self.logger = Logger(service=self.__class__.__name__, level=getenv('LOG_LEVEL'))
-        dynamodb_resource: DynamoDBServiceResource = boto3.resource('dynamodb')
+        dynamodb_resource: DynamoDBServiceResource = Boto3Session('dynamodb').get_resource()
         self.table: Table = dynamodb_resource.Table(table_name)
         self.next_token_returned_msg = "Next Token Returned: {}"
         self.logger.debug("Initialized client for DynamoDB table: " + self.table.table_name)

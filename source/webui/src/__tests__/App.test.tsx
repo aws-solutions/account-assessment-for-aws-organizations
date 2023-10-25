@@ -125,7 +125,7 @@ describe('the landing page', () => {
         await userEvent.click(screen.getByText(/Job History/i));
 
         // ASSERT
-        const heading = screen.getByRole('heading', {name: `Job History (0)`});
+        const heading = screen.getByRole('heading', {name: `Job History (2)`});
         expect(heading).toBeInTheDocument();
       });
 

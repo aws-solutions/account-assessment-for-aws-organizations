@@ -10,6 +10,7 @@ class MetricsDataModel(TypedDict):
     ServicesCount: str
     AccountsCount: str
     RegionsCount: str
+    Version: str
 
 
 class MetricResponseModel(TypedDict):
