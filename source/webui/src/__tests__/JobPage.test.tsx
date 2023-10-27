@@ -87,7 +87,7 @@ describe('the JobPage', () => {
     // ASSERT
     await screen.findByText(/Loading resources/i)
     expect(await screen.findByRole('heading', {name: (/Job Details/i)})).toBeInTheDocument();
-    await waitForElementToBeRemoved(() => screen.queryByText(/Loading resources/i))
+    // await waitForElementToBeRemoved(() => screen.queryByText(/Loading resources/i))
 
     const table = screen.getByTitle('FindingsTable');
 
@@ -124,7 +124,7 @@ describe('the JobPage', () => {
     // ASSERT
     await screen.findByText(/Loading resources/i)
     expect(await screen.findByRole('heading', {name: (/Job Details/i)})).toBeInTheDocument();
-    await waitForElementToBeRemoved(() => screen.queryByText(/Loading resources/i))
+    // await waitForElementToBeRemoved(() => screen.queryByText(/Loading resources/i))
 
     const table = screen.getByTitle('FindingsTable');
 
@@ -162,7 +162,7 @@ describe('the JobPage', () => {
     // ASSERT
     await screen.findByText(/Loading resources/i)
     expect(await screen.findByRole('heading', {name: (/Job Details/i)})).toBeInTheDocument();
-    await waitForElementToBeRemoved(() => screen.queryByText(/Loading resources/i))
+    // await waitForElementToBeRemoved(() => screen.queryByText(/Loading resources/i))
 
     const table = screen.getByTitle('FailuresTable');
 

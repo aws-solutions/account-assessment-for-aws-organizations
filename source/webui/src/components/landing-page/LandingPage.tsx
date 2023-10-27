@@ -11,6 +11,17 @@ import {apiPathJobs} from "../jobs/JobsDefinitions";
 import Header from "@cloudscape-design/components/header";
 import {formattedDateTime} from "../../util/Formatter";
 
+function HeaderComponent({item}: {
+  item: JobModel }) {
+    let assessmentType = item.AssessmentType;
+      while (assessmentType.indexOf(('_')) > -1) {
+        assessmentType = assessmentType.replace('_', '-');
+      }
+  return <>        <Link fontSize="heading-m"
+  href={`/assessments/${assessmentType}`}>{assessmentType}</Link>
+  </>
+}
+
 export const LandingPage = () => {
 
   const [apiData, setApiData] = useState<ApiResponseState<ResultList<JobModel>>>({
@@ -46,16 +57,7 @@ export const LandingPage = () => {
 
 
   const cardDefinition: CardsProps.CardDefinition<JobModel> = {
-    header: item => {
-      let assessmentType = item.AssessmentType;
-      while (assessmentType.indexOf(('_')) > -1) {
-        assessmentType = assessmentType.replace('_', '-');
-      }
-      return (
-        <Link fontSize="heading-m"
-              href={`/assessments/${assessmentType}`}>{assessmentType}</Link>
-      );
-    },
+    header: item => <HeaderComponent item={item}/>, //NOSONAR S6478: will be refactored in a feature release.
     sections: [
       {
         id: "JobStatus",
@@ -75,7 +77,7 @@ export const LandingPage = () => {
       {
         id: "JobId",
         header: "Job ID",
-        content: item => <Link href={`/jobs/${item.AssessmentType}/${item.JobId}`}>{item.JobId}</Link>
+        content: item => <Link href={`/jobs/${item.AssessmentType}/${item.JobId}`}>{item.JobId}</Link> //NOSONAR S6478: will be refactored in a feature release.
       }
     ]
   };

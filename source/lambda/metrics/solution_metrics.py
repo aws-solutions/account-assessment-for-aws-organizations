@@ -32,8 +32,8 @@ class SolutionMetrics(object):
                 data = self._generate_metrics(assessment_type, findings)
                 metrics = self._denormalize_to_metrics_model(data)
                 return self.post_metrics(metrics)
-        except:
-            pass
+        except Exception as exception:
+            self.logger.warning(f"error in metrics: {exception}")
 
     def _generate_metrics(self, assessment_type, findings):
         services = set()
@@ -62,7 +62,7 @@ class SolutionMetrics(object):
         json_data = dumps(metrics, cls=DecimalEncoder)
         headers = {'content-type': 'application/json'}
         url = getenv('METRICS_URL', 'https://metrics.awssolutionsbuilder.com/generic')
-        r = requests.post(url, data=json_data, headers=headers)
+        r = requests.post(url, data=json_data, headers=headers, timeout=90)
         code = r.status_code
         return code
 
@@ -74,7 +74,8 @@ class SolutionMetrics(object):
             'Solution': solution_id,
             'TimeStamp': str(datetime.utcnow().isoformat()),
             'UUID': uuid,
-            'Data': data
+            'Data': data,
+            'Version': getenv('SOLUTION_VERSION')
         }
         self.logger.debug(model)
         return model

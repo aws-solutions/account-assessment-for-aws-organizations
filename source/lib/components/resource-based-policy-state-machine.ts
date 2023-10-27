@@ -1,4 +1,4 @@
-import {Fail, JsonPath, Map, Pass, StateMachine, Succeed, TaskInput} from "aws-cdk-lib/aws-stepfunctions";
+import {Fail, JsonPath, Map, Pass, StateMachine, Succeed, TaskInput, DefinitionBody} from "aws-cdk-lib/aws-stepfunctions";
 import {LambdaInvoke} from "aws-cdk-lib/aws-stepfunctions-tasks";
 import {Construct} from "constructs";
 import * as lambda from "aws-cdk-lib/aws-lambda";
@@ -23,25 +23,33 @@ export function createStateMachine(
 
   const setJobStatusToFailed = new LambdaInvoke(scope, 'FailJob', failedJobProps).next(new Fail(scope, 'Failed'));
 
-  const definition =
-    new Map(scope, 'AccountIterator', accountIteratorProps).iterator(
-      new LambdaInvoke(scope, 'AccountValidation', accountValidationProps)
-        .next(
-          new Map(scope, 'ServiceIterator', serviceIteratorProps).iterator(
-            new LambdaInvoke(scope, 'ScanServicePerAccount', scanServicePerAccountProps)
-              .next(
-                new Pass(scope, 'TaskComplete', taskCompleteProps)
-              )
+  const definitionBody = DefinitionBody.fromChainable(
+    new Map(scope, "AccountIterator", accountIteratorProps)
+      .iterator(
+        new LambdaInvoke(
+          scope,
+          "AccountValidation",
+          accountValidationProps
+        ).next(
+          new Map(scope, "ServiceIterator", serviceIteratorProps).iterator(
+            new LambdaInvoke(
+              scope,
+              "ScanServicePerAccount",
+              scanServicePerAccountProps
+            ).next(new Pass(scope, "TaskComplete", taskCompleteProps))
           )
-        ))
-      .addCatch(setJobStatusToFailed, {resultPath: "$.Error"})
-      .next(new LambdaInvoke(scope, 'FinishJob', finishJobProps))
-      .next(new Succeed(scope, 'Success'));
+        )
+      )
+      .addCatch(setJobStatusToFailed, { resultPath: "$.Error" })
+      .next(new LambdaInvoke(scope, "FinishJob", finishJobProps))
+      .next(new Succeed(scope, "Success"))
+  );
 
-  const stateMachine = new StateMachine(scope, 'ScanAllSpokeAccounts', {
-    definition,
-    tracingEnabled: true
+  const stateMachine = new StateMachine(scope, "ScanAllSpokeAccounts", {
+    definitionBody: definitionBody,
+    tracingEnabled: true,
   });
+
   const cfnPolicy = stateMachine.role.node.findChild('DefaultPolicy')
     .node.findChild('Resource') as CfnPolicy;
   cfnPolicy && addCfnSuppressRules(cfnPolicy, [{

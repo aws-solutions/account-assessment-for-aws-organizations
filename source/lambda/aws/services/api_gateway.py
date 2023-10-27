@@ -10,7 +10,7 @@ from aws.utils.exceptions import service_exception_handler
 from aws.services.security_token_service import SecurityTokenService
 from aws.utils.boto3_session import Boto3Session
 from aws_lambda_powertools import Logger
-from mypy_boto3_apigateway.type_defs import RestApiResponseMetadataTypeDef
+from mypy_boto3_apigateway.type_defs import RestApiResponseTypeDef
 
 
 class APIGateway:
@@ -24,7 +24,7 @@ class APIGateway:
         self.apigateway_client = boto_session.get_client()
 
     @service_exception_handler
-    def get_rest_apis(self) -> list[RestApiResponseMetadataTypeDef]:
+    def get_rest_apis(self) -> list[RestApiResponseTypeDef]:
         response = self.apigateway_client.get_rest_apis()
 
         api_list = response.get('items', [])
