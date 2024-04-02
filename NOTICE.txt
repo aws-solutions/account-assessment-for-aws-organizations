@@ -54,6 +54,15 @@ sinon under BSD-3-Clause
 ts-jest under MIT
 ts-node under MIT
 typescript under Apache-2.0
+@aws-cdk/aws-servicecatalogappregistry-alpha under Apache-2.0
+@aws-solutions-constructs/aws-wafwebacl-apigateway under Apache-2.0
+cdk-nag under Apache-2.0
+webpack-dev-middleware under MIT
+aws-cdk.asset-awscli-v1 under Apache-2.0
+aws-cdk.asset-kubectl-v20 under Apache-2.0
+aws-cdk.asset-node-proxy-agent-v6 under Apache-2.0
+jsii under Apache-2.0
+minimist under MIT
 
 pip packages:
  aws-xray-sdk               Apache Software License
@@ -62,9 +71,43 @@ pip packages:
  cfnresponse                Apache Software License
  s3transfer                 Apache Software License
  requests                   Apache Software License
+ importlib-resources        Apache Software License
+ coverage                   Apache Software License
+ docker                     Apache Software License
+ jsonschema-path            Apache Software License
+ moto                       Apache Software License
+ rsa                        Apache Software License
+ websocket-client           Apache Software License
+ cryptography               Apache Software License; BSD License
  python-dateutil            Apache Software License; BSD License
+ responses                  Apache-2.0
  fastjsonschema             BSD License
+ docutils                   BSD License
+ mock                       BSD License
+ openapi-schema-validator   BSD License
+ openapi-spec-validator     BSD License
  wrapt                      BSD License
+ Jinja2                     BSD License
+ MarkupSafe                 BSD License
+ lazy-object-proxy          BSD License
+ Werkzeug                   BSD License
+ colorama                   BSD License
+ pyasn1                     BSD License
+ pycparser                  BSD License
+ pytest                     MIT License
+ pytest-cov                 MIT License
+ pytest-describe            MIT License
+ pytest-mock                MIT License
+ pytest-runner              MIT License
+ xmltodict                  MIT License
+ referencing                MIT License
+ cffi                       MIT License
+ jsonschema-specifications  MIT License
+ iniconfig                  MIT License
+ rfc3339-validator          MIT License
+ rpds-py                    MIT License
+
+ pluggy                     MIT License
  boto3-stubs                MIT License
  botocore-stubs             MIT License
  jmespath                   MIT License
@@ -103,5 +146,9 @@ pip packages:
  types-s3transfer           MIT License
  urllib3                    MIT License
  pyparsing                  MIT License
+ publication                MIT License
+ typeguard                  MIT License
+ cattrs                     MIT License
+ attrs                      MIT
  aws-lambda-powertools      MIT No Attribution
- typing-extensions          Python Software Foundation License
+ typing_extensions          Python Software Foundation License

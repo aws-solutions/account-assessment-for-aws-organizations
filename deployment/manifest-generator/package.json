@@ -1,12 +1,15 @@
 {
     "name": "manifest-generator",
-    "version": "0.0.0",
+    "version": "1.0.6",
+    "license": "Apache-2.0",
+    "author": {
+        "name": "Amazon Web Services",
+        "url": "https://aws.amazon.com/solutions",
+        "organization": true
+    },
     "private": true,
     "description": "Create a manifest.json that lists all files to include in a WebUI deployment",
     "main": "app.js",
-    "author": {
-        "name": "aws-solutions-builder"
-    },
     "dependencies": {
         "minimist": "*"
     }

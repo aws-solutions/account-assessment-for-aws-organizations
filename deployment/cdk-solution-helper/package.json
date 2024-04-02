@@ -1,6 +1,13 @@
 {
   "name": "cdk-solution-helper",
-  "version": "0.1.0",
+  "version": "1.0.6",
+  "description": "Account Assessment for AWS Organizations (SO0217)",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Amazon Web Services",
+    "url": "https://aws.amazon.com/solutions",
+    "organization": true
+  },
   "devDependencies": {
     "@types/node": "^20.8.7",
     "@types/jest": "^29.5.6",
