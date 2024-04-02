@@ -64,7 +64,7 @@ If you discover a potential security issue in this project we ask that you notif
 
 ## Licensing
 
-See the [LICENSE](https://github.com/aws-solutions/account-assessment-for-aws-organizations/blob/master/LICENSE) file
+See the [LICENSE](https://github.com/aws-solutions/account-assessment-for-aws-organizations/blob/main/LICENSE.txt) file
 for our project's licensing. We will ask you to confirm the licensing of your contribution.
 
 We may ask you to sign

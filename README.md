@@ -243,8 +243,9 @@ This will update your hub stack with the changed resources, but use the unchange
 
 ## Collection of operational metrics
 
-This solution collects anonymous operational metrics to help AWS improve the quality and features of the solution. For
-more information, including how to disable this capability, please see the [implementation guide](https://aws.amazon.com/solutions/implementations/account-assessment-for-aws-organizations/).
+This solution collects anonymized operational metrics to help AWS improve the quality and features of the solution. For
+more information, including how to disable this capability, please see
+the [implementation guide](https://docs.aws.amazon.com/solutions/latest/account-assessment-for-aws-organizations/reference.html).
 
 ***
 
