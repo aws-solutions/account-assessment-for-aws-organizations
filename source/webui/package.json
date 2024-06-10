@@ -1,6 +1,6 @@
 {
   "name": "account-assessment-for-aws-organizations-webui",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Account Assessment for AWS Organizations (SO0217)",
   "license": "Apache-2.0",
   "author": {
@@ -10,9 +10,9 @@
   },
   "private": true,
   "dependencies": {
-    "@aws-amplify/api": "^5.4.1",
-    "@aws-amplify/auth": "^5.6.1",
-    "@aws-amplify/core": "^5.8.1",
+    "@aws-amplify/api": "^5.4.12",
+    "@aws-amplify/auth": "^5.6.12",
+    "@aws-amplify/core": "^5.8.12",
     "@cloudscape-design/collection-hooks": "^1.0.9",
     "@cloudscape-design/components": "^3.0.72",
     "@cloudscape-design/design-tokens": "^3.0.3",
@@ -22,9 +22,9 @@
     "@types/react-dom": "^18.0.6",
     "bootstrap": "^5.2.1",
     "date-fns": "^2.29.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.4.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.23.1",
     "react-scripts": "^5.0.1",
     "typescript": "^4.9.5",
     "web-vitals": "^3.0.2",
