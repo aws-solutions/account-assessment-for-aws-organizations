@@ -81,6 +81,7 @@ pip packages:
  cryptography               Apache Software License; BSD License
  python-dateutil            Apache Software License; BSD License
  responses                  Apache-2.0
+ pathable                   Apache-2.0
  fastjsonschema             BSD License
  docutils                   BSD License
  mock                       BSD License
@@ -106,8 +107,8 @@ pip packages:
  iniconfig                  MIT License
  rfc3339-validator          MIT License
  rpds-py                    MIT License
-
  pluggy                     MIT License
+ annotated-types            MIT License
  boto3-stubs                MIT License
  botocore-stubs             MIT License
  jmespath                   MIT License
@@ -146,6 +147,8 @@ pip packages:
  types-s3transfer           MIT License
  urllib3                    MIT License
  pyparsing                  MIT License
+ pydantic                   MIT License
+ pydantic_core              MIT License
  publication                MIT License
  typeguard                  MIT License
  cattrs                     MIT License
