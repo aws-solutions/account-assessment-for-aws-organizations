@@ -21,7 +21,7 @@ logger = Logger(service='test_exception_handler', level='INFO')
 
 
 # ARRANGE
-class TestServiceName:
+class MockService:
     def __init__(self, account_id, region):
         self.account_id = account_id
         self.region = region
@@ -57,7 +57,7 @@ class ScanTestService:
     def scan_single_region(self, region_name: str):
         test_resources_in_all_regions = []
         self.logger.info(f"Scanning Test Policies in {region_name}")
-        test_client = TestServiceName(self.account_id, region_name)
+        test_client = MockService(self.account_id, region_name)
         objects = test_client.list_regions()
         test_resources_in_all_regions.extend(objects)
         return test_resources_in_all_regions
@@ -68,7 +68,7 @@ class ScanTestService:
     def raise_single_region_not_enabled(self, region_name):
         test_resources_in_all_regions = []
         self.logger.info(f"Scanning Test Policies in {region_name}")
-        test_client = TestServiceName(self.account_id, region_name)
+        test_client = MockService(self.account_id, region_name)
         if region_name == REGION:
             test_client.raise_region_not_enabled()
         objects = test_client.list_regions()
@@ -79,7 +79,7 @@ class ScanTestService:
 
 def test_list_regions():
     # ACT
-    list_of_regions = TestServiceName(ACCOUNT_ID, REGION).list_regions()
+    list_of_regions = MockService(ACCOUNT_ID, REGION).list_regions()
 
     # ASSERT
     assert list_of_regions == [REGION]
@@ -88,7 +88,7 @@ def test_list_regions():
 def test_raise_region_not_enabled():
     # ACT
     with pytest.raises(Exception) as exc_info:
-        TestServiceName(ACCOUNT_ID, REGION).raise_region_not_enabled()
+        MockService(ACCOUNT_ID, REGION).raise_region_not_enabled()
 
     # ASSERT
     assert exc_info.value.args[0] == f"{REGION} is disabled, you must enable it before scanning resources in this " \
@@ -98,7 +98,7 @@ def test_raise_region_not_enabled():
 def test_raise_service_unavailable():
     # ACT
     with pytest.raises(Exception) as exc_info:
-        TestServiceName(ACCOUNT_ID, REGION).raise_service_unavailable()
+        MockService(ACCOUNT_ID, REGION).raise_service_unavailable()
 
     # ASSERT
     assert exc_info.value.args[0] == f"Service is not available in {REGION}."
@@ -107,7 +107,7 @@ def test_raise_service_unavailable():
 def test_raise_connection_timeout():
     # ACT
     with pytest.raises(Exception) as exc_info:
-        TestServiceName(ACCOUNT_ID, REGION).raise_connection_timeout()
+        MockService(ACCOUNT_ID, REGION).raise_connection_timeout()
 
     # ASSERT
     assert exc_info.value.args[0] == f"Service endpoint connection timed out in {REGION}"

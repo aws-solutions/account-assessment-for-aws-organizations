@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.9] - 2024-08
+
+### Security
+
+- Upgrade `fast-xml-parser` to mitigate [CVE-2024-41818](https://nvd.nist.gov/vuln/detail/CVE-2024-41818)
+
+### Fixed
+
+- When scan fails for a certain S3 bucket, the solution will no longer fail the scan for all S3 buckets in the account.
+  The failed buckets will be reported as individual failures with bucket name in on the solution UI, while scan results
+  for all other buckets will be reported successfully.
+
 ## [1.0.8] - 2024-06
 
 ### Fixed

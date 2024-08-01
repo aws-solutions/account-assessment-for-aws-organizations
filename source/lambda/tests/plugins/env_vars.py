@@ -10,6 +10,7 @@ import pytest
 def pytest_load_initial_conftests():
     os.environ['LOG_LEVEL'] = 'debug'
     os.environ['AWS_REGION'] = 'us-east-1'
+    os.environ['SOLUTION_VERSION'] = "v1.0.0"
     os.environ['ORG_MANAGEMENT_ROLE_NAME'] = 'execution-role-name'
     os.environ['SPOKE_ROLE_NAME'] = 'AccountAssessment-Spoke-ExecutionRole'
     os.environ[
