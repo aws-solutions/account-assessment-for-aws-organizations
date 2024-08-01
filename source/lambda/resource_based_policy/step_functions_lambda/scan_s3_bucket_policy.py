@@ -1,7 +1,7 @@
 #  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #  SPDX-License-Identifier: Apache-2.0
 from os import getenv
-from typing import Iterable
+from typing import Iterable, Union
 
 from aws_lambda_powertools import Logger
 from mypy_boto3_s3.type_defs import BucketTypeDef, GetBucketPolicyOutputTypeDef
@@ -42,7 +42,7 @@ class S3BucketPolicy:
             if (s3_data := self.denormalize_to_s3_data(bucket)) is not None  # filter out buckets where api call failed
         ]
 
-    def denormalize_to_s3_data(self, bucket_name: str) -> model.S3Data | None:
+    def denormalize_to_s3_data(self, bucket_name: str) -> Union[model.S3Data, None]:
         try:
             bucket_location = self.s3_client.get_bucket_location(bucket_name)
 
