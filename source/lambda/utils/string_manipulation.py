@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import re
-from typing import List
 
 
 def sanitize(name, space_allowed=False, replace_with_character='_'):

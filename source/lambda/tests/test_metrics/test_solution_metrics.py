@@ -79,3 +79,18 @@ def test_counts_resource_based_policies_findings():
                        'FindingsCount': '4',
                        'RegionsCount': '2',
                        'ServicesCount': '3'}
+    
+def test_if_version_is_included_in_the_metrics():
+    # ARRANGE
+    findings = [
+        resource_based_policies_create_request('s3.amazonaws.com', 'us-east-1'),
+        resource_based_policies_create_request('glacier.amazonaws.com', 'us-east-1'),
+        resource_based_policies_create_request('sns.amazonaws.com', 'us-east-2'),
+        resource_based_policies_create_request('sns.amazonaws.com', 'us-east-2'),
+    ]
+
+    # ACT
+    metrics = SolutionMetrics()._generate_metrics('RESOURCE_BASED_POLICIES', findings)
+
+    model = SolutionMetrics()._denormalize_to_metrics_model(metrics)
+    assert model.get("Version") == "v1.0.0"

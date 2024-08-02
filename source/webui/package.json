@@ -1,6 +1,6 @@
 {
   "name": "account-assessment-for-aws-organizations-webui",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "description": "Account Assessment for AWS Organizations (SO0217)",
   "license": "Apache-2.0",
   "author": {
