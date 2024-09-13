@@ -1,9 +1,9 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 import uuid
 
 from aws_lambda_powertools import Logger
-from moto import mock_sts
+from moto import mock_aws
 
 from trusted_access_enabled_services.scan_for_trusted_services import \
     TrustedAccessStrategy
@@ -11,7 +11,7 @@ from trusted_access_enabled_services.scan_for_trusted_services import \
 logger = Logger(level="info")
 
 
-@mock_sts
+@mock_aws
 def test_zero_enabled_aws_service_access(organizations_setup):
     # ARRANGE
     job_id = str(uuid.uuid4())
@@ -32,7 +32,7 @@ def test_zero_enabled_aws_service_access(organizations_setup):
         assert "AssessedAt" in service.keys()
 
 
-@mock_sts
+@mock_aws
 def test_enabled_aws_service_access(org_client, organizations_setup):
     # ARRANGE
     job_id = str(uuid.uuid4())
@@ -53,7 +53,7 @@ def test_enabled_aws_service_access(org_client, organizations_setup):
         assert "AssessedAt" in service.keys()
 
 
-@mock_sts
+@mock_aws
 def test_multiple_enabled_aws_service_access(org_client, organizations_setup):
     # ARRANGE
     job_id = str(uuid.uuid4())

@@ -1,15 +1,15 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 from aws_lambda_powertools import Logger
-from moto import mock_sts
+from moto import mock_aws
 
 from aws.services.organizations import Organizations
 
 logger = Logger(level="info")
 
 
-@mock_sts
+@mock_aws
 def test_get_active_accounts(organizations_setup):
     # ARRANGE
     all_accounts = Organizations().list_accounts()
@@ -21,7 +21,7 @@ def test_get_active_accounts(organizations_setup):
     assert len(all_accounts) == len(accounts)
 
 
-@mock_sts
+@mock_aws
 def test_exclude_suspended_accounts(org_client, organizations_setup):
     # ARRANGE
     all_accounts = Organizations().list_accounts()

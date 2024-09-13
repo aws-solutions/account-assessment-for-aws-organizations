@@ -1,5 +1,5 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 from moto.core import DEFAULT_ACCOUNT_ID as ACCOUNT_ID
 
@@ -20,8 +20,8 @@ mock_policies = [
                 "Condition": {"StringEquals": {"aws:PrincipalOrgID": "o-a1b2c3d4e5"}
                               }
             }
-        }},
-
+        }
+    },
     {
         "MockResourceName": "resource_2",
         "MockPolicyName": "PrincipalOrgPathsPolicy",
@@ -37,8 +37,8 @@ mock_policies = [
                     "aws:PrincipalOrgPaths": ["o-a1b2c3d4e5/r-ab12/ou-ab12-11111111/ou-ab12-22222222/"]
                 }}
             }
-        }},
-
+        }
+    },
     {
         "MockResourceName": "resource_3",
         "MockPolicyName": "ResourceOrgIdPolicy",
@@ -55,8 +55,8 @@ mock_policies = [
                     }
                 }
             }
-        }},
-
+        }
+    },
     {
         "MockResourceName": "resource_4", "MockPolicyName": "ResourceOrgPathsPolicy",
         "MockPolicy": {
@@ -70,7 +70,44 @@ mock_policies = [
                     "aws:ResourceOrgPaths": ["o-a1b2c3d4e5/r-ab12/ou-ab12-11111111/*"]
                 }}
             }
-        }},
+        }
+    },
+    {
+        "MockResourceName": "resource_30",
+        "MockPolicyName": "SourceOrgIdPolicy",
+        "MockPolicy": {
+            "Version": "2012-10-17",
+            "Statement": {
+                "Sid": "DenyPutObjectToS3SourcesOutsideMyOrganization",
+                "Effect": "Deny",
+                "Action": ["s3:PutObject"],
+                "Resource": ["arn:aws:s3:::policy-genius-dev/*"],
+                "Condition": {
+                    "StringNotEquals": {
+                        "aws:SourceOrgID": "o-123456789"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "MockResourceName": "resource_40",
+        "MockPolicyName": "SourceOrgPathsPolicy",
+        "MockPolicy": {
+            "Version": "2012-10-17",
+            "Statement": {
+                "Sid": "DenyPutObjectToS3SourcesOutsideMyOrganization",
+                "Effect": "Deny",
+                "Action": "s3:PutObject",
+                "Resource": "arn:aws:s3:::policy-genius-dev/*",
+                "Condition": {
+                    "ForAnyValue:StringLike": {
+                        "aws:SourceOrgPaths": ["o-a1b2c3d4e5/r-ab12/ou-ab12-11111111/*"]
+                    }
+                }
+            }
+        }
+    },
     {
         "MockResourceName": "resource_5",
         "MockPolicyName": "PolicyWithWithMultipleKeys",
@@ -92,8 +129,8 @@ mock_policies = [
                     }
                 }
             }
-        }},
-
+        }
+    },
     {
         "MockResourceName": "resource_6",
         "MockPolicyName": "PolicyWithWithMultipleStatementsAndKeys",

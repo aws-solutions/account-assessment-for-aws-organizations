@@ -1,7 +1,7 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 from aws_lambda_powertools import Logger
-from moto import mock_glacier, mock_sts
+from moto import mock_aws
 from mypy_boto3_glacier.type_defs import DescribeVaultOutputTypeDef, VaultAccessPolicyTypeDef
 
 from resource_based_policy.step_functions_lambda.scan_glacier_vault_policy import GlacierVaultPolicy
@@ -10,8 +10,7 @@ from tests.test_resource_based_policy.mock_data import event
 logger = Logger(level="info")
 
 
-@mock_sts
-@mock_glacier
+@mock_aws
 def test_glacier_vault_policy_scan_no_vaults():
     # ACT
     response = GlacierVaultPolicy(event).scan()
@@ -21,7 +20,7 @@ def test_glacier_vault_policy_scan_no_vaults():
     assert response == []
 
 
-@mock_sts
+@mock_aws
 def test_mock_glacier_scan_policy(mocker):
     # ARRANGE
     list_vaults_response: list[DescribeVaultOutputTypeDef] = [

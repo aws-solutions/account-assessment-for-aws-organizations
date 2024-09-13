@@ -1,12 +1,12 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 import io
 import zipfile
 
 import boto3
 from aws_lambda_powertools import Logger
 from botocore.exceptions import ClientError
-from moto import mock_lambda, mock_sts
+from moto import mock_aws
 
 from resource_based_policy.step_functions_lambda.scan_lambda_function_policy import LambdaFunctionPolicy
 from tests.test_resource_based_policy.mock_data import event
@@ -14,8 +14,7 @@ from tests.test_resource_based_policy.mock_data import event
 logger = Logger(level="info")
 
 
-@mock_sts
-@mock_lambda
+@mock_aws
 def test_lambda_function_policy_no_functions():
     # ACT
     response = LambdaFunctionPolicy(event).scan()
@@ -25,8 +24,7 @@ def test_lambda_function_policy_no_functions():
     assert response == []
 
 
-@mock_sts
-@mock_lambda
+@mock_aws
 def test_lambda_function_default_policy_scan(iam_client):
     # ARRANGE
     for region in event['Regions']:
@@ -49,14 +47,13 @@ def test_lambda_function_default_policy_scan(iam_client):
     assert len(list(response)) == 0
 
 
-@mock_sts
-@mock_lambda
+@mock_aws
 def test_lambda_function_organization_policy_scan(iam_client):
     # ARRANGE
     for region in event['Regions']:
         lambda_function_client = boto3.client("lambda", region_name=region)
         zip_content = get_test_zip_file1()
-        function_name = "function-default-policy"
+        function_name = "function-default-policy2"
         lambda_function_client.create_function(
                 FunctionName=function_name,
                 Runtime="python3.7",
@@ -82,7 +79,9 @@ def test_lambda_function_organization_policy_scan(iam_client):
             'aws:PrincipalOrgID',
             'aws:PrincipalOrgPaths',
             'aws:ResourceOrgID',
-            'aws:ResourceOrgPaths'
+            'aws:ResourceOrgPaths',
+            'aws:SourceOrgID',
+            'aws:SourceOrgPaths'
         ]
 
 

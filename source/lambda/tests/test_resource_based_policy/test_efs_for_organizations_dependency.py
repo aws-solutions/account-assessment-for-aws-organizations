@@ -1,9 +1,9 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 import datetime
 
 from aws_lambda_powertools import Logger
-from moto import mock_sts, mock_efs
+from moto import mock_aws
 from mypy_boto3_efs.type_defs import FileSystemDescriptionTypeDef
 
 import resource_based_policy.resource_based_policy_model as model
@@ -13,8 +13,7 @@ from tests.test_resource_based_policy.mock_data import event
 logger = Logger(level="info")
 
 
-@mock_sts
-@mock_efs
+@mock_aws
 def test_no_efs():
     # ACT
     response = ElasticFileSystemPolicy(event).scan()
@@ -24,7 +23,7 @@ def test_no_efs():
     assert len(list(response)) == 0
 
 
-@mock_sts
+@mock_aws
 def test_mock_efs_scan_policy(mocker):
     # ARRANGE
     describe_file_systems_response: list[FileSystemDescriptionTypeDef] = [
@@ -68,7 +67,9 @@ def test_mock_efs_scan_policy(mocker):
             'aws:PrincipalOrgID',
             'aws:PrincipalOrgPaths',
             'aws:ResourceOrgID',
-            'aws:ResourceOrgPaths'
+            'aws:ResourceOrgPaths',
+            'aws:SourceOrgID',
+            'aws:SourceOrgPaths'
         ]
 
 

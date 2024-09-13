@@ -1,10 +1,10 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 import json
 
 import boto3
 from aws_lambda_powertools import Logger
-from moto import mock_sts, mock_iot
+from moto import mock_aws
 
 from resource_based_policy.step_functions_lambda.scan_iot_policy import IoTPolicy
 from tests.test_resource_based_policy.mock_data import event, mock_policies
@@ -12,8 +12,7 @@ from tests.test_resource_based_policy.mock_data import event, mock_policies
 logger = Logger(level="info")
 
 
-@mock_sts
-@mock_iot
+@mock_aws
 def test_no_iot_policy():
     # ACT
     response = IoTPolicy(event).scan()
@@ -23,8 +22,7 @@ def test_no_iot_policy():
     assert len(list(response)) == 0
 
 
-@mock_sts
-@mock_iot
+@mock_aws
 def test_iot_policy_scan():
     # ARRANGE
     for region in event['Regions']:
@@ -42,10 +40,12 @@ def test_iot_policy_scan():
 
     # ASSERT
     for resource in response:
-        assert len(list(response)) == 12
+        assert len(list(response)) == 16
         assert resource['DependencyType'] in [
             'aws:PrincipalOrgID',
             'aws:PrincipalOrgPaths',
             'aws:ResourceOrgID',
-            'aws:ResourceOrgPaths'
+            'aws:ResourceOrgPaths',
+            'aws:SourceOrgID',
+            'aws:SourceOrgPaths'
         ]

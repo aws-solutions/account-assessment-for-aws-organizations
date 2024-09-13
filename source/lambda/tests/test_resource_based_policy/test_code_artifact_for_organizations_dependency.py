@@ -1,10 +1,10 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 import datetime
 
 from aws_lambda_powertools import Logger
-from moto import mock_sts
+from moto import mock_aws
 from mypy_boto3_codeartifact.type_defs import DomainSummaryTypeDef, RepositorySummaryTypeDef, \
     GetDomainPermissionsPolicyResultTypeDef, GetRepositoryPermissionsPolicyResultTypeDef
 
@@ -14,7 +14,7 @@ from tests.test_resource_based_policy.mock_data import event
 logger = Logger(level='info', service="test_code_build")
 
 
-@mock_sts
+@mock_aws
 def test_mock_codeartifact_scan_policy_no_projects(mocker):
     # ARRANGE
     mock_codeartifact(mocker)
@@ -27,7 +27,7 @@ def test_mock_codeartifact_scan_policy_no_projects(mocker):
     assert response == []
 
 
-@mock_sts
+@mock_aws
 def test_mock_codeartifact_scan_policy(mocker):
     # ARRANGE
     list_domains_response: list[DomainSummaryTypeDef] = [{
@@ -102,7 +102,9 @@ def test_mock_codeartifact_scan_policy(mocker):
             'aws:PrincipalOrgID',
             'aws:PrincipalOrgPaths',
             'aws:ResourceOrgID',
-            'aws:ResourceOrgPaths'
+            'aws:ResourceOrgPaths',
+            'aws:SourceOrgID',
+            'aws:SourceOrgPaths'
         ]
 
 

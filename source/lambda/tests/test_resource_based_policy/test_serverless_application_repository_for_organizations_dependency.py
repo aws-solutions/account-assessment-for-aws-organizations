@@ -1,17 +1,17 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 from aws_lambda_powertools import Logger
-from moto import mock_sts
+from moto import mock_aws
 from mypy_boto3_serverlessrepo.type_defs import ApplicationSummaryTypeDef, ApplicationPolicyStatementTypeDef
 
-from tests.test_resource_based_policy.mock_data import event
 from resource_based_policy.step_functions_lambda.scan_serverless_application_policy import ServerlessApplicationPolicy
+from tests.test_resource_based_policy.mock_data import event
 
 logger = Logger(level="info", service="test_code_build")
 
 
-@mock_sts
+@mock_aws
 def test_mock_serverless_application_repository_scan_policy_no_policies(mocker):
     # ARRANGE
     mock_serverless_application_repository(mocker)
@@ -24,7 +24,7 @@ def test_mock_serverless_application_repository_scan_policy_no_policies(mocker):
     assert response == []
 
 
-@mock_sts
+@mock_aws
 def test_mock_serverless_application_repository_scan_policy(mocker):
     # ARRANGE
     list_applications_response: list[ApplicationSummaryTypeDef] = [

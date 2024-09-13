@@ -1,10 +1,10 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 import json
 
 import boto3
 from aws_lambda_powertools import Logger
-from moto import mock_ecr, mock_sts
+from moto import mock_aws
 
 from resource_based_policy.step_functions_lambda.scan_ec2_container_registry_repository_policy import \
     EC2ContainerRegistryRepositoryPolicy
@@ -13,8 +13,7 @@ from tests.test_resource_based_policy.mock_data import mock_policies, event
 logger = Logger(level="info")
 
 
-@mock_sts
-@mock_ecr
+@mock_aws
 def test_ecr_policy_scan_no_topics():
     # ACT
     response = EC2ContainerRegistryRepositoryPolicy(event).scan()
@@ -24,8 +23,7 @@ def test_ecr_policy_scan_no_topics():
     assert response == []
 
 
-@mock_sts
-@mock_ecr
+@mock_aws
 def test_ecr_policy_scan():
     # ARRANGE
     for region in event['Regions']:
@@ -46,12 +44,14 @@ def test_ecr_policy_scan():
     logger.info(response)
 
     # ASSERT
-    assert len(list(response)) == 12
+    assert len(list(response)) == 16
     for resource in response:
         assert resource['DependencyType'] in [
             'aws:PrincipalOrgID',
             'aws:PrincipalOrgPaths',
             'aws:ResourceOrgID',
-            'aws:ResourceOrgPaths'
+            'aws:ResourceOrgPaths',
+            'aws:SourceOrgID',
+            'aws:SourceOrgPaths'
         ]
 

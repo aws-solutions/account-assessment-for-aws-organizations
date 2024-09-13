@@ -1,15 +1,15 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 from aws_lambda_powertools import Logger
-from moto import mock_sts
+from moto import mock_aws
 
 from aws.services.security_token_service import SecurityTokenService
 
 logger = Logger(level="info")
 
 
-@mock_sts
+@mock_aws
 def test_assume_role_in_same_account(organizations_setup):
     # ARRANGE
     sts = SecurityTokenService()
@@ -25,7 +25,7 @@ def test_assume_role_in_same_account(organizations_setup):
     assert "Expiration" in credentials.keys()
 
 
-@mock_sts
+@mock_aws
 def test_assume_role_in_different_account(org_client, organizations_setup):
     # ARRANGE
     sts = SecurityTokenService()

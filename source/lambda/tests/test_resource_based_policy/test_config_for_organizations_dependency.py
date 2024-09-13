@@ -1,9 +1,9 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 import datetime
 
 from aws_lambda_powertools import Logger
-from moto import mock_sts
+from moto import mock_aws
 from mypy_boto3_config.type_defs import OrganizationConfigRuleTypeDef, \
     GetCustomRulePolicyResponseTypeDef
 
@@ -13,7 +13,7 @@ from tests.test_resource_based_policy.mock_data import event
 logger = Logger(level="info", service="test_code_build")
 
 
-@mock_sts
+@mock_aws
 def test_mock_config_scan_policy_no_policies(mocker):
     # ARRANGE
     mock_config(mocker)
@@ -26,7 +26,7 @@ def test_mock_config_scan_policy_no_policies(mocker):
     assert response == []
 
 
-@mock_sts
+@mock_aws
 def test_mock_config_scan_policy(mocker):
     # ARRANGE
     describe_organization_config_rules_response: list[OrganizationConfigRuleTypeDef] = [

@@ -1,12 +1,12 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 import json
 import os
 import uuid
 
 import pytest
 from aws_lambda_powertools import Logger
-from moto import mock_sts
+from moto import mock_aws
 
 from aws.services.step_functions import StepFunctions
 from resource_based_policy.start_state_machine_execution_to_scan_services import \
@@ -22,7 +22,7 @@ logger = Logger(level="info")
 
 
 def describe_parse_request():
-    @mock_sts
+    @mock_aws
     def test_collects_validation_errors(mocker, organizations_setup):
         # ARRANGE
         mocker.patch.object(SupportedRegions, 'regions', return_value=['eu-central-1'])
@@ -44,7 +44,7 @@ def describe_parse_request():
         assert e.error == "Validation Error"
         assert e.message == 'No valid AccountIds selected, No valid ServiceNames selected, No valid Regions selected'
 
-    @mock_sts
+    @mock_aws
     def test_raises_error_for_invalid_org_unit(mocker, organizations_setup):
         # ARRANGE
         mocker.patch.object(SupportedRegions, 'regions', return_value={'eu-central-1'})
@@ -66,7 +66,7 @@ def describe_parse_request():
         assert e.error == "Validation Error"
         assert e.message == 'Invalid OrgUnitIds: this-is-invalid'
 
-    @mock_sts
+    @mock_aws
     def test_raises_error_for_invalid_configuration_name(mocker, organizations_setup):
         # ARRANGE
         account_id = organizations_setup['dev_account_id']
@@ -90,7 +90,7 @@ def describe_parse_request():
         assert e.error == "Validation Error"
         assert e.message == 'Invalid configuration name.'
 
-    @mock_sts
+    @mock_aws
     def test_parses_all_attributes(mocker, organizations_setup):
         # ARRANGE
         account_id = organizations_setup['dev_account_id']
@@ -111,7 +111,7 @@ def describe_parse_request():
         assert parsed_request['Regions'] == request_body['Regions']
         assert set(parsed_request['ServiceNames']) == set(request_body['ServiceNames'])
 
-    @mock_sts
+    @mock_aws
     def test_replaces_empty_attribute_by_all_valid_values(mocker, organizations_setup):
         # ARRANGE
         existing_account_id = organizations_setup['dev_account_id']
@@ -129,7 +129,7 @@ def describe_parse_request():
         # ASSERT
         assert parsed_request['ServiceNames'] == ['config', 'cloudformation', 's3']
 
-    @mock_sts
+    @mock_aws
     def test_resolves_org_unit_to_account_ids(mocker, organizations_setup):
         # ARRANGE
         org_unit_id = organizations_setup['dev_ou_id']
@@ -149,7 +149,7 @@ def describe_parse_request():
         account_ids_in_org_unit = [organizations_setup['dev_account_id'], organizations_setup['dev_account_id_2']]
         assert parsed_request['AccountIds'] == account_ids_in_org_unit
 
-    @mock_sts
+    @mock_aws
     def test_parses_full_scan(mocker, organizations_setup):
         # ARRANGE
         existing_account_id = organizations_setup['dev_account_id']
@@ -168,7 +168,7 @@ def describe_parse_request():
         assert json.dumps(parsed_request)  # verify the request is JSON serializable
 
 
-@mock_sts
+@mock_aws
 def test_start_scan(mocker, freeze_clock, organizations_setup, resource_based_policies_table):
     # ARRANGE
     existing_account_id = organizations_setup['dev_account_id']
