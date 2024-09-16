@@ -1,14 +1,17 @@
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+
 import os
 import re
 from datetime import datetime
 
-from moto import mock_sts
+from moto import mock_aws
 from moto.core import DEFAULT_ACCOUNT_ID as ACCOUNT_ID
 
 from aws.services.step_functions import StepFunctions
 
 
-@mock_sts
+@mock_aws
 def test_state_machine_start_execution(stepfunctions_client, organizations_setup):
     # ARRANGE
     region = "us-east-1"

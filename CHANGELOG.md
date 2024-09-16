@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.11] - 2024-9
+
+### Fixed
+
+- Added support for keys `aws:SourceOrgID`, `aws:SourceOrgPaths` in policy conditions
+
+### Updated dependencies
+
+- `moto` from v4.x to v5.x for python unit tests
+- `micromatch` to mitigate [CVE-2024-4067](https://avd.aquasec.com/nvd/cve-2024-4067)
+- `webpack` to mitigate [CVE-2024-43788](https://avd.aquasec.com/nvd/cve-2024-43788)
+- `express` to mitigate [CVE-2024-43796](https://avd.aquasec.com/nvd/cve-2024-43796)
+- `send` to mitigate [CVE-2024-43799 ](https://avd.aquasec.com/nvd/cve-2024-43799)
+- `serve-static` to mitigate [CVE-2024-43800](https://avd.aquasec.com/nvd/cve-2024-43800)
+- `path-to-regexp` to mitigate [CVE-2024-45296](https://avd.aquasec.com/nvd/cve-2024-45296)
+- `body-parser` to mitigate [CVE-2024-45590](https://avd.aquasec.com/nvd/cve-2024-45590)
+
 ## [1.0.10] - 2024-8
 
 - Upgrade `axios` to mitigate [CVE-2024-39338](https://nvd.nist.gov/vuln/detail/CVE-2024-39338)

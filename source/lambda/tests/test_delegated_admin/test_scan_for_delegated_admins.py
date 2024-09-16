@@ -1,9 +1,9 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 import uuid
 
 from aws_lambda_powertools import Logger
-from moto import mock_sts
+from moto import mock_aws
 
 from delegated_admins.scan_for_delegated_admins import \
     DelegatedAdminsStrategy
@@ -11,7 +11,7 @@ from delegated_admins.scan_for_delegated_admins import \
 logger = Logger(level="info")
 
 
-@mock_sts
+@mock_aws
 def test_delegated_admin_account_scan(org_client, organizations_setup):
     # ARRANGE
     dev_account_id = organizations_setup['dev_account_id']

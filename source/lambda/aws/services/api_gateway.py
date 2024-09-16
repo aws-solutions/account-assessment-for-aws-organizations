@@ -12,7 +12,6 @@ from aws.utils.boto3_session import Boto3Session
 from aws_lambda_powertools import Logger
 from mypy_boto3_apigateway.type_defs import RestApiResponseTypeDef
 
-
 class APIGateway:
     def __init__(self, account_id, region):
         self.logger = Logger(service=self.__class__.__name__, level=getenv('LOG_LEVEL'))

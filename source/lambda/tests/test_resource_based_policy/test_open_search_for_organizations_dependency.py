@@ -1,8 +1,8 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 from aws_lambda_powertools import Logger
-from moto import mock_sts
+from moto import mock_aws
 from mypy_boto3_opensearch.type_defs import DomainInfoTypeDef, DomainStatusTypeDef
 
 from resource_based_policy.step_functions_lambda.scan_open_search_domain_policy import OpenSearchDomainPolicy
@@ -11,7 +11,7 @@ from tests.test_resource_based_policy.mock_data import event
 logger = Logger(level='info', service="test_code_build")
 
 
-@mock_sts
+@mock_aws
 def test_mock_opensearch_scan_policy_no_policies(mocker):
     # ARRANGE
     mock_opensearch(mocker)
@@ -24,7 +24,7 @@ def test_mock_opensearch_scan_policy_no_policies(mocker):
     assert response == []
 
 
-@mock_sts
+@mock_aws
 def test_mock_opensearch_scan_policy(mocker):
     # ARRANGE
     list_domain_names_response: list[DomainInfoTypeDef] = [
@@ -220,7 +220,9 @@ def test_mock_opensearch_scan_policy(mocker):
             'aws:PrincipalOrgID',
             'aws:PrincipalOrgPaths',
             'aws:ResourceOrgID',
-            'aws:ResourceOrgPaths'
+            'aws:ResourceOrgPaths',
+            'aws:SourceOrgID',
+            'aws:SourceOrgPaths'
         ]
 
 

@@ -1,10 +1,10 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 import json
 
 import boto3
 from aws_lambda_powertools import Logger
-from moto import mock_cloudformation, mock_sts
+from moto import mock_aws
 
 from resource_based_policy.step_functions_lambda.scan_cloudformation_stack_policy import CloudFormationStackPolicy
 from tests.test_resource_based_policy.mock_data import mock_policies, event
@@ -12,8 +12,7 @@ from tests.test_resource_based_policy.mock_data import mock_policies, event
 logger = Logger(level="info")
 
 
-@mock_sts
-@mock_cloudformation
+@mock_aws
 def test_cloudformation_stacks_no_stacks():
     # ACT
     response = CloudFormationStackPolicy(event).scan()
@@ -43,8 +42,7 @@ MOCK_TEMPLATE = {
 }
 
 
-@mock_sts
-@mock_cloudformation
+@mock_aws
 def test_cloudformation_policy_scan():
     # ARRANGE
     for region in event['Regions']:
@@ -65,18 +63,19 @@ def test_cloudformation_policy_scan():
     logger.info(response)
 
     # ASSERT
-    assert len(list(response)) == 12
+    assert len(list(response)) == 16
     for resource in response:
         assert resource['DependencyType'] in [
             'aws:PrincipalOrgID',
             'aws:PrincipalOrgPaths',
             'aws:ResourceOrgID',
-            'aws:ResourceOrgPaths'
+            'aws:ResourceOrgPaths',
+            'aws:SourceOrgID',
+            'aws:SourceOrgPaths'
         ]
 
 
-@mock_sts
-@mock_cloudformation
+@mock_aws
 def test_cloudformation_policy_scan_with_filter_deleted_stacks():
     # ARRANGE
     for region in event['Regions']:
@@ -105,11 +104,13 @@ def test_cloudformation_policy_scan_with_filter_deleted_stacks():
     logger.info(response)
 
     # ASSERT
-    assert len(list(response)) == 6
+    assert len(list(response)) == 10
     for resource in response:
         assert resource['DependencyType'] in [
             'aws:PrincipalOrgID',
             'aws:PrincipalOrgPaths',
             'aws:ResourceOrgID',
-            'aws:ResourceOrgPaths'
+            'aws:ResourceOrgPaths',
+            'aws:SourceOrgID',
+            'aws:SourceOrgPaths'
         ]

@@ -1,10 +1,10 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 import json
 
 import pytest
 from aws_lambda_powertools import Logger
-from moto import mock_iam, mock_sts
+from moto import mock_aws
 
 from resource_based_policy.step_functions_lambda.scan_iam_policy import IAMPolicy
 from tests.test_resource_based_policy.mock_data import mock_policies, event
@@ -12,8 +12,7 @@ from tests.test_resource_based_policy.mock_data import mock_policies, event
 logger = Logger(level="info")
 
 
-@mock_sts
-@mock_iam
+@mock_aws
 def test_scan_no_roles_no_policies():
     # ARRANGE
 
@@ -62,18 +61,20 @@ def iam_setup(iam_client):
                     PolicyDocument=json.dumps(policy_object.get('MockPolicy')))
 
 
-@mock_sts
+@mock_aws
 def test_scan_iam_policies(iam_setup):
     # ACT
     response = IAMPolicy(event).scan()
     logger.info(response)
 
     # ASSERT
-    assert len(list(response)) == 15
+    assert len(list(response)) == 19
     for resource in response:
         assert resource['DependencyType'] in [
             'aws:PrincipalOrgID',
             'aws:PrincipalOrgPaths',
             'aws:ResourceOrgID',
-            'aws:ResourceOrgPaths'
+            'aws:ResourceOrgPaths',
+            'aws:SourceOrgID',
+            'aws:SourceOrgPaths'
         ]

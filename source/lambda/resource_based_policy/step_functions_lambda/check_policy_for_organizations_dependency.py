@@ -1,9 +1,10 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 import json
+from os import getenv
+
 from aws_lambda_powertools import Logger
 from mypy_boto3_serverlessrepo.type_defs import ApplicationPolicyStatementTypeDef
-from os import getenv
 
 from resource_based_policy.resource_based_policy_model import PolicyAnalyzerRequest, \
     PolicyAnalyzerResponse
@@ -13,6 +14,8 @@ AWS_RESOURCE_ORG_PATHS = "aws:ResourceOrgPaths"
 AWS_RESOURCE_ORG_ID = "aws:ResourceOrgID"
 AWS_PRINCIPAL_ORG_PATHS = "aws:PrincipalOrgPaths"
 AWS_PRINCIPAL_ORG_ID = "aws:PrincipalOrgID"
+AWS_SOURCE_ORG_PATHS = "aws:SourceOrgPaths"
+AWS_SOURCE_ORG_ID = "aws:SourceOrgID"
 
 
 class CheckForOrganizationsDependency:
@@ -31,6 +34,8 @@ class CheckForOrganizationsDependency:
                 self._check_for_principal_org_paths(resource)
                 self._check_for_resource_org_id(resource)
                 self._check_for_resource_org_paths(resource)
+                self._check_for_source_org_id(resource)
+                self._check_for_source_org_paths(resource)
 
         response = [item for sub_item, item in enumerate(self.resources_dependent_on_organizations) if item not in
                     self.resources_dependent_on_organizations[sub_item + 1:]]
@@ -63,6 +68,16 @@ class CheckForOrganizationsDependency:
             self.logger.debug("Found ResourceOrgPaths in the policy")
             self.process_statement_in_policy(resource)
 
+    def _check_for_source_org_id(self, resource):
+        if AWS_SOURCE_ORG_ID.lower() in resource['Policy'].lower():
+            self.logger.debug("Found SourceOrgID in the policy")
+            self.process_statement_in_policy(resource)
+
+    def _check_for_source_org_paths(self, resource):
+        if AWS_SOURCE_ORG_PATHS.lower() in resource['Policy'].lower():
+            self.logger.debug("Found SourceOrgPaths in the policy")
+            self.process_statement_in_policy(resource)
+
     def process_statement_in_policy(self, resource):
         self.logger.debug(resource)
         policy_statement = json.loads(resource['Policy']).get('Statement')
@@ -88,7 +103,9 @@ class CheckForOrganizationsDependency:
                         AWS_PRINCIPAL_ORG_ID.lower(),
                         AWS_PRINCIPAL_ORG_PATHS.lower(),
                         AWS_RESOURCE_ORG_ID.lower(),
-                        AWS_RESOURCE_ORG_PATHS.lower()
+                        AWS_RESOURCE_ORG_PATHS.lower(),
+                        AWS_SOURCE_ORG_ID.lower(),
+                        AWS_SOURCE_ORG_PATHS.lower()
                     ]:
                         policy_response: PolicyAnalyzerResponse = {
                             "ResourceName": resource_name,

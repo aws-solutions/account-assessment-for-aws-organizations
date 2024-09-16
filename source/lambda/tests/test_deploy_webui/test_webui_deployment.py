@@ -1,12 +1,10 @@
-# !/bin/python
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 import json
 from os import environ
 
 import pytest
-from aws_lambda_powertools.utilities.typing import LambdaContext
-from moto import mock_s3
+from moto import mock_aws
 from mypy_boto3_s3 import S3ServiceResource
 
 from aws.services.s3 import S3
@@ -34,7 +32,7 @@ def describe_webui_deploy():
     environ['AWS_SECURITY_TOKEN'] = 'testing'
     environ['AWS_SESSION_TOKEN'] = 'testing'
 
-    @mock_s3
+    @mock_aws
     def test_webui_files_are_copied_and_config_is_generated():
         # ARRANGE
         web_ui_deployer = WebUIDeployer()
@@ -73,7 +71,7 @@ def describe_webui_deploy():
         generated_config_filename = "aws-exports-generated.json"
         assert generated_config_filename in keys
 
-    @mock_s3
+    @mock_aws
     def test_lambda_handler_throws_no_such_bucket():
         # ARRANGE
 

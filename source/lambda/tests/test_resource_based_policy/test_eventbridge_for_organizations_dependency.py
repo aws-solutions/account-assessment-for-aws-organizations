@@ -1,9 +1,9 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 import boto3
 from aws_lambda_powertools import Logger
-from moto import mock_sts, mock_events
+from moto import mock_aws
 
 from resource_based_policy.resource_based_policy_model import ResourceBasedPolicyResponseModel
 from resource_based_policy.step_functions_lambda.scan_event_bus_policy import EventBusPolicy
@@ -12,8 +12,7 @@ from tests.test_resource_based_policy.mock_data import event
 logger = Logger(level="info")
 
 
-@mock_sts
-@mock_events
+@mock_aws
 def test_no_event_bus():
     # ACT
     response = EventBusPolicy(event).scan()
@@ -23,8 +22,7 @@ def test_no_event_bus():
     assert len(list(response)) == 0
 
 
-@mock_sts
-@mock_events
+@mock_aws
 def test_event_bus_no_policy():
     # ARRANGE
     for region in event['Regions']:
@@ -41,8 +39,7 @@ def test_event_bus_no_policy():
     assert len(list(response)) == 0
 
 
-@mock_sts
-@mock_events
+@mock_aws
 def test_event_bus_with_policy():
     # ARRANGE
     condition = {

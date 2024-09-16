@@ -1,5 +1,5 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 import os
 from os import environ
@@ -7,7 +7,7 @@ from os import environ
 import boto3
 import pytest
 from aws_lambda_powertools import Logger
-from moto import mock_organizations, mock_dynamodb, mock_stepfunctions, mock_s3, mock_iam, mock_glacier
+from moto import mock_aws
 
 from utils.base_repository import Clock
 
@@ -28,7 +28,7 @@ def aws_credentials():
 @pytest.fixture
 def org_client(aws_credentials):
     """Organizations Mock Client"""
-    with mock_organizations():
+    with mock_aws():
         connection = boto3.client("organizations", region_name="us-east-1")
         yield connection
 
@@ -36,42 +36,42 @@ def org_client(aws_credentials):
 @pytest.fixture(scope='module')
 def dynamodb_client_resource(aws_credentials):
     """DDB Mock Client"""
-    with mock_dynamodb():
+    with mock_aws():
         connection = boto3.resource("dynamodb")
         yield connection
 
 
 @pytest.fixture(scope='module')
 def stepfunctions_client(aws_credentials):
-    with mock_stepfunctions():
+    with mock_aws():
         connection = boto3.client("stepfunctions", region_name="us-east-1")
         yield connection
 
 
 @pytest.fixture(scope='module')
 def iam_client(aws_credentials):
-    with mock_iam():
+    with mock_aws():
         connection = boto3.client("iam", region_name="us-east-1")
         yield connection
 
 
 @pytest.fixture(scope='module')
 def s3_client(aws_credentials):
-    with mock_s3():
+    with mock_aws():
         connection = boto3.client("s3", region_name="us-east-1")
         yield connection
 
 
 @pytest.fixture(scope='module')
 def s3_client_resource(aws_credentials):
-    with mock_s3():
+    with mock_aws():
         connection = boto3.resource("s3", region_name="us-east-1")
         yield connection
 
 
 @pytest.fixture(scope='module')
 def glacier_client(aws_credentials):
-    with mock_glacier():
+    with mock_aws():
         connection = boto3.client("glacier", region_name="us-east-1")
         yield connection
 

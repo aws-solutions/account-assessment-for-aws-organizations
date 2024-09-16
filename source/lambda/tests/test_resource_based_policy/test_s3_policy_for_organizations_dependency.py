@@ -5,7 +5,7 @@ import os
 
 import pytest
 from aws_lambda_powertools import Logger
-from moto import mock_s3, mock_sts
+from moto import mock_aws
 
 from assessment_runner.jobs_repository import JobsRepository
 
@@ -16,8 +16,7 @@ from tests.test_resource_based_policy.mock_data import mock_policies, event
 logger = Logger(level="info")
 
 
-@mock_sts
-@mock_s3
+@mock_aws
 def test_s3_policy_scan_no_buckets():
     # ACT
     response = S3BucketPolicy(event).scan()
@@ -45,7 +44,8 @@ def s3_setup(s3_client, s3_client_resource):
                             f"put policy: {policy_object.get('MockPolicy')}")
     yield number_of_buckets
 
-@mock_sts
+
+@mock_aws
 def test_s3_policy_scan(s3_setup):
 
     # ACT
@@ -53,17 +53,40 @@ def test_s3_policy_scan(s3_setup):
     logger.info(response)
 
     # ASSERT
-    assert len(list(response)) == 6
+    assert len(list(response)) == 8
     for resource in response:
         assert resource['DependencyType'] in [
             'aws:PrincipalOrgID',
             'aws:PrincipalOrgPaths',
             'aws:ResourceOrgID',
-            'aws:ResourceOrgPaths'
+            'aws:ResourceOrgPaths',
+            'aws:SourceOrgID',
+            'aws:SourceOrgPaths'
         ]
 
+    # Make sure there is at least one test policy for each Dependency, so we're not missing a test case
+    policies_with_principal_org_id = [policy for policy in response if policy['DependencyType'] == 'aws:PrincipalOrgID']
+    assert len(policies_with_principal_org_id) > 0
 
-@mock_sts
+    policies_with_principal_org_paths = [policy for policy in response if
+                                         policy['DependencyType'] == 'aws:PrincipalOrgPaths']
+    assert len(policies_with_principal_org_paths) > 0
+
+    policies_with_resource_org_id = [policy for policy in response if policy['DependencyType'] == 'aws:ResourceOrgID']
+    assert len(policies_with_resource_org_id) > 0
+
+    policies_with_resource_org_paths = [policy for policy in response if
+                                        policy['DependencyType'] == 'aws:ResourceOrgPaths']
+    assert len(policies_with_resource_org_paths) > 0
+
+    policies_with_source_org_id = [policy for policy in response if policy['DependencyType'] == 'aws:SourceOrgID']
+    assert len(policies_with_source_org_id) > 0
+
+    policies_with_source_org_paths = [policy for policy in response if policy['DependencyType'] == 'aws:SourceOrgPaths']
+    assert len(policies_with_source_org_paths) > 0
+
+
+@mock_aws
 def test_s3_policy_scan_get_bucket_location_catches_error(job_history_table, s3_setup, mocker):
     mock_get_bucket_location = mocker.patch('aws.services.s3.S3.get_bucket_location')
     # Simulate the first and third call raising exceptions, every other call succeeding

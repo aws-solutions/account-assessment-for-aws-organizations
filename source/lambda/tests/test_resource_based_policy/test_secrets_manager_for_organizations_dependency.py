@@ -1,17 +1,18 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 import datetime
 
 from aws_lambda_powertools import Logger
-from moto import mock_sts
+from moto import mock_aws
 from mypy_boto3_secretsmanager.type_defs import SecretListEntryTypeDef, GetResourcePolicyResponseTypeDef
-from tests.test_resource_based_policy.mock_data import event
+
 from resource_based_policy.step_functions_lambda.scan_secrets_manager_policy import SecretsManagerPolicy
+from tests.test_resource_based_policy.mock_data import event
 
 logger = Logger(level="info", service="test_code_build")
 
 
-@mock_sts
+@mock_aws
 def test_mock_secretsmanager_scan_policy_no_policies(mocker):
     # ARRANGE
     mock_secretsmanager(mocker)
@@ -24,7 +25,7 @@ def test_mock_secretsmanager_scan_policy_no_policies(mocker):
     assert response == []
 
 
-@mock_sts
+@mock_aws
 def test_mock_secretsmanager_scan_policy(mocker):
     # ARRANGE
     list_secrets_response: list[SecretListEntryTypeDef] = [
