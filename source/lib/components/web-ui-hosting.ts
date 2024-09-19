@@ -1,3 +1,6 @@
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
+
 import {Construct} from "constructs";
 import {CloudFrontToS3} from "@aws-solutions-constructs/aws-cloudfront-s3";
 import {CfnOutput, CfnParameter, Duration} from "aws-cdk-lib";
@@ -8,7 +11,7 @@ import {
   ResponseHeadersPolicy,
   ViewerProtocolPolicy
 } from "aws-cdk-lib/aws-cloudfront";
-import {S3Origin} from "aws-cdk-lib/aws-cloudfront-origins";
+import {S3BucketOrigin} from "aws-cdk-lib/aws-cloudfront-origins";
 import * as defaults from '@aws-solutions-constructs/core';
 import {IBucket} from "aws-cdk-lib/aws-s3";
 
@@ -80,7 +83,7 @@ export class WebUIHosting extends Construct {
             }
           ],
           defaultBehavior: {
-            origin: new S3Origin(this.s3BucketInterface),
+            origin: S3BucketOrigin.withOriginAccessControl(this.s3BucketInterface),
             viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
             responseHeadersPolicy: securityHeadersPolicy,
 
