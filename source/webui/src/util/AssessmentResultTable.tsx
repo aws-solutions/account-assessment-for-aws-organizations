@@ -8,7 +8,6 @@ import {ReactElement, useState} from "react";
 import Table from "@cloudscape-design/components/table";
 import Header from "@cloudscape-design/components/header";
 import CollectionPreferences from "@cloudscape-design/components/collection-preferences";
-import {SortingState} from "@cloudscape-design/collection-hooks/dist/mjs/interfaces";
 
 export interface AssessmentResult {
   JobId: string,
@@ -77,7 +76,7 @@ type AssessmentResultTableProps = {
   title: string,
   data: any[],
   loading: boolean,
-  sorting: { defaultState?: SortingState<any> },
+  sorting: { defaultState?: TableProps.SortingState<any> },
   headerVariant: any,
   tableVariant: TableProps.Variant,
   actions: React.ReactElement<any, string | React.JSXElementConstructor<any>>,

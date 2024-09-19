@@ -1,5 +1,10 @@
 #!/bin/bash
 #
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+
+#
 # This script packages your project into a solution distributable that can be
 # used as an input to the solution builder validation pipeline.
 #
@@ -34,7 +39,7 @@ normal="$(tput sgr0)"
 # SETTINGS
 #------------------------------------------------------------------------------
 # Important: CDK global version number
-cdk_version="2.102.0"
+cdk_version="2.158.0"
 run_helper="true"
 
 #------------------------------------------------------------------------------
