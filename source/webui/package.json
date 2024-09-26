@@ -1,6 +1,6 @@
 {
   "name": "account-assessment-for-aws-organizations-webui",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "Account Assessment for AWS Organizations (SO0217)",
   "license": "Apache-2.0",
   "author": {
@@ -89,7 +89,8 @@
       "path-to-regexp": ">=8.1.0"
     },
     "path-to-regexp": ">=8.1.0",
-    "micromatch": ">=4.0.8"
+    "micromatch": ">=4.0.8",
+    "rollup": "3.29.5"
   },
   "jest": {
     "testMatch": [
