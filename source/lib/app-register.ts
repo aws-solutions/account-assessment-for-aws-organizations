@@ -15,10 +15,10 @@ import {
   Tags,
 } from "aws-cdk-lib";
 import * as appreg from "@aws-cdk/aws-servicecatalogappregistry-alpha";
-import { CfnApplication } from "aws-cdk-lib/aws-applicationinsights";
-import { CfnAttributeGroupAssociation, CfnResourceAssociation, } from "aws-cdk-lib/aws-servicecatalogappregistry";
-import { CfnResourceShare } from "aws-cdk-lib/aws-ram";
-import { IConstruct } from "constructs";
+import {CfnApplication} from "aws-cdk-lib/aws-applicationinsights";
+import {CfnAttributeGroupAssociation, CfnResourceAssociation,} from "aws-cdk-lib/aws-servicecatalogappregistry";
+import {CfnResourceShare} from "aws-cdk-lib/aws-ram";
+import {IConstruct} from "constructs";
 
 export interface AppRegisterProps {
   solutionId: string;
@@ -139,7 +139,7 @@ export class AppRegister {
   ) {
     const orgId = new CfnParameter(hubStack, "OrganizationID", {
       description:
-        "Organization ID to support multi account deployment. Leave blank for single account deployments.",
+          "Organization ID to support multi account deployment.",
       type: "String",
       allowedPattern: "^$|^o-[a-z0-9]{10,32}$",
       default: "",
@@ -150,7 +150,7 @@ export class AppRegister {
       "ManagementAccountId",
       {
         description:
-          "Account ID for the management account of the Organization. Leave blank for single account deployments.",
+            "Account ID for the management account of the Organization.",
         type: "String",
         default: "",
       }

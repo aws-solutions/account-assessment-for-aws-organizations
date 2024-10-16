@@ -40,7 +40,7 @@ The default deployment of solution pre-packaged template deploys following infra
 
 ### Setup
 
-- Python Prerequisite: python=3.9 | pip3=21.3.1
+- Python Prerequisite: python=3.12 | pip3=21.3.1
 - Javascript Prerequisite: node=v18.10.0 | npm=8.19.2
 
 Clone the repository and make desired code changes.

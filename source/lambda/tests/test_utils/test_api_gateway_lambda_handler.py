@@ -1,5 +1,5 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 from aws_lambda_powertools.utilities.typing import LambdaContext
 
@@ -24,6 +24,45 @@ def test_wraps_handler_response_in_http_response():
     # ASSERT
     assert response['statusCode'] == 200
     assert response['body'] == '{"foo": "bar"}'
+
+
+def test_accepts_content_type_case_insensitive():
+    # ARRANGE
+    def handler_function(_event, _context):
+        return {"foo": "bar"}
+
+    event = {
+        'body': '{}',
+        'headers': {
+            'Content-type': 'application/json; charset=UTF-8'
+        }
+    }
+
+    # ACT
+    response = GenericApiGatewayEventHandler().handle_and_create_response(event, LambdaContext(), handler_function)
+
+    # ASSERT
+    assert response['statusCode'] == 200
+    assert response['body'] == '{"foo": "bar"}'
+
+
+def test_returns_415_on_missing_header():
+    # ARRANGE
+    def handler_function(_event, _context):
+        raise IndexError()
+
+    event = {
+        'body': '{invalid_syntax}',
+        'headers': {
+            # content-type header is missing
+        }
+    }
+
+    # ACT
+    response = GenericApiGatewayEventHandler().handle_and_create_response(event, LambdaContext(), handler_function)
+
+    # ASSERT
+    assert response['statusCode'] == 415
 
 
 def test_wraps_handler_error_in_http_response():
