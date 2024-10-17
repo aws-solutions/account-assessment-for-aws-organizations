@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.14] - 2024-10
+
+### Changed
+
+- Remove dependencies `bootstrap` and `datefns`
+- Allow backend to accept uppercase http headers, to prevent errors when receiving uppercase `Content-type`
+- Replace pip3/requirements.txt dependency management with Poetry
+
+### Added
+
+- Add poetry.lock file to support reproducible builds, improve vulnerability scanning
+
 ## [1.0.13] - 2024-9
 
 - Upgrade `rollup` to mitigate [CVE-2024-47068](https://nvd.nist.gov/vuln/detail/CVE-2024-47068)

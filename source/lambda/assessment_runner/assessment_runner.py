@@ -1,7 +1,8 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 import os
+import traceback
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import List, Dict, Optional
@@ -61,11 +62,12 @@ class AssessmentRunner:
                 return new_job
         except Exception as e:
             self.logger.error('Failed to scan/write in Job ' + new_job['JobId'])
+            self.logger.error(traceback.format_exc())
             self.logger.error(e)
             if isinstance(e, ClientException):
                 new_job['Error'] = e.error + " " + e.message
             self._finish_job(new_job, JobStatus.FAILED)
-            raise e
+            raise
 
     def _create_job_entry_in_ddb(self, event: APIGatewayProxyEvent) -> JobModel:
 

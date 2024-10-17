@@ -26,8 +26,7 @@ setup_python_env() {
 
     echo "Installing python packages"
     # install test dependencies in the python virtual environment
-	pip3 install -r testing_requirements.txt
-	pip3 install -r requirements.txt
+  "$POETRY_HOME"/bin/poetry install
 
 	echo "deactivate virtual environment"
 	deactivate

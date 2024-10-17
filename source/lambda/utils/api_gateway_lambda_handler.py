@@ -1,7 +1,8 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 import json
+import traceback
 from json import JSONDecodeError
 from os import getenv
 from typing import TypedDict, List
@@ -44,6 +45,33 @@ class ClientException(Exception):
         self.status_code = status_code
 
 
+def validate_content_type(event: dict):
+    allowed_content_types = [
+        'application/json',
+        'application/json; charset=utf-8'
+    ]
+    content_type: str | None = None
+
+    # Iterate through the headers and find the 'Content-Type' header (case-insensitive)
+    for header_key, header_value in event["headers"].items():
+        if header_key.lower() == 'content-type':
+            content_type = header_value.lower()
+            break
+
+    if not content_type in allowed_content_types:
+        raise ClientException(
+            error='Invalid content-type',
+            message=f'Accepting: {", ".join(allowed_content_types)}',
+            status_code=415
+        )
+
+
+def validate_body(event: dict):
+    if event.get("body"):
+        validate_content_type(event)
+        json.loads(event["body"])
+
+
 class GenericApiGatewayEventHandler:
 
     def __init__(self):
@@ -64,7 +92,7 @@ class GenericApiGatewayEventHandler:
             self.logger.debug(f"Event: {str(event)}")
             self.logger.debug(f"Context: {str(context)}")
 
-            self.validate_body(event)
+            validate_body(event)
 
             event = APIGatewayProxyEvent(event)
 
@@ -85,6 +113,7 @@ class GenericApiGatewayEventHandler:
                 }
         except ClientException as error:
             self.logger.error(f"Error: {error}")
+            self.logger.error(traceback.format_exc())
             body = json.dumps({
                 'Error': error.error,
                 'Message': error.message
@@ -96,6 +125,7 @@ class GenericApiGatewayEventHandler:
             }
         except JSONDecodeError as error:
             self.logger.error(f"Error: {error}")
+            self.logger.error(traceback.format_exc())
             body = json.dumps({
                 'Error': 'JSONDecodeError',
                 'Message': error.msg
@@ -107,6 +137,7 @@ class GenericApiGatewayEventHandler:
             }
         except Exception as error:
             self.logger.error(f"Error: {error}")
+            self.logger.error(traceback.format_exc())
             error_type = type(error).__name__
             body = {
                 "Error": error_type,
@@ -117,13 +148,3 @@ class GenericApiGatewayEventHandler:
                 'body': json.dumps(body),
                 'headers': default_headers,
             }
-
-    def validate_body(self, event):
-        if event.get("body"):
-            if event["headers"].get("content-type") != 'application/json' and \
-                    event["headers"].get("content-type") != 'application/json; charset=UTF-8':
-                raise ClientException(error='Invalid content-type',
-                                      message='Accepting application/json or application/json; charset=UTF-8',
-                                      status_code=415)
-            else:
-                json.loads(event["body"])
