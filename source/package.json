@@ -1,6 +1,6 @@
 {
   "name": "account-assessment-for-aws-organizations",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "Account Assessment for AWS Organizations (SO0217)",
   "license": "Apache-2.0",
   "author": {
@@ -28,7 +28,7 @@
     "@types/jest": "^29.5.3",
     "@types/node": "^20.4.9",
     "@types/sinon": "^10.0.12",
-    "aws-cdk": "^2.158.0",
+    "aws-cdk": "^2.163.1",
     "jest": "^29.6.2",
     "sinon": "^17.0.0",
     "ts-jest": "^29.1.1",
@@ -39,8 +39,8 @@
     "@aws-cdk/aws-servicecatalogappregistry-alpha": "^2.158.0-alpha.0",
     "@aws-solutions-constructs/aws-cloudfront-s3": "^2.70.0",
     "@aws-solutions-constructs/aws-wafwebacl-apigateway": "^2.70.0",
-    "aws-cdk-lib": "^2.158.0",
-    "cdk-nag": "^2.28.195",
+    "aws-cdk-lib": "^2.163.1",
+    "cdk-nag": "^2.29.14",
     "constructs": "^10.3.0"
   },
   "overrides": {

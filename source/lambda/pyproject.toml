@@ -4,11 +4,11 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
-aws-lambda-powertools = "~3.1.0"
+aws-lambda-powertools = "~3.2.0"
 aws-xray-sdk = "~2.14.0"
-botocore = "~1.35.41"
-boto3 = "~1.35.41"
-boto3-stubs = { extras = ["essential", "sts", "organizations", "stepfunctions", "s3", "glacier", "iam", "sns", "sqs", "lambda", "efs", "secretsmanager", "iot", "kms", "apigateway", "events", "sesv2", "ecr", "config", "ssm-incidents", "opensearch", "cloudformation", "glue", "serverlessrepo", "backup", "codeartifact", "codebuild", "mediastore", "ec2"], version = "~1.35.41" }
+botocore = "~1.35.46"
+boto3 = "~1.35.46"
+boto3-stubs = { extras = ["essential", "sts", "organizations", "stepfunctions", "s3", "glacier", "iam", "sns", "sqs", "lambda", "efs", "secretsmanager", "iot", "kms", "apigateway", "events", "sesv2", "ecr", "config", "ssm-incidents", "opensearch", "cloudformation", "glue", "serverlessrepo", "backup", "codeartifact", "codebuild", "mediastore", "ec2"], version = "~1.35.46" }
 cfnresponse = "~1.1.5"
 requests = "~2.32.3"
 pyparsing = "~3.2.0"
@@ -17,8 +17,8 @@ pydantic = "~2.9.2"
 [tool.poetry.group.dev.dependencies]
 python = "^3.12"
 mock = "~5.1.0"
-boto3-stubs = { extras = ["essential"], version = "~1.35.41" }
-moto = {extras = ["sts", "organizations", "stepfunctions", "s3", "glacier", "iam", "sns", "sqs", "lambda", "efs", "secretsmanager", "iot", "kms", "apigateway", "events", "sesv2", "ecr", "config", "ssm-incidents", "opensearch", "cloudformation", "glue", "serverlessrepo", "backup", "codeartifact", "codebuild", "mediastore", "ec2"], version = "~5.0.17"}
+boto3-stubs = { extras = ["essential"], version = "~1.35.46" }
+moto = {extras = ["sts", "organizations", "stepfunctions", "s3", "glacier", "iam", "sns", "sqs", "lambda", "efs", "secretsmanager", "iot", "kms", "apigateway", "events", "sesv2", "ecr", "config", "ssm-incidents", "opensearch", "cloudformation", "glue", "serverlessrepo", "backup", "codeartifact", "codebuild", "mediastore", "ec2"], version = "~5.0.18"}
 pytest = "~8.3.3"
 pytest-mock = "~3.14.0"
 pytest-runner = "~6.0.1"
