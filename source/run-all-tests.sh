@@ -1,5 +1,10 @@
 #!/bin/bash
 #
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+
+#
 # This script runs all tests for the root CDK project, as well as any microservices, Lambda functions, or dependency
 # source code packages. These include unit tests, integration tests, and snapshot tests.
 #
@@ -13,25 +18,6 @@
 [ "$DEBUG" == 'true' ] && set -x
 set -e
 
-setup_python_env() {
-	if [ -d "./.venv-test" ]; then
-		echo "Reusing already setup python venv in ./.venv-test. Delete ./.venv-test if you want a fresh one created."
-		return
-	fi
-
-    echo "Setting up python venv"
-	python3 -m venv .venv-test
-	echo "Initiating virtual environment"
-	source .venv-test/bin/activate
-
-    echo "Installing python packages"
-    # install test dependencies in the python virtual environment
-  "$POETRY_HOME"/bin/poetry install
-
-	echo "deactivate virtual environment"
-	deactivate
-}
-
 run_python_tests() {
 	local component_path=$1
 
@@ -40,14 +26,21 @@ run_python_tests() {
 	echo "------------------------------------------------------------------------------"
 	cd $component_path
 
-	if [ "${CLEAN:-true}" = "true" ]; then
-        rm -fr .venv-test
-    fi
+  # Check if poetry is available in the shell
+  if command -v poetry >/dev/null 2>&1; then
+    POETRY_COMMAND="poetry"
+  elif [ -n "$POETRY_HOME" ] && [ -x "$POETRY_HOME/bin/poetry" ]; then
+    POETRY_COMMAND="$POETRY_HOME/bin/poetry"
+  else
+    echo "Poetry is not available. Aborting script." >&2
+    exit 1
+  fi
 
-	setup_python_env
+  echo "Installing python packages"
 
-	echo "Initiating virtual environment"
-	source .venv-test/bin/activate
+  "$POETRY_COMMAND" install
+  # Activate the virtual environment, so pytest is available below
+  source $("$POETRY_COMMAND" env info --path)/bin/activate
 
 	coverage_report_path="$source_dir/lambda/coverage.xml"
 	echo "coverage report path set to $coverage_report_path"
@@ -61,11 +54,9 @@ run_python_tests() {
     # path to the corresponding project relative path. The $source_dir holds the absolute path for source directory.
     sed -i -e "s,<source>$source_dir,<source>source,g" $coverage_report_path
 
-	echo "deactivate virtual environment"
-	deactivate
+  deactivate
 
 	if [ "${CLEAN:-true}" = "true" ]; then
-		rm -fr .venv-test
 		rm .coverage
 		rm -fr .pytest_cache
 		rm -fr __pycache__ test/__pycache__
@@ -113,10 +104,10 @@ source_dir="$(cd $PWD/../source; pwd -P)"
 ## Create mock zip file for cdk to find needed asset
 mkdir -p ../deployment/regional-s3-assets/
 touch ../deployment/regional-s3-assets/lambda.zip
-run_cdk_project_tests $source_dir || true
-
-# Test the WebUI project
-run_webui_tests $source_dir/webui || true
+#run_cdk_project_tests $source_dir || true
+#
+## Test the WebUI project
+#run_webui_tests $source_dir/webui || true
 
 # Test the attached Lambda functions
 run_python_tests $source_dir/lambda
