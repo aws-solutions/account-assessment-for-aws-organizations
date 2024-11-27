@@ -1,6 +1,6 @@
 {
   "name": "account-assessment-for-aws-organizations",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "Account Assessment for AWS Organizations (SO0217)",
   "license": "Apache-2.0",
   "author": {
