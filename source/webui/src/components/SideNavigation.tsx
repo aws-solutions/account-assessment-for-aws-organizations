@@ -27,23 +27,45 @@ export function Navigation() {
           }}
           items={[
             {
+              text: "Dashboard",
+              type: "link",
+              href: "/"
+            },
+            {
+              type: "divider"
+            },
+            {
               text: "Findings",
               type: "section",
               items: [
                 {
                   text: "Resource-Based Policies",
                   type: "link",
-                  href: "/assessments/resource-based-policy"
+                  href: "/resource-based-policy"
                 },
                 {
                   text: "Delegated Admin Accounts",
                   type: "link",
-                  href: "/assessments/delegated-admin"
+                  href: "/delegated-admin"
                 },
                 {
                   text: "Trusted Access",
                   type: "link",
-                  href: "/assessments/trusted-access"
+                  href: "/trusted-access"
+                }
+              ]
+            },
+            {
+              type: "divider"
+            },
+            {
+              text: "Policy Explorer",
+              type: "section",
+              items: [
+                {
+                  text: "Search",
+                  type: "link",
+                  href: "/policy-explorer"
                 }
               ]
             },

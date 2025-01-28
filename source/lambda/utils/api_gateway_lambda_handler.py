@@ -3,6 +3,7 @@
 
 import json
 import traceback
+from datetime import datetime, timezone
 from json import JSONDecodeError
 from os import getenv
 from typing import TypedDict, List
@@ -15,6 +16,7 @@ from typing_extensions import NotRequired
 from utils.decimal_json_encoder import DecimalJsonEncoder
 
 APPLICATION_JSON = 'application/json'
+APPLICATION_JSON_UTF8 = 'application/json; charset=utf-8'
 ALLOWED_HEADERS = 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'
 default_headers = {
     'Access-Control-Allow-Headers': ALLOWED_HEADERS,
@@ -47,8 +49,8 @@ class ClientException(Exception):
 
 def validate_content_type(event: dict):
     allowed_content_types = [
-        'application/json',
-        'application/json; charset=utf-8'
+        APPLICATION_JSON,
+        APPLICATION_JSON_UTF8
     ]
     content_type: str | None = None
 
@@ -117,7 +119,7 @@ class GenericApiGatewayEventHandler:
             body = json.dumps({
                 'Error': error.error,
                 'Message': error.message
-            })
+            }, cls=DecimalJsonEncoder)
             return {
                 'statusCode': error.status_code,
                 'body': body,
@@ -129,7 +131,7 @@ class GenericApiGatewayEventHandler:
             body = json.dumps({
                 'Error': 'JSONDecodeError',
                 'Message': error.msg
-            })
+            }, cls=DecimalJsonEncoder)
             return {
                 'statusCode': 400,
                 'body': body,
@@ -141,10 +143,26 @@ class GenericApiGatewayEventHandler:
             error_type = type(error).__name__
             body = {
                 "Error": error_type,
-                "Message": "An unexpected error occurred"
+                "Message": "An unexpected error occurred. Inspect CloudWatch logs for more information.",
+                "Timestamp": datetime.now(tz=timezone.utc).isoformat(),
             }
             return {
-                'statusCode': 500,
-                'body': json.dumps(body),
+                'statusCode': 400,
+                'body': json.dumps(body, cls=DecimalJsonEncoder),
                 'headers': default_headers,
             }
+
+    def validate_body(self, event):
+        if event.get("body"):
+            content_type_key = "content-type"
+            for key in event["headers"].keys():
+                if key.lower() == "content-type":
+                    content_type_key = key
+
+            if event["headers"].get(content_type_key) != APPLICATION_JSON and \
+                    event["headers"].get(content_type_key) != APPLICATION_JSON_UTF8:
+                raise ClientException(error='Invalid content-type',
+                                      message='Accepting application/json or application/json; charset=UTF-8',
+                                      status_code=415)
+            else:
+                json.loads(event["body"])

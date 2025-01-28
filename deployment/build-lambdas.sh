@@ -1,4 +1,10 @@
 #!/bin/bash
+#
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+
+[ "$DEBUG" == 'true' ] && set -x
 deployment_dir="$PWD"
 staging_dist_dir="$deployment_dir/staging"
 build_dist_dir="$deployment_dir/regional-s3-assets"
@@ -18,12 +24,31 @@ build_python_artifacts() {
   cd $lambda_artifact_name
   rm -fr .venv
   rm -fr .venv-test
-  pip3 install -r requirements.txt --target .
+
+  # Check if poetry is available in the shell
+  if command -v poetry >/dev/null 2>&1; then
+    POETRY_COMMAND="poetry"
+  elif [ -n "$POETRY_HOME" ] && [ -x "$POETRY_HOME/bin/poetry" ]; then
+    POETRY_COMMAND="$POETRY_HOME/bin/poetry"
+  else
+    echo "Poetry is not available. Aborting script." >&2
+    exit 1
+  fi
+
+  # Try to export the requirements.txt file
+  if "$POETRY_COMMAND" export --without dev -f requirements.txt --output requirements.txt --without-hashes; then
+    # If the export was successful, install the requirements
+    pip3 install -r requirements.txt --target .
+  else
+    echo "Failed to generate requirements.txt file. Aborting script." >&2
+    exit 1
+  fi
+
   pip3 install -U pip-licenses
   pip-licenses --from=mixed --order=license
   rm -fr __pycache__
   rm -fr tests
-  rm -rf requirements.txt testing_requirements.txt .coveragerc LICENSE
+  rm -rf requirements.txt .coveragerc coverage.xml LICENSE
 }
 
 package_lambda_dir()
@@ -51,3 +76,4 @@ echo "Create staging directory $staging_dist_dir"
 mkdir -p "$staging_dist_dir"
 build_python_artifacts
 package_lambda_dir
+echo "Finished build-lambdas.sh"

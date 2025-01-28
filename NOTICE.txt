@@ -11,147 +11,440 @@ THIRD PARTY COMPONENTS
 **********************
 This software includes third party software subject to the following copyrights:
 
-npm packages:
-@aws-amplify/api under Apache-2.0
-@aws-amplify/auth under Apache-2.0
-@aws-amplify/core under Apache-2.0
-@cloudscape-design/collection-hooks under Apache-2.0
-@cloudscape-design/components under Apache-2.0
-@cloudscape-design/design-tokens under Apache-2.0
-@cloudscape-design/global-styles under Apache-2.0
-@types/node under MIT
-@types/react under MIT
-@types/react-dom under MIT
-bootstrap under MIT
-date-fns under MIT
-react under MIT
-react-dom under MIT
-react-router-dom under MIT
-react-scripts under MIT
-typescript under Apache-2.0
-web-vitals under Apache-2.0
-@babel/core under MIT
-@babel/preset-env under MIT
-@babel/preset-react under MIT
-@babel/preset-typescript under MIT
-@testing-library/jest-dom under MIT
-@testing-library/react under MIT
-@testing-library/user-event under MIT
-@types/jest under MIT
-babel-jest under MIT
-msw under MIT
-renamer under MIT
-@aws-solutions-constructs/aws-cloudfront-s3 under Apache-2.0
-aws-cdk-lib under Apache-2.0
-constructs under Apache-2.0
-@aws-cdk/assert under Apache-2.0
-@types/jest under MIT
-@types/node under MIT
-@types/sinon under MIT
-aws-cdk under Apache-2.0
-jest under MIT
-sinon under BSD-3-Clause
-ts-jest under MIT
-ts-node under MIT
-typescript under Apache-2.0
-@aws-cdk/aws-servicecatalogappregistry-alpha under Apache-2.0
-@aws-solutions-constructs/aws-wafwebacl-apigateway under Apache-2.0
-cdk-nag under Apache-2.0
-webpack-dev-middleware under MIT
-aws-cdk.asset-awscli-v1 under Apache-2.0
-aws-cdk.asset-kubectl-v20 under Apache-2.0
-aws-cdk.asset-node-proxy-agent-v6 under Apache-2.0
-jsii under Apache-2.0
-minimist under MIT
+Python Packages:
+=================
+ GitPython                 BSD-3-Clause
+ MarkupSafe                BSD-3-Clause
+ PyYAML                    MIT
+ aws-sam-translator        Apache License 2.0
+ backports.shutil-get-terminal-size MIT
+ boto3                     Apache License 2.0
+ botocore                  Apache License 2.0
+ certifi                   MPL-2.0
+ cfn-lint                  MIT no attribution
+ charset-normalizer        MIT
+ dataclasses-jsonschema    MIT
+ dulwich                   Apachev2 or later or GPLv2
+ gitdb                     BSD License
+ jmespath                  MIT
+ jsonpatch                 Modified BSD License
+ jsonpointer               Modified BSD License
+ mpmath                    BSD
+ pathspec                  MPL 2.0
+ pip                       MIT
+ pip-licenses              MIT
+ pydantic_core             MIT
+ pyrsistent                MIT
+ python-dateutil           Dual License
+ regex                     Apache Software License
+ reprint                   Apache-2.0
+ requests                  Apache-2.0
+ s3transfer                Apache License 2.0
+ six                       MIT
+ smmap                     BSD-3-Clause
+ sympy                     BSD
+ tabulate                  MIT
+ tomli                     MIT License
+ urllib3                   MIT
+ wcwidth                   MIT
 
-pip packages:
- aws-xray-sdk               Apache Software License
- boto3                      Apache Software License
- botocore                   Apache Software License
- cfnresponse                Apache Software License
- s3transfer                 Apache Software License
- requests                   Apache Software License
- importlib-resources        Apache Software License
- coverage                   Apache Software License
- docker                     Apache Software License
- jsonschema-path            Apache Software License
- moto                       Apache Software License
- rsa                        Apache Software License
- websocket-client           Apache Software License
- cryptography               Apache Software License; BSD License
- python-dateutil            Apache Software License; BSD License
- responses                  Apache-2.0
- pathable                   Apache-2.0
- fastjsonschema             BSD License
- docutils                   BSD License
- mock                       BSD License
- openapi-schema-validator   BSD License
- openapi-spec-validator     BSD License
- wrapt                      BSD License
- Jinja2                     BSD License
- MarkupSafe                 BSD License
- lazy-object-proxy          BSD License
- Werkzeug                   BSD License
- colorama                   BSD License
- pyasn1                     BSD License
- pycparser                  BSD License
- pytest                     MIT License
- pytest-cov                 MIT License
- pytest-describe            MIT License
- pytest-mock                MIT License
- pytest-runner              MIT License
- xmltodict                  MIT License
- referencing                MIT License
- cffi                       MIT License
- jsonschema-specifications  MIT License
- iniconfig                  MIT License
- rfc3339-validator          MIT License
- rpds-py                    MIT License
- pluggy                     MIT License
- annotated-types            MIT License
- boto3-stubs                MIT License
- botocore-stubs             MIT License
- jmespath                   MIT License
- mypy-boto3-apigateway      MIT License
- mypy-boto3-backup          MIT License
- mypy-boto3-cloudformation  MIT License
- mypy-boto3-codeartifact    MIT License
- mypy-boto3-codebuild       MIT License
- mypy-boto3-config          MIT License
- mypy-boto3-dynamodb        MIT License
- mypy-boto3-ec2             MIT License
- mypy-boto3-ecr             MIT License
- mypy-boto3-efs             MIT License
- mypy-boto3-events          MIT License
- mypy-boto3-glacier         MIT License
- mypy-boto3-glue            MIT License
- mypy-boto3-iam             MIT License
- mypy-boto3-iot             MIT License
- mypy-boto3-kms             MIT License
- mypy-boto3-lambda          MIT License
- mypy-boto3-mediastore      MIT License
- mypy-boto3-opensearch      MIT License
- mypy-boto3-organizations   MIT License
- mypy-boto3-rds             MIT License
- mypy-boto3-s3              MIT License
- mypy-boto3-secretsmanager  MIT License
- mypy-boto3-serverlessrepo  MIT License
- mypy-boto3-sesv2           MIT License
- mypy-boto3-sns             MIT License
- mypy-boto3-sqs             MIT License
- mypy-boto3-ssm-incidents   MIT License
- mypy-boto3-stepfunctions   MIT License
- mypy-boto3-sts             MIT License
- six                        MIT License
- types-awscrt               MIT License
- types-s3transfer           MIT License
- urllib3                    MIT License
- pyparsing                  MIT License
- pydantic                   MIT License
- pydantic_core              MIT License
- publication                MIT License
- typeguard                  MIT License
- cattrs                     MIT License
- attrs                      MIT
- aws-lambda-powertools      MIT No Attribution
- typing_extensions          Python Software Foundation License
+Node.js Packages:
+==================
+ ace-builds                BSD-3-Clause
+ acorn                     MIT
+ acorn-walk                MIT
+ agent-base                MIT
+ ajv                       MIT
+ ansi-escapes              MIT
+ ansi-regex                MIT
+ ansi-styles               MIT
+ anymatch                  ISC
+ aproba                    ISC
+ are-we-there-yet          ISC
+ arg                       MIT
+ argparse                  MIT
+ aria-query                Apache-2.0
+ assertion-error           MIT
+ astral-regex              MIT
+ async                     MIT
+ asynckit                  MIT
+ at-least-node             ISC
+ aws-amplify               Apache-2.0
+ aws-cdk                   Apache-2.0
+ aws-cdk-lib               Apache-2.0
+ babel-jest                MIT
+ babel-plugin-istanbul     BSD-3-Clause
+ babel-plugin-jest-hoist   MIT
+ babel-preset-current-node-syntax MIT
+ babel-preset-jest         MIT
+ balanced-match            MIT
+ base64-js                 MIT
+ bowser                    MIT
+ brace-expansion           MIT
+ braces                    MIT
+ browserslist              MIT
+ browserslist-to-esbuild   MIT
+ bs-logger                 MIT
+ bser                      Apache-2.0
+ buffer                    MIT
+ buffer-from               MIT
+ cac                       MIT
+ callsites                 MIT
+ camelcase                 MIT
+ caniuse-lite              CC-BY-4.0
+ case                      (MIT OR GPL-3.0-or-later)
+ cdk-nag                   Apache-2.0
+ chai                      MIT
+ chalk                     MIT
+ char-regex                MIT
+ charenc                   BSD-3-Clause
+ check-error               MIT
+ ci-info                   MIT
+ cjs-module-lexer          MIT
+ cli-width                 ISC
+ cliui                     ISC
+ clsx                      MIT
+ co                        MIT
+ collect-v8-coverage       MIT
+ color-convert             MIT
+ color-name                MIT
+ color-support             ISC
+ combined-stream           MIT
+ concat-map                MIT
+ console-control-strings   ISC
+ constructs                Apache-2.0
+ convert-source-map        MIT
+ cookie                    MIT
+ crc-32                    Apache-2.0
+ create-jest               MIT
+ create-require            MIT
+ cross-spawn               MIT
+ crypt                     BSD-3-Clause
+ css-selector-tokenizer    MIT
+ css.escape                MIT
+ cssesc                    MIT
+ cssstyle                  MIT
+ csstype                   MIT
+ d3-path                   BSD-3-Clause
+ d3-shape                  BSD-3-Clause
+ data-urls                 MIT
+ date-fns                  MIT
+ debug                     MIT
+ decimal.js                MIT
+ dedent                    MIT
+ deep-diff                 MIT
+ deep-eql                  MIT
+ deepmerge                 MIT
+ define-lazy-prop          MIT
+ delayed-stream            MIT
+ dequal                    MIT
+ detect-newline            MIT
+ diff                      BSD-3-Clause
+ diff-sequences            MIT
+ dom-accessibility-api     MIT
+ dom-helpers               MIT
+ eastasianwidth            MIT
+ ejs                       Apache-2.0
+ electron-to-chromium      ISC
+ emittery                  MIT
+ emoji-regex               MIT
+ entities                  BSD-2-Clause
+ error-ex                  MIT
+ es-module-lexer           MIT
+ esbuild                   MIT
+ escalade                  MIT
+ escape-string-regexp      MIT
+ esprima                   BSD-2-Clause
+ estree-walker             MIT
+ execa                     MIT
+ exit                      MIT
+ expect                    MIT
+ expect-type               Apache-2.0
+ fast-deep-equal           MIT
+ fast-json-stable-stringify MIT
+ fast-uri                  BSD-3-Clause
+ fast-xml-parser           MIT
+ fastparse                 MIT
+ fb-watchman               Apache-2.0
+ filelist                  Apache-2.0
+ fill-range                MIT
+ find-up                   MIT
+ foreground-child          ISC
+ form-data                 MIT
+ fs-extra                  MIT
+ fs.realpath               ISC
+ fsevents                  MIT
+ function-bind             MIT
+ gauge                     ISC
+ gensync                   MIT
+ get-caller-file           ISC
+ get-package-type          MIT
+ get-stream                MIT
+ glob                      ISC
+ globals                   MIT
+ graceful-fs               ISC
+ graphql                   MIT
+ has-flag                  MIT
+ has-unicode               ISC
+ hasown                    MIT
+ headers-polyfill          MIT
+ html-encoding-sniffer     MIT
+ html-escaper              MIT
+ http-proxy-agent          MIT
+ https-proxy-agent         MIT
+ human-signals             Apache-2.0
+ iconv-lite                MIT
+ idb                       ISC
+ ieee754                   BSD-3-Clause
+ ignore                    MIT
+ immer                     MIT
+ import-local              MIT
+ imurmurhash               MIT
+ indent-string             MIT
+ inflight                  ISC
+ inherits                  ISC
+ intl-messageformat        BSD-3-Clause
+ is-arrayish               MIT
+ is-buffer                 MIT
+ is-core-module            MIT
+ is-docker                 MIT
+ is-fullwidth-code-point   MIT
+ is-generator-fn           MIT
+ is-node-process           MIT
+ is-number                 MIT
+ is-potential-custom-element-name MIT
+ is-stream                 MIT
+ is-wsl                    MIT
+ isarray                   MIT
+ isexe                     ISC
+ istanbul-lib-coverage     BSD-3-Clause
+ istanbul-lib-instrument   BSD-3-Clause
+ istanbul-lib-report       BSD-3-Clause
+ istanbul-lib-source-maps  BSD-3-Clause
+ istanbul-reports          BSD-3-Clause
+ jackspeak                 BlueOak-1.0.0
+ jake                      Apache-2.0
+ jest                      MIT
+ jest-changed-files        MIT
+ jest-circus               MIT
+ jest-cli                  MIT
+ jest-config               MIT
+ jest-diff                 MIT
+ jest-docblock             MIT
+ jest-each                 MIT
+ jest-environment-node     MIT
+ jest-get-type             MIT
+ jest-haste-map            MIT
+ jest-leak-detector        MIT
+ jest-matcher-utils        MIT
+ jest-message-util         MIT
+ jest-mock                 MIT
+ jest-pnp-resolver         MIT
+ jest-regex-util           MIT
+ jest-resolve              MIT
+ jest-resolve-dependencies MIT
+ jest-runner               MIT
+ jest-runtime              MIT
+ jest-snapshot             MIT
+ jest-util                 MIT
+ jest-validate             MIT
+ jest-watcher              MIT
+ jest-worker               MIT
+ js-cookie                 MIT
+ js-tokens                 MIT
+ js-yaml                   MIT
+ jsdom                     MIT
+ jsesc                     MIT
+ json-parse-even-better-errors MIT
+ json-schema-traverse      MIT
+ json5                     MIT
+ jsonfile                  MIT
+ jsonschema                MIT
+ just-extend               MIT
+ kleur                     MIT
+ leven                     MIT
+ lines-and-columns         MIT
+ locate-path               MIT
+ lodash                    MIT
+ lodash.get                MIT
+ lodash.memoize            MIT
+ lodash.truncate           MIT
+ loose-envify              MIT
+ loupe                     MIT
+ lru-cache                 ISC
+ lz-string                 MIT
+ magic-string              MIT
+ magicast                  MIT
+ make-dir                  MIT
+ make-error                ISC
+ makeerror                 BSD-3-Clause
+ md5                       BSD-3-Clause
+ meow                      MIT
+ merge-stream              MIT
+ micromatch                MIT
+ mime-db                   MIT
+ mime-types                MIT
+ mimic-fn                  MIT
+ min-indent                MIT
+ minimatch                 ISC
+ minipass                  ISC
+ mnth                      MIT
+ ms                        MIT
+ msw                       MIT
+ mute-stream               ISC
+ nanoid                    MIT
+ natural-compare           MIT
+ nise                      BSD-3-Clause
+ node-int64                MIT
+ node-releases             MIT
+ normalize-path            MIT
+ npm-run-path              MIT
+ npmlog                    ISC
+ nwsapi                    MIT
+ object-assign             MIT
+ once                      ISC
+ onetime                   MIT
+ open                      MIT
+ outvariant                MIT
+ p-limit                   MIT
+ p-locate                  MIT
+ p-try                     MIT
+ package-json-from-dist    BlueOak-1.0.0
+ parse-json                MIT
+ parse5                    MIT
+ path-exists               MIT
+ path-is-absolute          MIT
+ path-key                  MIT
+ path-parse                MIT
+ path-scurry               BlueOak-1.0.0
+ path-to-regexp            MIT
+ pathe                     MIT
+ pathval                   MIT
+ picocolors                ISC
+ picomatch                 MIT
+ pirates                   MIT
+ pkg-dir                   MIT
+ postcss                   MIT
+ pretty-format             MIT
+ prompts                   MIT
+ prop-types                MIT
+ psl                       MIT
+ punycode                  MIT
+ pure-rand                 MIT
+ querystringify            MIT
+ react                     MIT
+ react-dom                 MIT
+ react-is                  MIT
+ react-keyed-flatten-children MIT
+ react-redux               MIT
+ react-refresh             MIT
+ react-router              MIT
+ react-router-dom          MIT
+ react-transition-group    BSD-3-Clause
+ redent                    MIT
+ redux                     MIT
+ redux-thunk               MIT
+ regenerator-runtime       MIT
+ require-directory         MIT
+ require-from-string       MIT
+ requires-port             MIT
+ reselect                  MIT
+ resolve                   MIT
+ resolve-cwd               MIT
+ resolve-from              MIT
+ resolve.exports           MIT
+ rollup                    MIT
+ rollup-plugin-visualizer  MIT
+ rrweb-cssom               MIT
+ rxjs                      Apache-2.0
+ safer-buffer              MIT
+ saxes                     ISC
+ scheduler                 MIT
+ semver                    ISC
+ set-blocking              ISC
+ shebang-command           MIT
+ shebang-regex             MIT
+ siginfo                   ISC
+ signal-exit               ISC
+ sinon                     BSD-3-Clause
+ sisteransi                MIT
+ slash                     MIT
+ slice-ansi                MIT
+ source-map                BSD-3-Clause
+ source-map-js             BSD-3-Clause
+ source-map-support        MIT
+ sprintf-js                BSD-3-Clause
+ stack-utils               MIT
+ stackback                 MIT
+ statuses                  MIT
+ std-env                   MIT
+ strict-event-emitter      MIT
+ string-length             MIT
+ string-width              MIT
+ strip-ansi                MIT
+ strip-bom                 MIT
+ strip-final-newline       MIT
+ strip-indent              MIT
+ strip-json-comments       MIT
+ strnum                    MIT
+ supports-color            MIT
+ supports-preserve-symlinks-flag MIT
+ symbol-tree               MIT
+ table                     BSD-3-Clause
+ test-exclude              ISC
+ tinybench                 MIT
+ tinyexec                  MIT
+ tinypool                  MIT
+ tinyrainbow               MIT
+ tinyspy                   MIT
+ tldts                     MIT
+ tldts-core                MIT
+ tmpl                      BSD-3-Clause
+ to-fast-properties        MIT
+ to-regex-range            MIT
+ tough-cookie              BSD-3-Clause
+ tr46                      MIT
+ ts-jest                   MIT
+ ts-node                   MIT
+ tslib                     0BSD
+ type-detect               MIT
+ type-fest                 (MIT OR CC0-1.0)
+ typescript                Apache-2.0
+ ulid                      MIT
+ undici-types              MIT
+ universalify              MIT
+ update-browserslist-db    MIT
+ uri-js                    BSD-2-Clause
+ url-parse                 MIT
+ use-sync-external-store   MIT
+ uuid                      MIT
+ v8-compile-cache-lib      MIT
+ v8-to-istanbul            ISC
+ vite                      MIT
+ vite-node                 MIT
+ vitest                    MIT
+ w3c-xmlserializer         MIT
+ walker                    Apache-2.0
+ web-vitals                Apache-2.0
+ webidl-conversions        BSD-2-Clause
+ weekstart                 MIT
+ whatwg-encoding           MIT
+ whatwg-mimetype           MIT
+ whatwg-url                MIT
+ which                     ISC
+ why-is-node-running       MIT
+ wide-align                ISC
+ wrap-ansi                 MIT
+ wrappy                    ISC
+ write-file-atomic         ISC
+ ws                        MIT
+ xml-name-validator        Apache-2.0
+ xmlchars                  MIT
+ y18n                      ISC
+ yallist                   ISC
+ yaml                      ISC
+ yargs                     MIT
+ yargs-parser              ISC
+ yn                        MIT
+ yocto-queue               MIT
+ yoctocolors-cjs           MIT

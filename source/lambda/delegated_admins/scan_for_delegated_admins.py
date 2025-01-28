@@ -1,6 +1,8 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
-from datetime import datetime
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+import json
+import traceback
+from datetime import datetime, timezone
 from os import getenv
 from typing import List, Iterable
 
@@ -14,18 +16,36 @@ from aws.services.organizations import Organizations
 from delegated_admins.delegated_admin_model import DelegatedAdminCreateRequest
 from delegated_admins.delegated_admins_repository import DelegatedAdminsRepository
 from metrics.solution_metrics import SolutionMetrics
-from utils.api_gateway_lambda_handler import ApiGatewayResponse, GenericApiGatewayEventHandler
+from utils.api_gateway_lambda_handler import ApiGatewayResponse, GenericApiGatewayEventHandler, default_headers
+from utils.decimal_json_encoder import DecimalJsonEncoder
 
+logger = Logger(getenv('LOG_LEVEL'))
 tracer = Tracer()
 
 
 @tracer.capture_lambda_handler
+@logger.inject_lambda_context(log_event=True)
 def lambda_handler(event: dict, context: LambdaContext) -> ApiGatewayResponse:
-    return GenericApiGatewayEventHandler().handle_and_create_response(
-        event,
-        context,
-        AssessmentRunner(DelegatedAdminsStrategy()).run_assessment
-    )
+    try:
+        return GenericApiGatewayEventHandler().handle_and_create_response(
+            event,
+            context,
+            AssessmentRunner(DelegatedAdminsStrategy()).run_assessment
+        )
+    except Exception as error:
+        logger.error(f"Error: {error}")
+        logger.error(traceback.format_exc())
+        error_type = type(error).__name__
+        body = {
+            "Error": error_type,
+            "Message": "An unexpected error occurred. Inspect CloudWatch logs for more information.",
+            "Timestamp": datetime.now(tz=timezone.utc).isoformat(),
+        }
+        return {
+            'statusCode': 400,
+            'body': json.dumps(body, cls=DecimalJsonEncoder),
+            'headers': default_headers,
+        }
 
 
 class DelegatedAdminsStrategy(SynchronousScanStrategy):
@@ -89,4 +109,4 @@ class DelegatedAdminsStrategy(SynchronousScanStrategy):
 
     def write(self, delegated_admins: List[DelegatedAdminCreateRequest]):
         findings = DelegatedAdminsRepository().create_all(delegated_admins)
-        SolutionMetrics().send_metrics(self.assessment_type(), findings)
+        SolutionMetrics().send_scan_metrics(self.assessment_type(), findings)

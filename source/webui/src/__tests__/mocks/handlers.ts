@@ -1,9 +1,8 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import {rest} from 'msw'
+import {delay, http, HttpResponse} from 'msw';
 import {JobDetails, JobTaskFailure} from "../../components/jobs/JobModel";
-import {randomUUID} from "crypto";
 import {apiPathResourceBasedPolicies} from "../../components/resource-based-policies/ResourceBasedPoliciesDefinitions";
 import {apiPathDelegatedAdmins} from "../../components/delegated-admin/DelegatedAdminDefinitions";
 import {apiPathTrustedAccess} from "../../components/trusted-access/TrustedAccessDefinitions";
@@ -11,13 +10,42 @@ import {DelegatedAdminModel} from "../../components/delegated-admin/DelegatedAdm
 import {TrustedAccessModel} from "../../components/trusted-access/TrustedAccessModel";
 import {ResourceBasedPolicyModel} from "../../components/resource-based-policies/ResourceBasedPolicyModel";
 import {delegatedAdminItems} from "../DelegatedAdminPage.test";
+import {v4} from "uuid";
 
+/**
+ * Return a 200 OK http response with the given payload.
+ * Delays the response by 200ms to simulate realistic latency and allow
+ * to test a loading spinner etc on the UI.
+ */
+export const ok = async (payload: object | object[], delayMilliseconds: number = 200) => {
+  await delay(delayMilliseconds);
+  return HttpResponse.json(payload, {
+    status: 200,
+    headers: [['Access-Control-Allow-Origin', '*']],
+  });
+};
+export const noContent = async (delayMilliseconds: number = 200) => {
+  await delay(delayMilliseconds);
+  return HttpResponse.json(undefined, {
+    status: 204,
+    headers: [['Access-Control-Allow-Origin', '*']],
+  });
+};
+export const badRequest = async (payload: object | object[], delayMilliseconds: number = 200) => {
+  await delay(delayMilliseconds);
+  return HttpResponse.json(payload, {
+    status: 400,
+    headers: [['Access-Control-Allow-Origin', '*']],
+  });
+};
 
-export const newJobId = randomUUID();
+export const newJobId = v4();
 
 export function newJob(assessmentType?: string, jobId?: string) {
+  const type = assessmentType || "DELEGATED_ADMIN";
   return {
-    AssessmentType: assessmentType || "DELEGATED_ADMIN",
+    SortKey: `${type}#${jobId ?? v4()}`,
+    AssessmentType: type,
     JobId: jobId || newJobId,
     JobStatus: 'SUCCEEDED',
     StartedAt: new Date().toISOString(),
@@ -85,78 +113,44 @@ export const sampleSelectionOptions = {
 };
 
 // Default http responses for all tests. can be overwritten by individual tests with server.use(...)
-export const handlers = [
+export const handlers = (apiUrl: string) => [
 
-  rest.get('/jobs/:assessmentType/:id', (request, response, context) => {
-    return response(
-      context.status(200),
-      context.json(newJobDetails())
-    )
+  http.get(apiUrl + '/jobs/:assessmentType/:id', () => {
+    return ok(newJobDetails())
   }),
 
-  rest.delete('/jobs/:assessmentType/:id', (request, response, context) => {
-    return response(
-      context.status(204)
-    )
+  http.delete(apiUrl + '/jobs/:assessmentType/:id', () => {
+    return noContent()
   }),
 
 
-  rest.get('/jobs', (request, response, context) => {
-    return response(
-      context.status(200),
-      context.json({Results: []}),
+  http.get(apiUrl + '/jobs', () => {
+    return ok({Results: []}
     )
   }),
 
-  rest.post(apiPathDelegatedAdmins, (request, response, context) => {
-    return response(
-      context.status(200),
-      context.json(newJob())
+  http.post(apiUrl + apiPathDelegatedAdmins, () => {
+    return ok(newJob()
     )
   }),
 
-  rest.get(apiPathDelegatedAdmins, (request, response, context) => {
-    return response(
-      context.status(200),
-      context.json({Results: []}),
+  http.get(apiUrl + apiPathDelegatedAdmins, () => {
+    return ok({Results: []}
     )
   }),
 
-  rest.post(apiPathTrustedAccess, (request, response, context) => {
-    return response(
-      context.status(200),
-      context.json(newJob())
+  http.post(apiUrl + apiPathTrustedAccess, () => {
+    return ok(newJob()
     )
   }),
 
-  rest.get(apiPathTrustedAccess, (request, response, context) => {
-    return response(
-      context.status(200),
-      context.json({Results: []}),
+  http.get(apiUrl + apiPathTrustedAccess, () => {
+    return ok({Results: []}
     )
   }),
 
-  rest.post(apiPathResourceBasedPolicies, (request, response, context) => {
-    const activeJob = newJob('RESOURCE_BASED_POLICY');
-    activeJob.JobStatus = 'ACTIVE';
-    return response(
-      context.status(200),
-      context.json(activeJob)
-    )
+  http.get(apiUrl + apiPathResourceBasedPolicies, () => {
+    return ok({Results: []},)
   }),
 
-  rest.get(apiPathResourceBasedPolicies, (request, response, context) => {
-    return response(
-      context.status(200),
-      context.json({Results: []}),
-    )
-  }),
-
-  rest.get('scan-configs', (request, response, context) => {
-
-    return response(
-      context.status(200),
-      context.json(sampleSelectionOptions),
-    )
-  }),
 ]

@@ -1,17 +1,18 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 # !/bin/python
 
 from os import getenv
 
+from aws_lambda_powertools import Logger
 from botocore.exceptions import ClientError
+from mypy_boto3_iam.type_defs import PolicyTypeDef, PolicyVersionTypeDef, GetPolicyVersionResponseTypeDef, \
+    ListPoliciesResponseTypeDef, ListRolesResponseTypeDef, RoleTypeDef, GetRolePolicyResponseTypeDef, \
+    ListRolePoliciesResponseTypeDef
 
 from aws.services.security_token_service import SecurityTokenService
 from aws.utils.boto3_session import Boto3Session
-from aws_lambda_powertools import Logger
-from mypy_boto3_iam.type_defs import PolicyTypeDef, PolicyVersionTypeDef, GetPolicyVersionResponseTypeDef,  \
-    ListPoliciesResponseTypeDef, ListRolesResponseTypeDef, RoleTypeDef
 
 
 class IAM:
@@ -76,13 +77,47 @@ class IAM:
                 response = self.iam_client.list_roles(
                     Marker=marker,
                 )
-                self.logger.info("Extending IAM Role List")
+                self.logger.debug("Extending IAM Role List")
                 roles.extend(response.get('Roles', []))
                 is_truncated = response.get('IsTruncated')
                 marker = response.get('Marker')
 
             self.logger.debug(f"Roles: {roles}")
             return roles
+        except ClientError as err:
+            self.logger.error(err)
+            raise
+        
+    def list_role_inline_policies(self, role_name: str) -> list[str]:
+        """_summary_
+
+        Args:
+            role_name (str): role name
+
+        Returns:
+            list[str]: This will only list iam inline policies created for the roles, which are categorized as `Customer inline` any managed policies which are attached to the role
+            are not listed in this api call.
+        """
+        try:
+            list_role_policies_response: ListRolePoliciesResponseTypeDef = self.iam_client.list_role_policies(
+                RoleName=role_name
+            )
+            response = list_role_policies_response.get('PolicyNames', [])
+            self.logger.debug(f"Role Policies: {response}")
+            return response
+        except ClientError as err:
+            self.logger.error(err)
+            raise
+        
+    def get_role_policy(self, role_name: str, policy_name: str) -> GetRolePolicyResponseTypeDef:
+        self.logger.debug(f"Getting Role Policy: {role_name}, {policy_name}")
+        try:
+            response: GetRolePolicyResponseTypeDef = self.iam_client.get_role_policy(
+                RoleName=role_name,
+                PolicyName=policy_name
+            )
+            self.logger.debug(f"Role Policy: {response}")
+            return response
         except ClientError as err:
             self.logger.error(err)
             raise

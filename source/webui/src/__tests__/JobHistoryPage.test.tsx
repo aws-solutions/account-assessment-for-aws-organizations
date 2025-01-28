@@ -1,13 +1,11 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import React from 'react';
-import {render, screen, waitFor, waitForElementToBeRemoved, within} from '@testing-library/react';
-import {NotificationContext, NotificationContextProvider} from "../contexts/NotificationContext";
-import {JobHistoryPage} from '../components/jobs/JobHistoryPage';
-import {server} from "./mocks/server";
-import {rest} from "msw";
-import {newJob} from "./mocks/handlers";
+import {screen, waitForElementToBeRemoved, within} from '@testing-library/react';
+import {MOCK_SERVER_URL, server} from "./mocks/server";
+import {http} from "msw";
+import {badRequest, newJob, ok} from "./mocks/handlers";
+import {renderAppContent} from "./test-utils.tsx";
 
 describe('the JobHistoryPage', () => {
 
@@ -15,11 +13,9 @@ describe('the JobHistoryPage', () => {
     // ARRANGE
 
     // ACT
-    render(
-      <NotificationContextProvider>
-        <JobHistoryPage/>
-      </NotificationContextProvider>
-    );
+    renderAppContent({
+      initialRoute: '/jobs',
+    });
 
     // ASSERT
     expect(await screen.findByRole('heading', {name: (/Job History/i)})).toBeInTheDocument();
@@ -32,25 +28,20 @@ describe('the JobHistoryPage', () => {
       newJob('RESOURCE_BASED_POLICY')
     ];
     server.use(
-      rest.get('/jobs', (request, response, context) => {
-        return response(
-          context.status(200),
-          context.json({Results: jobs}),
-        )
+      http.get(MOCK_SERVER_URL + '/jobs', () => {
+        return ok({Results: jobs})
       })
     )
 
     // ACT
-    render(
-      <NotificationContextProvider>
-        <JobHistoryPage/>
-      </NotificationContextProvider>
-    );
+    renderAppContent({
+      initialRoute: '/jobs',
+    });
 
     // ASSERT
     expect(await screen.findByRole('heading', {name: (/Job History/i)})).toBeInTheDocument();
-    // await screen.findByText(/Loading resources/i)
-    // await waitForElementToBeRemoved(() => screen.queryByText(/Loading resources/i))
+    await screen.findByText(/Loading resources/i);
+    await waitForElementToBeRemoved(screen.queryByText(/Loading resources/i));
 
     const table = screen.getByRole('table');
     const rows = await within(table).findAllByRole('row');
@@ -64,33 +55,21 @@ describe('the JobHistoryPage', () => {
   it('renders an error', async () => {
     // ARRANGE
     server.use(
-      rest.get('/jobs', (request, response, context) => {
-        return response(
-          context.status(400),
-          context.json({Error: "Error", Message: "Ooops. Something went wrong."})
-        )
+      http.get(MOCK_SERVER_URL + '/jobs', () => {
+        return badRequest({Error: "Error", Message: "Ooops. Something went wrong."})
       }),
     );
-    let setNotificationsMockFn = jest.fn();
+
 
     // ACT
-    render(
-      <NotificationContext.Provider value={{notifications: [], setNotifications: setNotificationsMockFn}}>
-        <JobHistoryPage/>
-      </NotificationContext.Provider>
-    );
+    renderAppContent({
+      initialRoute: '/jobs',
+    });
 
     // ASSERT
     expect(await screen.findByRole('heading', {name: (/Job History/i)})).toBeInTheDocument();
-    await waitFor(() => {
-      expect(setNotificationsMockFn).toHaveBeenLastCalledWith([{
-        header: 'Error',
-        content: `Ooops. Something went wrong.`,
-        type: 'error',
-        dismissible: true,
-        onDismiss: expect.any(Function)
-      }])
-    })
+    const flashbar = await screen.findByTestId('flashbar');
+    await within(flashbar).findByText('Unexpected error');
   });
 
 });

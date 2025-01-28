@@ -80,5 +80,6 @@ def handle_client_exception(error: ValueError):
 
 
 @tracer.capture_lambda_handler
+@logger.inject_lambda_context(log_event=True)
 def lambda_handler(event: dict, context: LambdaContext) -> dict:
     return app.resolve(event, context)

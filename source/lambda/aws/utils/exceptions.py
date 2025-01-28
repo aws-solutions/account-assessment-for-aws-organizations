@@ -46,7 +46,8 @@ def resource_not_found_exception_handler(func):
                 'PolicyNotFound',
                 'NotFoundException',
                 'NoSuchBucketPolicy',
-                'PolicyNotFoundException'
+                'PolicyNotFoundException',
+                'InvalidParameterException'
             ]
             if err.response['Error']['Code'] in exception_codes:
                 logger.error(str(err))

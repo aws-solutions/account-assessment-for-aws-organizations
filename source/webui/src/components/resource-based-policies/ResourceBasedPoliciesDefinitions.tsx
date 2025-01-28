@@ -3,8 +3,9 @@
 
 import {TableProps} from "@cloudscape-design/components";
 import {formattedDateTime} from "../../util/Formatter";
-import Link from "@cloudscape-design/components/link";
+
 import {ResourceBasedPolicyModel} from "./ResourceBasedPolicyModel";
+import {RouterLink} from "../navigation/RouterLink.tsx";
 
 export const apiPathResourceBasedPolicies = '/resource-based-policies';
 
@@ -47,7 +48,7 @@ export const resourceBasedPolicyColumns: Array<TableProps.ColumnDefinition<Resou
   {
     header: "Last Found at Job Id",
     id: "JobId",
-    cell: (item) => <Link href={`/jobs/RESOURCE_BASED_POLICY/${item.JobId}`}>{item.JobId}</Link>
+    cell: (item) => <RouterLink href={`/jobs/RESOURCE_BASED_POLICY/${item.JobId}`}>{item.JobId}</RouterLink>
   },
 ];
 
@@ -83,3 +84,6 @@ export const resourceBasedPolicyColumnsForJob: Array<TableProps.ColumnDefinition
     cell: (item) => item.DependencyOn
   },
 ];
+
+export const resourceBasedPoliciesCsvHeader = "AccountId, Service Name, Resource Name, Region, Dependency Type, Dependency On, Last Found at";
+export const resourceBasedPoliciesCsvAttributes = ['AccountId', 'ServiceName', 'ResourceName', 'Region', 'DependencyType', 'DependencyOn', 'AssessedAt'];

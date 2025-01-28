@@ -7,20 +7,21 @@
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
 
-import { server } from './__tests__/mocks/server'
-import Amplify from "@aws-amplify/core";
+import {MOCK_SERVER_URL, server} from './__tests__/mocks/server'
+import {Amplify} from "aws-amplify";
 
 // Establish API mocking before all tests.
 beforeAll(() => {
-  server.listen();
+  server.listen({
+    onUnhandledRequest: 'error'
+  });
   Amplify.configure({
-    "API": {
-      "endpoints": [
-        {
-          "endpoint": "", // empty endpoint URL means the mock server is called
-          "name": "AccountAssessmentApi"
-        }
-      ]
+    API: {
+      REST: {
+        AccountAssessmentApi: {
+          "endpoint": MOCK_SERVER_URL
+        }, // empty endpoint URL means the mock server is called
+      }
     },
   });
 })

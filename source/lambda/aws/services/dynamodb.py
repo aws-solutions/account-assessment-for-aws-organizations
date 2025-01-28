@@ -1,17 +1,18 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 # !/bin/python
 from os import getenv
 from typing import Dict, List
 
-import boto3
 from aws_lambda_powertools import Logger
-from boto3.dynamodb.conditions import Key
-from aws.utils.boto3_session import Boto3Session
+from boto3.dynamodb.conditions import Key, Attr
 from mypy_boto3_dynamodb.service_resource import DynamoDBServiceResource, Table
 from mypy_boto3_dynamodb.type_defs import QueryOutputTableTypeDef, ScanOutputTableTypeDef, \
     UpdateItemInputTableUpdateItemTypeDef, GetItemOutputTableTypeDef
+
+from aws.utils.boto3_session import Boto3Session
+from policy_explorer.policy_explorer_model import DdbPagination
 from utils.list_utils import split_list_by_batch_size
 
 MAX_BATCH_SIZE = 25
@@ -24,7 +25,7 @@ class DynamoDB:
 
     def __init__(self, table_name: str):
         self.logger = Logger(service=self.__class__.__name__, level=getenv('LOG_LEVEL'))
-        dynamodb_resource: DynamoDBServiceResource = Boto3Session('dynamodb').get_resource()
+        dynamodb_resource: DynamoDBServiceResource = Boto3Session('dynamodb', region=getenv('AWS_REGION')).get_resource()
         self.table: Table = dynamodb_resource.Table(table_name)
         self.next_token_returned_msg = "Next Token Returned: {}"
         self.logger.debug("Initialized client for DynamoDB table: " + self.table.table_name)
@@ -114,12 +115,40 @@ class DynamoDB:
         self.logger.debug(f"Updated item in table {self.table.table_name}: "
                           f"{kwargs['Key']}")
 
-    def query(self, partition_key, sort_key_prefix='') -> List[Dict]:
+    def query(self, partition_key,
+              sort_key_prefix='',
+              filters: Dict = dict(),
+              pagination: DdbPagination = dict(Limit=5000)
+              ) -> List[Dict]:
         self.logger.debug(
             f"Querying DynamoDB table {self.table.table_name} for Keys {partition_key}/{sort_key_prefix}:")
-        response: QueryOutputTableTypeDef = self.table.query(
-            KeyConditionExpression=Key('PartitionKey').eq(partition_key) & Key('SortKey').begins_with(sort_key_prefix)
+
+        # Start with the KeyConditionExpression
+        key_condition_expression = Key('PartitionKey').eq(partition_key) & Key('SortKey').begins_with(sort_key_prefix)
+
+        # Initialize FilterExpression dynamically based on filters dict
+        filter_expression = None
+        for attr_name, attr_value in filters.items():
+            self.logger.debug(
+                f"Adding filter {attr_name} with value {attr_value}")
+            if filter_expression is None:
+                filter_expression = Attr(attr_name).contains(attr_value)
+            else:
+                filter_expression = filter_expression & Attr(attr_name).contains(attr_value)
+
+        # Build the query parameters
+        query_params: dict = dict(
+            KeyConditionExpression=key_condition_expression,
+            Limit=pagination['Limit'],
         )
+        if pagination.get('ExclusiveStartKey'):
+            query_params['ExclusiveStartKey'] = pagination['ExclusiveStartKey']
+        if filter_expression is not None:
+            query_params['FilterExpression'] = filter_expression
+
+        # Execute the query with the filter expression if present
+        response: QueryOutputTableTypeDef = self.table.query(**query_params)
+
         return response['Items']
 
     def delete_item(self, key):
@@ -137,6 +166,11 @@ class DynamoDB:
         data = response['Items']
 
         while 'LastEvaluatedKey' in response:
-            response = self.table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
+            response = self.table.query(
+                IndexName=index_name,
+                KeyConditionExpression=Key(key).eq(index_value),
+                ExclusiveStartKey=response['LastEvaluatedKey']
+            )
             data.extend(response['Items'])
+        self.logger.debug('Found {} items.'.format(len(data)))
         return data

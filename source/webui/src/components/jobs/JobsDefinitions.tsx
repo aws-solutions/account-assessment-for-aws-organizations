@@ -4,7 +4,8 @@
 import {JobModel, JobTaskFailure} from "./JobModel";
 import {formattedDateTime} from "../../util/Formatter";
 import {TableProps} from "@cloudscape-design/components";
-import Link from "@cloudscape-design/components/link";
+import {RouterLink} from "../navigation/RouterLink.tsx";
+
 
 export const apiPathJobs = '/jobs';
 
@@ -17,7 +18,7 @@ export const jobHistoryColumns: Array<TableProps.ColumnDefinition<JobModel>> = [
   {
     header: "Job ID",
     id: "JobId",
-    cell: (item) => <Link href={`/jobs/${item.AssessmentType}/${item.JobId}`}>{item.JobId}</Link>
+    cell: (item) => <RouterLink href={`/jobs/${item.AssessmentType}/${item.JobId}`}>{item.JobId}</RouterLink>
   },
   {
     header: "Status",
@@ -46,25 +47,25 @@ export const taskFailureColumns: Array<TableProps.ColumnDefinition<JobTaskFailur
     header: "Service Name",
     id: "ServiceName",
     cell: (item) => item.ServiceName || '-',
-    width: '12em'
+    width: 250
   },
   {
     header: "AccountId",
     id: "AccountId",
     cell: (item) => item.AccountId || '-',
-    width: '10em'
+    width: 150
   },
   {
     header: "Region",
     id: "Region",
     cell: (item) => item.Region || '-',
-    width: '10em'
+    width: 150
   },
   {
     header: "Failed at",
     id: "FailedAt",
     cell: (item) => formattedDateTime(item.FailedAt),
-    width: '10em'
+    width: 100
   },
   {
     header: "Error",

@@ -1,23 +1,33 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import {createContext, useEffect, useState} from 'react';
-import {Auth} from '@aws-amplify/auth';
-import {Hub, HubCapsule} from '@aws-amplify/core';
-import {CognitoUser} from "amazon-cognito-identity-js";
+import React, {createContext, ReactNode, useEffect, useState} from 'react';
+import {AuthUser, fetchUserAttributes, getCurrentUser, signInWithRedirect, signOut} from 'aws-amplify/auth';
+import {Hub} from 'aws-amplify/utils';
 
+export const UserContext = createContext<{
+  user: AuthUser | null,
+  email: string | null,
+  orgId: string | null,
+  signOut: () => Promise<void>,
+  signInWithRedirect: () => Promise<void>
+}>({
+  user: null,
+  email: null,
+  orgId: null,
+  signOut: () => Promise.resolve(),
+  signInWithRedirect: () => Promise.resolve()
+});
+export const UserContextProvider = (props: { orgId: string | null, children: ReactNode }) => {
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
 
-export const UserContext = createContext<CognitoUser | null>(null);
-export const UserContextProvider = (props: any) => {
-  const [user, setUser] = useState<CognitoUser | null>(null);
-  const [progressCircle, setProgressCircle] = useState(true);
-
-  Hub.listen('auth', (hubCapsule: HubCapsule) => {
-    switch (hubCapsule.payload.event) {
-      case 'signOut':
+  Hub.listen('auth', ({payload}) => {
+    switch (payload.event) {
+      case 'signedOut':
         setUser(null);
         break;
-      case 'cognitoHostedUI':
+      case 'signInWithRedirect':
         checkUser();
         break;
       default:
@@ -26,12 +36,12 @@ export const UserContextProvider = (props: any) => {
   })
 
   useEffect(() => {
-    Hub.listen('auth', (hubCapsule: HubCapsule) => {
-      switch (hubCapsule.payload.event) {
-        case 'cognitoHostedUI':
+    Hub.listen('auth', ({payload}) => {
+      switch (payload.event) {
+        case 'signInWithRedirect':
           checkUser();
           break
-        case 'signOut':
+        case 'signedOut':
           setUser(null);
           break
       }
@@ -41,24 +51,31 @@ export const UserContextProvider = (props: any) => {
 
   const checkUser = async () => {
     try {
-      const responseUser: CognitoUser | null = await Auth.currentAuthenticatedUser()
-      setUser(responseUser)
-      setProgressCircle(false)
+      const responseUser: AuthUser | null = await getCurrentUser();
+      setUser({
+        ...responseUser
+      })
+      try {
+        const userAttributesOutput = await fetchUserAttributes();
+        setEmail(userAttributesOutput.email ?? null)
+      } catch (e) {
+        console.log(e);
+      }
     } catch (error) {
+      console.error(error);
       setUser(null)
-      setProgressCircle(false)
     }
   };
 
   return (
-    <>
-      {progressCircle ? (
-        'Loading'
-      ) : (
-          <UserContext.Provider value={user}>
-            {props.children}
-          </UserContext.Provider>
-      )}
-    </>
+    <UserContext.Provider value={{
+      user,
+      email,
+      orgId: props.orgId,
+      signOut,
+      signInWithRedirect
+    }}>
+      {props.children}
+    </UserContext.Provider>
   )
 }

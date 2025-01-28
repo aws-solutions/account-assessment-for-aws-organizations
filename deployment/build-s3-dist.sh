@@ -32,14 +32,14 @@
 #  - version-code: version of the package
 #-----------------------
 # Formatting
-[[ $TRACE ]] && set -x
+[[ $TRACE ]] && [ "$DEBUG" == 'true' ] && set -x
 bold="$(tput bold)"
 normal="$(tput sgr0)"
 #------------------------------------------------------------------------------
 # SETTINGS
 #------------------------------------------------------------------------------
 # Important: CDK global version number
-cdk_version="2.163.1"
+cdk_version="2.176.0"
 run_helper="true"
 
 #------------------------------------------------------------------------------
@@ -118,7 +118,7 @@ cleanup_temporary_generted_files()
     echo "------------------------------------------------------------------------------"
 
     # Delete generated files: CDK Consctruct typescript transcompiled generted files
-    do_cmd cd $source_dir/
+    do_cmd cd $source_dir/infra
     do_cmd npm run cleanup:tsc
 
     # Delete the temporary /staging folder
@@ -255,7 +255,7 @@ do_cmd cd $source_dir/webui
 do_cmd npm install
 GENERATE_SOURCEMAP=false INLINE_RUNTIME_CHUNK=false do_cmd npm run build
 # Rename /build to /webui
-mv ./build ./webui
+mv ./dist ./webui
 # Move to the $build_dist_dir that will be deployed to the regional S3 bucket
 mv ./webui $build_dist_dir
 
@@ -288,7 +288,7 @@ echo "--------------------------------------------------------------------------
 # Install the global aws-cdk package
 # Note: do not install using global (-g) option. This makes build-s3-dist.sh difficult
 # for customers and developers to use, as it globally changes their environment.
-do_cmd cd $source_dir
+do_cmd cd $source_dir/infra
 do_cmd npm install
 do_cmd npm install aws-cdk@$cdk_version
 

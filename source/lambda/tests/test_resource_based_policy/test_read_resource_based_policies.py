@@ -29,7 +29,6 @@ def describe_read_resource_based_policies():
         # ARRANGE
         repository = ResourceBasedPoliciesRepository()
         resource_based_policies = repository.create_all(test_items)
-        print(resource_based_policies)
 
         class_under_test = ReadResourceBasedPolicies()
 

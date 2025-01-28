@@ -52,7 +52,7 @@ class ResourceBasedPoliciesRepository(BaseRepository[ResourceBasedPolicyResponse
         )
 
     def _map_to_model(self, request: ResourceBasedPolicyResponseModel) -> ResourceBasedPolicyDBModel:
-        return dict(
+        return ResourceBasedPolicyDBModel(
             request,
             PartitionKey=PARTITION_KEY_POLICIES,
             SortKey=sort_key_resource_based_policies(
@@ -64,4 +64,5 @@ class ResourceBasedPoliciesRepository(BaseRepository[ResourceBasedPolicyResponse
             ),
             ExpiresAt=self._calculate_expires_at()
         )
+        
 

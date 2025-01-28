@@ -1,14 +1,13 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 import json
 import uuid
 
-from aws_lambda_powertools.utilities.typing import LambdaContext
-
 from assessment_runner import api_router
 from assessment_runner.job_model import JobDetails
 from assessment_runner.jobs_repository import JobsRepository
+from tests.test_utils.testdata_factory import TestLambdaContext
 from tests.test_utils.testdata_factory import job_create_request
 
 item1 = job_create_request(assessment_type='DELEGATED_ADMIN')
@@ -21,7 +20,7 @@ def describe_read_job():
         event = {"path": "/jobs/DELEGATED_ADMIN/" + uuid.uuid4().hex, "httpMethod": "GET"}
 
         # ACT
-        result = api_router.lambda_handler(event, LambdaContext())
+        result = api_router.lambda_handler(event, TestLambdaContext())
 
         # ASSERT
         assert result['statusCode'] == 400
@@ -36,7 +35,7 @@ def describe_read_job():
         event = {"path": f"/jobs/{job['AssessmentType']}/{job['JobId']}", "httpMethod": "GET"}
 
         # ACT
-        result = api_router.lambda_handler(event, LambdaContext())
+        result = api_router.lambda_handler(event, TestLambdaContext())
 
         # ASSERT
         assert result['statusCode'] == 200

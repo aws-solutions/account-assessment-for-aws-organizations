@@ -13,4 +13,5 @@ export interface DelegatedAdminModel extends AssessmentResult {
   JoinedMethod: string,
   JoinedTimestamp: string,
   DelegationEnabledDate: string
+  SortKey: string
 }

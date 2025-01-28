@@ -12,9 +12,9 @@ from assessment_runner.job_model import JobTaskFailureCreateRequest
 from assessment_runner.jobs_repository import JobsRepository
 from aws.utils.exceptions import RegionNotEnabled, ServiceUnavailable, ConnectionTimeout
 from aws.utils.exceptions import service_exception_handler
-from resource_based_policy.resource_based_policy_model import ScanServiceRequestModel
-from resource_based_policy.step_functions_lambda.utils import scan_regions
-from tests.test_resource_based_policy.mock_data import event as event_from_api_gateway
+from policy_explorer.policy_explorer_model import ScanServiceRequestModel
+from policy_explorer.step_functions_lambda.utils import scan_regions
+from tests.test_policy_explorer.mock_data import event as event_from_api_gateway
 
 REGION = 'us-east-1'
 logger = Logger(service='test_exception_handler', level='INFO')

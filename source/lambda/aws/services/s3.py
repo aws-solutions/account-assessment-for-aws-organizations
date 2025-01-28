@@ -35,9 +35,15 @@ class S3:
 
     @service_exception_handler
     def get_bucket_location(self, bucket_name) -> str:
+        # Some buckets might have region set to None example, buckets created by cloudtrail service.
+        # in such cases the bucket is globally available without Location Constraint, this method will return
+        # GLOBAL in those cases in place of the region.
         s3_bucket_region = self.s3_client.get_bucket_location(
             Bucket=bucket_name
         ).get('LocationConstraint')
+        self.logger.info(f"bucket name {bucket_name} and location {s3_bucket_region}")
+        if s3_bucket_region is None:
+            return "GLOBAL"
         return s3_bucket_region
 
     @resource_not_found_exception_handler
@@ -98,12 +104,13 @@ class S3:
 
 
 class Glacier:
-    def __init__(self, account_id):
+    def __init__(self, account_id, region):
         self.logger = Logger(service=self.__class__.__name__, level=getenv('LOG_LEVEL'))
+        self.region = region
         role_name = getenv('SPOKE_ROLE_NAME')
         self.logger.debug(f"Assuming role {role_name} in {account_id} to scan service: {self.__class__.__name__}")
         account_credentials = SecurityTokenService().assume_role_by_name(account_id, role_name)
-        boto_session = Boto3Session('glacier', credentials=account_credentials)
+        boto_session = Boto3Session('glacier', credentials=account_credentials, region=region)
         self.glacier_client = boto_session.get_client()
 
     @service_exception_handler

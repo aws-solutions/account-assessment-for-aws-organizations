@@ -8,7 +8,8 @@ from botocore.exceptions import ClientError
 from mypy_boto3_organizations.client import OrganizationsClient
 from mypy_boto3_organizations.type_defs import ListDelegatedAdministratorsResponseTypeDef, \
     DelegatedAdministratorTypeDef, ListDelegatedServicesForAccountResponseTypeDef, DelegatedServiceTypeDef, \
-    EnabledServicePrincipalTypeDef, AccountTypeDef, ListAccountsResponseTypeDef
+    EnabledServicePrincipalTypeDef, AccountTypeDef, ListAccountsResponseTypeDef, PolicySummaryTypeDef, \
+    DescribePolicyResponseTypeDef, ListPoliciesResponseTypeDef
 
 from aws.services.security_token_service import SecurityTokenService
 from aws.utils.boto3_session import Boto3Session
@@ -158,6 +159,40 @@ class Organizations:
                 next_token = response.get('NextToken', None)
             return enabled_service_principals
 
+        except ClientError as err:
+            self.logger.error(err)
+            raise
+    
+
+    def list_policies(self) -> list[PolicySummaryTypeDef]:
+        try:
+            response: ListPoliciesResponseTypeDef = self.org_client.list_policies(
+                Filter='SERVICE_CONTROL_POLICY'
+                )
+            policies_summary_list: list[PolicySummaryTypeDef]  = response.get('Policies', [])
+            next_token = response.get('NextToken', None)
+            
+            while next_token is not None:
+                response = self.org_client.list_policies(
+                    Filter='SERVICE_CONTROL_POLICY',
+                    NextToken=next_token
+                )
+                policies_summary_list.extend(response.get('Policies', []))
+                next_token = response.get('NextToken', None)
+            return policies_summary_list
+        except ClientError as err:
+            self.logger.error(err)
+            raise
+
+
+    def describe_policy(self, policy_id: str) -> DescribePolicyResponseTypeDef:
+        try: 
+            response: DescribePolicyResponseTypeDef = self.org_client.describe_policy(
+                PolicyId=policy_id
+            )
+            policy = response.get('Policy')
+            if 'Content' in policy:
+                return policy.get('Content')
         except ClientError as err:
             self.logger.error(err)
             raise

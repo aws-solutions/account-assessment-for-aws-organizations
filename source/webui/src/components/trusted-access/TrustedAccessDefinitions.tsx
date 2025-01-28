@@ -4,7 +4,8 @@
 import {TrustedAccessModel} from "./TrustedAccessModel";
 import {TableProps} from "@cloudscape-design/components";
 import {formattedDateTime} from "../../util/Formatter";
-import Link from "@cloudscape-design/components/link";
+import {RouterLink} from "../navigation/RouterLink.tsx";
+
 
 export const apiPathTrustedAccess = '/trusted-access';
 
@@ -27,7 +28,7 @@ export const trustedAccessColumns: Array<TableProps.ColumnDefinition<TrustedAcce
   {
     header: "Last Found at Job Id",
     id: "JobId",
-    cell: (item) => <Link href={`/jobs/TRUSTED_ACCESS/${item.JobId}`}>{item.JobId}</Link>
+    cell: (item) => <RouterLink href={`/jobs/TRUSTED_ACCESS/${item.JobId}`}>{item.JobId}</RouterLink>
   },
 ];
 
@@ -43,3 +44,7 @@ export const trustedAccessColumnsForJob: Array<TableProps.ColumnDefinition<Trust
     cell: (item) => formattedDateTime(item.DateEnabled)
   },
 ];
+
+
+export const trustedAccessCsvHeader = "Service Principal, Date Enabled, Last Found at";
+export const trustedAccessCsvAttributes = ['ServicePrincipal', 'DateEnabled', 'AssessedAt'];

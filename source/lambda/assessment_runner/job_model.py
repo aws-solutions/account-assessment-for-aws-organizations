@@ -19,6 +19,7 @@ class AssessmentType(enum.Enum):
     DELEGATED_ADMIN = 'DELEGATED_ADMIN'
     TRUSTED_ACCESS = 'TRUSTED_ACCESS'
     RESOURCE_BASED_POLICY = 'RESOURCE_BASED_POLICY'
+    POLICY_EXPLORER = 'POLICY_EXPLORER'
 
 
 # Keep in sync with JobModel.ts in the UI project

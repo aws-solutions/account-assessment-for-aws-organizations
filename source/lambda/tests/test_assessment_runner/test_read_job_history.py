@@ -1,13 +1,13 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 import json
 
 from aws_lambda_powertools import Logger
-from aws_lambda_powertools.utilities.typing import LambdaContext
 
 from assessment_runner import api_router
 from assessment_runner.jobs_repository import JobsRepository
+from tests.test_utils.testdata_factory import TestLambdaContext
 from tests.test_utils.testdata_factory import job_create_request
 
 item1 = job_create_request()
@@ -22,7 +22,7 @@ def describe_read_job_history():
         # ARRANGE
 
         # ACT
-        result = api_router.lambda_handler(event, LambdaContext())
+        result = api_router.lambda_handler(event, TestLambdaContext())
 
         # ASSERT
         assert result['statusCode'] == 200
@@ -36,7 +36,7 @@ def describe_read_job_history():
         job2 = repository.create_job(item2)
 
         # ACT
-        result = api_router.lambda_handler(event, LambdaContext())
+        result = api_router.lambda_handler(event, TestLambdaContext())
 
         # ASSERT
         assert result['statusCode'] == 200
@@ -58,7 +58,7 @@ def describe_read_job_history():
         }
 
         # ACT
-        result = api_router.lambda_handler(query_event, LambdaContext())
+        result = api_router.lambda_handler(query_event, TestLambdaContext())
         # ASSERT
         body = json.loads(result.get('body'))
         assert job1 in body['Results']
