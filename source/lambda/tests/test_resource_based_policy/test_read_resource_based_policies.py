@@ -1,5 +1,5 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 from resource_based_policy.read_resource_based_policies import ReadResourceBasedPolicies
 from resource_based_policy.resource_based_policies_repository import ResourceBasedPoliciesRepository
@@ -29,7 +29,6 @@ def describe_read_resource_based_policies():
         # ARRANGE
         repository = ResourceBasedPoliciesRepository()
         resource_based_policies = repository.create_all(test_items)
-        print(resource_based_policies)
 
         class_under_test = ReadResourceBasedPolicies()
 

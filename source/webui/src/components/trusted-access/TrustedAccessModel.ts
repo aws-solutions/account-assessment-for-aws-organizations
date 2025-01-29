@@ -5,5 +5,6 @@ import {AssessmentResult} from "../../util/AssessmentResultTable";
 
 export interface TrustedAccessModel extends AssessmentResult {
   ServicePrincipal: string,
-  DateEnabled: string
+  DateEnabled: string,
+  SortKey: string
 }

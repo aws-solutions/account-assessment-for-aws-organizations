@@ -6,12 +6,15 @@ import {TrustedAccessModel} from "../trusted-access/TrustedAccessModel";
 import {ResourceBasedPolicyModel} from "../resource-based-policies/ResourceBasedPolicyModel";
 
 export type JobModel = {
+  SortKey: string,
   AssessmentType: string,
   JobId: string,
   StartedAt: string,
   StartedBy: string,
   FinishedAt?: string,
-  JobStatus: 'ACTIVE' | 'QUEUED' | 'SUCCEEDED' | 'FAILED',
+  JobStatus: 'ACTIVE' | 'QUEUED' | 'SUCCEEDED' | 'SUCCEEDED_WITH_FAILED_TASKS' | 'FAILED',
+  Findings?: Array<DelegatedAdminModel | TrustedAccessModel | ResourceBasedPolicyModel>,
+  TaskFailures?: Array<JobTaskFailure>
 }
 
 export type JobTaskFailure = {

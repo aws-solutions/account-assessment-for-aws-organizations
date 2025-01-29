@@ -39,5 +39,30 @@ def _get_member_account_id(all_accounts):
     logger.info(f"List accounts BEFORE closing account: {all_accounts}")
     for account in all_accounts:
         if account.get("Name") != "master":  # skip closing management account
-            if account.get("Status") == 'ACTIVE':
-                return account.get('Id')
+            if account.get("Status") == "ACTIVE":
+                return account.get("Id")
+
+
+@mock_aws
+def test_list_policies_idempotent(organizations_setup):
+    # ARRANGE
+    all_policies = Organizations().list_policies()
+
+    # ACT
+    policies = Organizations().list_policies()
+
+    # ASSERT
+    assert len(all_policies) == len(policies)
+    assert all(policy["Type"] == "SERVICE_CONTROL_POLICY" for policy in policies)
+    assert policies
+
+
+@mock_aws
+def test_describe_policy(organizations_setup):
+    # ARRANGE
+    policy_id = Organizations().list_policies()[0].get("Id")
+    policy_content = Organizations().describe_policy(policy_id)
+    # ACT
+    policy = Organizations().describe_policy(policy_id)
+    # ASSERT
+    assert policy_content == policy

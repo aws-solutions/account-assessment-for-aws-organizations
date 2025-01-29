@@ -28,7 +28,7 @@ implementation guide.
 
 The default deployment of solution pre-packaged template deploys following infrastructure in your account.
 
-<img src="./architecture.png" width="800" height="450">
+<img src="./docs/architecture.png" alt="architecture diagram">
 
 ## Installing pre-packaged solution template
 
@@ -61,6 +61,29 @@ _Note: Following steps have been tested under above pre-requisites_
   ├── build-lambdas.sh                      - builds and packages the lambda code only
 ├── source/   
   ├── account-assessment-solution.ts        - the CDK app that wraps your solution.
+  ├── infra/                                - the source code for the infrastructure-as-code AWS CDK project
+     ├── bin
+       └──  account-assessment-solution.ts     - the CDK app for your solution.
+     ├── lib
+       ├── account-assessment-hub-stack.ts    - the hub CDK stack.
+       ├── account-assessment-spoke-stack.ts  - the spoke CDK stack.
+       ├── app-register.ts                    - integrates Hub and Spoke stacks with AppRegistry
+       ├──org-management-account-stack.ts     - the AWS Organizations Management CDK stack.
+       └── components                         - hub stack resources grouped into constructs for better maintainability 
+         ├── api.ts                            - resources related to API Gateway
+         ├── cognito-authenticator.ts          - resources related to authentication
+         ├── job-history-component.ts          - DynamoDB table and Lambda functions related to the job management microservice
+         ├── resource-based-policy-component.ts - Lambda functions related to the resouce based policy microservice
+         ├── resource-based-policy-state-machine.ts - custom resource to deploy solution WebUI to S3
+         ├── simple-assessment-component.ts    - generic set of DynamoDB table and Lambda functions for all microservices.
+         ├── web-ui-deployer.ts                - custom resource to deploy solution WebUI to S3
+         └── web-ui-hosting.ts                 - resources to host the web ui in S3
+     └── test/
+        └── __snapshots__/
+├── cdk-solution-test.ts                    - example unit and snapshot tests for CDK project.
+  ├── cdk.json                              - config file for CDK.
+  ├── package.json                          - package file for the CDK project.
+  ├── README.md                             - doc file for the CDK project.
   ├── lambda/                               - the source code for the solution's lambda functions
     ├── requirements.txt
     ├── testing_requirements.txt            - python test dependency file
@@ -76,30 +99,7 @@ _Note: Following steps have been tested under above pre-requisites_
     ├── tests/
     ├── trusted_access_enabled_services/    - Trusted AWS Services scan microservice
     └── utils/
-   ├── bin
-       └──  account-assessment-solution.ts     - the main CDK stack for your solution.
-   ├── lib
-     ├── account-assessment-hub-stack.ts    - the hub CDK stack.
-     ├── account-assessment-spoke-stack.ts  - the spoke CDK stack.
-     ├── app-register.ts                    - integrates Hub and Spoke stacks with AppRegistry
-     ├──org-management-account-stack.ts     - the AWS Organizations Management CDK stack.
-     └── components                         - hub stack resources grouped into constructs for better maintainability 
-      ├── api.ts                            - resources related to API Gateway
-      ├── cognito-authenticator.ts          - resources related to authentication
-      ├── job-history-component.ts          - DynamoDB table and Lambda functions related to the job management microservice
-      ├── resource-based-policy-component.ts - Lambda functions related to the resouce based policy microservice
-      ├── resource-based-policy-state-machine.ts - custom resource to deploy solution WebUI to S3
-      ├── simple-assessment-component.ts    - generic set of DynamoDB table and Lambda functions for all microservices.
-      ├── web-ui-deployer.ts                - custom resource to deploy solution WebUI to S3
-      └── web-ui-hosting.ts                 - resources to host the web ui in S3
   ├── webui                                 - react app that serves as user interface for this solution
-  ├── test/
-    ├── __snapshots__/
-├── cdk-solution-test.ts                    - example unit and snapshot tests for CDK project.
-  ├── cdk.json                              - config file for CDK.
-  ├── jest.config.js                        - config file for unit tests.
-  ├── package.json                          - package file for the CDK project.
-  ├── README.md                             - doc file for the CDK project.
   ├── run-all-tests.sh                      - runs all tests within the /source folder. Referenced in the buildspec and build scripts.
 ├── .gitignore
 ├── .viperlightignore                       - Viperlight scan ignore configuration  (accepts file, path, or line item).
@@ -130,14 +130,28 @@ _✅ Ensure all unit tests pass. Review the generated coverage report_
 
 To build your customized distributable follow given steps.
 
-- Configure the solution name, version number and bucket name as environment variables
-- At deployment time, the webui distributable will be copied from DIST_OUTPUT_BUCKET to the created hosting bucket.
-  Replace `solutions-features` by your own bucket name, if you make changes to the web ui.
+- Pick a unique bucket name, `e.g. account-assessment-staging`. Set it as an environment variable on your terminal.
 
+```shell
+export DIST_OUTPUT_BUCKET=account-assessment-staging-$(date +%s)
 ```
-SOLUTION_NAME=AccountAssessment
-DIST_OUTPUT_BUCKET=solutions-features
-VERSION=custom001
+
+- In your AWS account, create a bucket with this name __appended with the deployment region__,
+  e.g. `account-assessment-staging-us-east-1`. (At deployment time, the webui distributable will be copied from that
+  bucket to the
+  created hosting bucket.)
+
+```shell
+export REGION=us-east-1
+ASSET_BUCKET_NAME=$DIST_OUTPUT_BUCKET-$REGION
+aws s3 mb s3://$ASSET_BUCKET_NAME/
+```
+
+- Configure the solution name, version number and deployment region as environment variables on your terminal as well
+
+```shell
+export SOLUTION_NAME=account-assessment-for-aws-organizations
+export SOLUTION_VERSION=v1.1
 ```
 
 - Build the distributable using build-s3-dist.sh
@@ -145,19 +159,31 @@ VERSION=custom001
 ```
 cd ./deployment
 chmod +x ./build-s3-dist.sh
-./build-s3-dist.sh $DIST_OUTPUT_BUCKET $SOLUTION_NAME $VERSION
+./build-s3-dist.sh $DIST_OUTPUT_BUCKET $SOLUTION_NAME $SOLUTION_VERSION
 cd ..
 ```
 
-- If you customized the web ui, upload the folder `webui` from `deployment/regional-s3-assets` to your own s3 bucket.
-  Replace `solutions-features` in package.json by yor own bucket name.
 
 ### Deploy
+
+Prerequisite: In your Org Management Account, enable sharing Resource Access Manager with your AWS Organization. (AWS
+Console -> Resource Access Manager -> Settings)
+
+Deploy the distributables to the S3 bucket in your account
+
+```
+export BUCKET_NAME=$DIST_OUTPUT_BUCKET-$REGION
+aws s3 ls s3://$BUCKET_NAME # test bucket exists - should not give an error
+cd ./deployment
+aws s3 cp global-s3-assets/  s3://$BUCKET_NAME/$SOLUTION_NAME/$SOLUTION_VERSION/ --recursive --acl bucket-owner-full-control --profile <PROFILE_NAME>
+aws s3 cp regional-s3-assets/  s3://$BUCKET_NAME/$SOLUTION_NAME/$SOLUTION_VERSION/ --recursive --acl bucket-owner-full-control --profile <PROFILE_NAME>
+```
+
+_✅ All assets are now staged on your S3 bucket. You or any user may use S3 links for deployments_
 
 Determine the parameter values that you want to deploy the stacks with:
 
 - DeploymentNamespace: An arbitrary value that is shared by Hub Stack and OrgMgmt Stack and Spoke Stack.
-- CognitoDomainPrefix: An arbitrary, globally unique value to prefix the login page url.
 - UserEmail: The email address for the first Cognito User which the deployment creates.
 - AllowListedIPRanges: CIDR blocks to permit API access. To allow any IP, use 0.0.0.0/1,128.0.0.0/1
 - HubAccountId: The AccountId of your AWS Account you are deploying the Hub Stack to.
@@ -181,11 +207,11 @@ cd ..
 With the values determined above, run the following commands:
 
 ```
-cd ./source
-npm run deploy -- --parameters DeploymentNamespace=<NAMESPACE> --parameters CognitoDomainPrefix=<PREFIX> --parameters UserEmail=<EMAIL>  --parameters AllowListedIPRanges=<IP-RANGES> --profile <PROFILE_HUB>
+cd ./source/infra
+npm run deploy -- --parameters DeploymentNamespace=<NAMESPACE> --parameters UserEmail=<EMAIL>  --parameters AllowListedIPRanges=<IP-RANGES> --parameters OrganizationID=<ORD_ID> --profile <PROFILE_HUB>
 npm run deploySpoke -- --parameters DeploymentNamespace=<NAMESPACE> --parameters HubAccountId=<HUB_ACCOUNT_ID> --profile <PROFILE_SPOKE>
 npm run deployOrgMgmt -- --parameters DeploymentNamespace=<NAMESPACE> --parameters HubAccountId=<HUB_ACCOUNT_ID> --profile <PROFILE_ORG_MGMT>
-cd ..
+cd ../..
 ```
 
 ### Faster development cycles
@@ -218,8 +244,8 @@ When you make changes to the lambda function code only (`source/lambda`), you ma
 code without building the webui. For that, run the following commands with the parameter values determined above:
 
 ```
-cd ./source
-npm run buildLambdaAndDeploy -- --parameters DeploymentNamespace=<NAMESPACE> --parameters CognitoDomainPrefix=<PREFIX> --parameters UserEmail=<EMAIL>  --parameters AllowListedIPRanges=<IP-RANGES> --profile <PROFILE_HUB>
+cd ./source/infra
+npm run buildLambdaAndDeploy -- --parameters DeploymentNamespace=<NAMESPACE> --parameters UserEmail=<EMAIL>  --parameters AllowListedIPRanges=<IP-RANGES> --profile <PROFILE_HUB>
 cd ..
 ```
 
@@ -232,7 +258,7 @@ Should you make changes to the CDK app code only, and neither webui nor lambda c
 
 ```
 cd ./source
-npm run deploy -- --parameters DeploymentNamespace=<NAMESPACE> --parameters CognitoDomainPrefix=<PREFIX> --parameters UserEmail=<EMAIL>  --parameters AllowListedIPRanges=<IP-RANGES> --profile <PROFILE_HUB>
+npm run deploy -- --parameters DeploymentNamespace=<NAMESPACE> --parameters UserEmail=<EMAIL>  --parameters AllowListedIPRanges=<IP-RANGES> --parameters OrganizationID=<ORD_ID> --profile <PROFILE_HUB>
 cd ..
 ```
 

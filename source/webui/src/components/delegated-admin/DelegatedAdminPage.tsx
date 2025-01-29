@@ -2,109 +2,66 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as React from "react";
-import {useContext, useEffect, useState} from "react";
+import {useEffect} from "react";
 import {DelegatedAdminModel} from "./DelegatedAdminModel";
 import {Button, SpaceBetween} from "@cloudscape-design/components";
-import {NotificationContext} from "../../contexts/NotificationContext";
-import {ApiResponseState, get, post, ResultList} from "../../util/ApiClient";
 import {JobModel} from "../jobs/JobModel";
-import {apiPathDelegatedAdmins, delegatedAdminDefinitions} from "./DelegatedAdminDefinitions";
+import {
+  delegatedAdminCsvAttributes,
+  delegatedAdminCsvHeader,
+  delegatedAdminDefinitions
+} from "./DelegatedAdminDefinitions";
 import {FullPageAssessmentResultTable} from "../../util/AssessmentResultTable";
 import {useNavigate} from "react-router-dom";
+import {useDispatch, useSelector} from "react-redux";
+import {fetchDelegatedAdmins, startDelegatedAdminsScan} from "../../store/delegated-admin-thunks.ts";
+import {ApiDataState, ApiDataStatus} from "../../store/types.ts";
+import {downloadCSV} from "../policy-explorer/create-csv.ts";
 
 export const DelegatedAdminPage = () => {
 
-  const [apiData, setApiData] = useState<ApiResponseState<ResultList<DelegatedAdminModel>>>({
-    responseBody: {Results: []},
-    error: null,
-    loading: false
-  });
-  const [startingScan, setStartingScan] = useState(false);
-  const {setNotifications} = useContext(NotificationContext);
+  const dispatch = useDispatch<any>();
   const navigate = useNavigate();
 
-  function loadDelegatedAdminsFromApi() {
-    setApiData({responseBody: null, error: null, loading: true});
-    get<ResultList<DelegatedAdminModel>>(apiPathDelegatedAdmins).then((result) => {
-      setApiData(result);
+  const delegatedAdmins = useSelector(
+    ({delegatedAdmins}: { delegatedAdmins: ApiDataState<DelegatedAdminModel> }) => delegatedAdmins,
+  );
 
-      if (result.error) {
-        setNotifications([{
-          header: result.error.Error,
-          content: result.error.Message,
-          type: 'error',
-          dismissible: true,
-          onDismiss: () => setNotifications([])
-        }]);
-      }
-    });
-  }
-
+  // if DelegatedAdmins haven't been fetched from backend before, fetch them on page load
   useEffect(() => {
-    setNotifications([]);
-    loadDelegatedAdminsFromApi();
+    if (delegatedAdmins.status === ApiDataStatus.IDLE)
+      dispatch(fetchDelegatedAdmins());
   }, []);
 
   const startScan = () => {
-    setNotifications([]);
-    setStartingScan(true);
-    post<JobModel>(apiPathDelegatedAdmins, {response: true, body: {}}).then((state) => {
-        if (state.error) {
-          setNotifications([{
-            header: 'Error',
-            content: 'Scan could not be started',
-            type: 'error',
-            dismissible: true,
-            onDismiss: () => setNotifications([])
-          }]);
-          setStartingScan(false);
-          return;
-        }
-
-        const job: JobModel | null = state.responseBody;
-        if (job?.JobStatus === 'SUCCEEDED') {
-
-          setNotifications([{
-            header: 'Scan succeeded',
-            content: `Job with ID ${job.JobId} finished successfully.`,
-            type: 'success',
-            dismissible: true,
-            onDismiss: () => setNotifications([])
-          }]);
-          navigate(`/jobs/${job.AssessmentType}/${job.JobId}`);
-        } else if (job?.JobStatus === 'FAILED') {
-          setNotifications([{
-            header: 'Scan failed',
-            content: `Job with ID ${job.JobId} finished with failure. For details please check the Cloudwatch Logs.`,
-            type: 'error',
-            dismissible: true,
-            onDismiss: () => setNotifications([])
-          }]);
-        } else {
-          setNotifications([{
-            header: 'Unexpected response',
-            content: `Job responded in an unexpected way. For details please check the Cloudwatch Logs.`,
-            dismissible: true,
-            onDismiss: () => setNotifications([])
-          }]);
-        }
-        setStartingScan(false);
+    dispatch(startDelegatedAdminsScan()).then(
+      ({payload}: { payload: JobModel }) => {
+        if (payload)
+          navigate(`/jobs/${payload.AssessmentType}/${payload.JobId}`)
       }
-    );
+    )
   };
 
+  const loading = delegatedAdmins.status === ApiDataStatus.LOADING;
+  const data = Object.values(delegatedAdmins.entities) ?? [];
   return (
     <FullPageAssessmentResultTable
       title={"Delegated Admin Accounts"}
-      data={apiData.responseBody?.Results || []}
-      loading={apiData.loading}
+      data={data}
+      loading={loading}
       columnDefinitions={delegatedAdminDefinitions}
       actions={
         <SpaceBetween direction="horizontal" size="xs">
-          <Button iconName="refresh" onClick={loadDelegatedAdminsFromApi} disabled={apiData.loading}>
+          <Button iconName="refresh" onClick={() => dispatch(fetchDelegatedAdmins())}
+                  disabled={loading}>
             Refresh
           </Button>
-          <Button variant={"primary"} loading={startingScan} onClick={startScan}>Start Scan</Button>
+          <Button variant={"primary"} loading={loading} onClick={startScan}>Start
+            Scan</Button>
+          <Button data-testid="download" variant="normal"
+                  onClick={() => downloadCSV(data, 'delegated-admins', delegatedAdminCsvHeader, delegatedAdminCsvAttributes)}>
+            Download Results
+          </Button>
         </SpaceBetween>
       }
     ></FullPageAssessmentResultTable>

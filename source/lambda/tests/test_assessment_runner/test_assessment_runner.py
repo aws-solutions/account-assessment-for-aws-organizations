@@ -1,15 +1,15 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 from typing import List, Dict
 
 import pytest
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
-from aws_lambda_powertools.utilities.typing import LambdaContext
 
 from assessment_runner.assessment_runner import AssessmentRunner, SynchronousScanStrategy
 from assessment_runner.job_model import JobModel
 from assessment_runner.jobs_repository import JobsRepository
+from tests.test_utils.testdata_factory import TestLambdaContext
 from tests.test_utils.testdata_factory import job_create_request
 from utils.api_gateway_lambda_handler import ClientException
 
@@ -52,7 +52,7 @@ def describe_assessment_runner():
         # ASSERT
         with pytest.raises(ClientException):
             # ACT
-            AssessmentRunner(scan_strategy=noop_strategy).run_assessment(event, LambdaContext())
+            AssessmentRunner(scan_strategy=noop_strategy).run_assessment(event, TestLambdaContext())
 
     def test_that_job_status_is_updated_to_succeeded(job_history_table):
         # ARRANGE
@@ -61,7 +61,7 @@ def describe_assessment_runner():
         event = APIGatewayProxyEvent(data={"requestContext": {"authorizer": {"claims": {"email": "some-useremail"}}}})
 
         # ACT
-        job_model = AssessmentRunner(scan_strategy=noop_strategy).run_assessment(event, LambdaContext())
+        job_model = AssessmentRunner(scan_strategy=noop_strategy).run_assessment(event, TestLambdaContext())
 
         # ASSERT
         item_in_ddb = repository.get_job(job_model['AssessmentType'], job_model['JobId'])
@@ -76,7 +76,7 @@ def describe_assessment_runner():
 
         # ACT
         with pytest.raises(Exception):
-            AssessmentRunner(scan_strategy=noop_strategy).run_assessment(event, LambdaContext())
+            AssessmentRunner(scan_strategy=noop_strategy).run_assessment(event, TestLambdaContext())
 
         # ASSERT
         items_in_ddb = repository.find_jobs_by_assessment_type(noop_strategy.assessment_type())

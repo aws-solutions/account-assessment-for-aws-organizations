@@ -1,15 +1,15 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 import json
 import uuid
 
 import pytest
-from aws_lambda_powertools.utilities.typing import LambdaContext
 from mypy_boto3_dynamodb.service_resource import Table
 
 from assessment_runner import api_router
 from assessment_runner.jobs_repository import JobsRepository
 from delegated_admins.delegated_admins_repository import DelegatedAdminsRepository
+from tests.test_utils.testdata_factory import TestLambdaContext
 from tests.test_utils.testdata_factory import job_create_request, delegated_admin_create_request, \
     trusted_access_create_request
 from trusted_access_enabled_services.trusted_services_repository import TrustedServicesRepository
@@ -25,7 +25,7 @@ def describe_delete_job():
         event = {"path": "/jobs/DELEGATED_ADMIN/" + uuid.uuid4().hex, "httpMethod": "DELETE"}
 
         # ACT
-        result: ApiGatewayResponse = api_router.lambda_handler(event, LambdaContext())
+        result: ApiGatewayResponse = api_router.lambda_handler(event, TestLambdaContext())
 
         # ASSERT
         assert result['statusCode'] == 400
@@ -40,7 +40,7 @@ def describe_delete_job():
         event = {"path": f"/jobs/{job['AssessmentType']}/{job['JobId']}", "httpMethod": "DELETE"}
 
         # ACT
-        result: ApiGatewayResponse = api_router.lambda_handler(event, LambdaContext())
+        result: ApiGatewayResponse = api_router.lambda_handler(event, TestLambdaContext())
 
         # ASSERT
         assert result['statusCode'] == 400
@@ -61,7 +61,7 @@ def describe_delete_job():
         event = {"path": f"/jobs/{job2['AssessmentType']}/{job2['JobId']}", "httpMethod": "DELETE"}
 
         # ACT
-        result = api_router.lambda_handler(event, LambdaContext())
+        result = api_router.lambda_handler(event, TestLambdaContext())
 
         # ASSERT
         assert result['statusCode'] == 200
@@ -88,7 +88,7 @@ def describe_delete_job():
         event = {"path": f"/jobs/{job['AssessmentType']}/{job['JobId']}", "httpMethod": "DELETE"}
 
         # ACT
-        result = api_router.lambda_handler(event, LambdaContext())
+        result = api_router.lambda_handler(event, TestLambdaContext())
 
         # ASSERT
         assert result['statusCode'] == 200
@@ -121,7 +121,7 @@ def describe_delete_job():
         event = {"path": f"/jobs/{job['AssessmentType']}/{job['JobId']}", "httpMethod": "DELETE"}
 
         # ACT
-        result = api_router.lambda_handler(event, LambdaContext())
+        result = api_router.lambda_handler(event, TestLambdaContext())
 
         # ASSERT
         assert result['statusCode'] == 200

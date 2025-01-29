@@ -1,19 +1,17 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import React from 'react';
-import {render, screen, waitFor, waitForElementToBeRemoved, within} from '@testing-library/react';
-import {DelegatedAdminPage} from '../components/delegated-admin/DelegatedAdminPage';
-import {NotificationContext, NotificationContextProvider} from "../contexts/NotificationContext";
+import {screen, waitForElementToBeRemoved, within} from '@testing-library/react';
 import {DelegatedAdminModel} from "../components/delegated-admin/DelegatedAdminModel";
-import {MemoryRouter} from "react-router-dom";
 import userEvent from "@testing-library/user-event";
-import {server} from "./mocks/server";
-import {rest} from "msw";
-import {newJobId} from "./mocks/handlers";
+import {MOCK_SERVER_URL, server} from "./mocks/server";
+import {http} from "msw";
+import {badRequest, newJobId, ok} from "./mocks/handlers";
+import {renderAppContent} from "./test-utils.tsx";
 
 export const delegatedAdminItems: DelegatedAdminModel[] = [
   {
+    SortKey: 'account-management.amazonaws.com#111122223333',
     Arn: "arn:aws:organizations::111122223333:account/o-t1y3bu06fa/275802758920805",
     Name: "Network",
     Status: "ACTIVE",
@@ -27,6 +25,7 @@ export const delegatedAdminItems: DelegatedAdminModel[] = [
     JobId: "3284055467"
   },
   {
+    SortKey: 'audit-manager.amazonaws.com#111122223333',
     Arn: "arn:aws:organizations::111122223333:account/o-t1y3bu06fa/275802920805",
     Name: "Network",
     Status: "ACTIVE",
@@ -40,6 +39,7 @@ export const delegatedAdminItems: DelegatedAdminModel[] = [
     JobId: "69565464"
   },
   {
+    SortKey: 'cfn-stacksets.amazonaws.com#111122223333',
     Arn: "arn:aws:organizations::111122223333:account/o-t1y3bu06fa/275802920805",
     Name: "Network",
     Status: "ACTIVE",
@@ -60,13 +60,9 @@ describe('the DelegatedAdminPage', () => {
     // ARRANGE
 
     // ACT
-    render(
-      <NotificationContextProvider>
-        <MemoryRouter>
-          <DelegatedAdminPage/>
-        </MemoryRouter>
-      </NotificationContextProvider>
-    );
+    renderAppContent({
+      initialRoute: '/delegated-admin',
+    });
 
     // ASSERT
     expect(screen.getByRole('button', {name: (/Start Scan/i)})).toBeInTheDocument();
@@ -77,24 +73,16 @@ describe('the DelegatedAdminPage', () => {
   it('renders all items from a list of DelegatedAdmins', async () => {
     // ARRANGE
     server.use(
-      rest.get('/delegated-admins', (request, response, context) => {
-        return response(
-          context.status(200),
-          context.json({Results: delegatedAdminItems}),
-        )
+      http.get(MOCK_SERVER_URL + '/delegated-admins', () => {
+        return ok({Results: delegatedAdminItems})
       }),
     );
 
     // ACT
-    render(
-      <NotificationContextProvider>
-        <MemoryRouter>
-          <DelegatedAdminPage/>
-        </MemoryRouter>
-      </NotificationContextProvider>
-    );
-    await screen.findByText(/Loading resources/i)
-    await waitForElementToBeRemoved(() => screen.queryByText(/Loading resources/i))
+    renderAppContent({
+      initialRoute: '/delegated-admin',
+    });
+    await screen.findByText(/Loading resources/i);
 
     const table = screen.getByRole('table');
 
@@ -107,24 +95,14 @@ describe('the DelegatedAdminPage', () => {
 
   it('shows an error notification', async () => {
     // ARRANGE
-    const setNotificationsMockFn = jest.fn();
     server.use(
-      rest.get('/delegated-admins', (request, response, context) => {
-        return response(
-          context.status(400),
-          context.json({error: "SomeError", message: "Oops. Something went wrong."}),
-        )
+      http.get(MOCK_SERVER_URL + '/delegated-admins', () => {
+        return badRequest({error: "SomeError", message: "Oops. Something went wrong."})
       }),
     );
 
     // ACT
-    render(
-      <NotificationContext.Provider value={{notifications: [], setNotifications: setNotificationsMockFn}}>
-        <MemoryRouter>
-          <DelegatedAdminPage/>
-        </MemoryRouter>
-      </NotificationContext.Provider>
-    );
+    renderAppContent({initialRoute: '/delegated-admin'})
     await screen.findByText(/Loading resources/i)
     await waitForElementToBeRemoved(() => screen.queryByText(/Loading resources/i))
 
@@ -132,26 +110,16 @@ describe('the DelegatedAdminPage', () => {
     // ASSERT
     expect(screen.getByRole('button', {name: (/Start Scan/i)})).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: (/Delegated Admin Accounts/i)})).toBeInTheDocument();
-    await waitFor(() => {
-      expect(setNotificationsMockFn).toHaveBeenCalled();
-    });
+
+    const flashbar = await screen.findByTestId('flashbar');
+    await within(flashbar).findByText('Unexpected error');
   });
 
 
   describe('starting a scan', () => {
 
-    let setNotificationsMockFn: jest.Mock;
     beforeEach(async () => {
-      setNotificationsMockFn = jest.fn();
-
-      // eslint-disable-next-line testing-library/no-render-in-setup
-      render(
-        <NotificationContext.Provider value={{notifications: [], setNotifications: setNotificationsMockFn}}>
-          <MemoryRouter>
-            <DelegatedAdminPage/>
-          </MemoryRouter>
-        </NotificationContext.Provider>
-      );
+      renderAppContent({initialRoute: '/delegated-admin'})
       await screen.findByText(/Loading resources/i)
       await waitForElementToBeRemoved(() => screen.queryByText(/Loading resources/i))
     })
@@ -160,17 +128,14 @@ describe('the DelegatedAdminPage', () => {
     it('shows a success message on succeeded scan', async () => {
       // ARRANGE
       server.use(
-        rest.post('/delegated-admins', (request, response, context) => {
-          return response(
-            context.status(200),
-            context.json({
-              AssessmentType: "DELEGATED_ADMIN",
-              JobId: newJobId,
-              JobStatus: 'SUCCEEDED',
-              StartedAt: new Date().toISOString(),
-              StartedBy: 'John.Doe@example.com'
-            })
-          );
+        http.post(MOCK_SERVER_URL + '/delegated-admins', () => {
+          return ok({
+            AssessmentType: "DELEGATED_ADMIN",
+            JobId: newJobId,
+            JobStatus: 'SUCCEEDED',
+            StartedAt: new Date().toISOString(),
+            StartedBy: 'John.Doe@example.com'
+          })
         })
       );
 
@@ -180,31 +145,21 @@ describe('the DelegatedAdminPage', () => {
       await userEvent.click(startScanButton)
 
       // ASSERT
-      await waitFor(() => {
-        expect(setNotificationsMockFn).toHaveBeenLastCalledWith([{
-          header: 'Scan succeeded',
-          content: `Job with ID ${newJobId} finished successfully.`,
-          type: 'success',
-          dismissible: true,
-          onDismiss: expect.any(Function)
-        }]);
-      });
+      const flashbar = await screen.findByTestId('flashbar');
+      await within(flashbar).findByText(`Job with ID ${newJobId} finished successfully.`);
     });
 
     it('shows an error message on a failed scan', async () => {
       // ARRANGE
       server.use(
-        rest.post('/delegated-admins', (request, response, context) => {
-          return response(
-            context.status(200),
-            context.json({
-              AssessmentType: "DELEGATED_ADMIN",
-              JobId: newJobId,
-              JobStatus: 'FAILED',
-              StartedAt: new Date().toISOString(),
-              StartedBy: 'John.Doe@example.com'
-            })
-          )
+        http.post(MOCK_SERVER_URL + '/delegated-admins', () => {
+          return ok({
+            AssessmentType: "DELEGATED_ADMIN",
+            JobId: newJobId,
+            JobStatus: 'FAILED',
+            StartedAt: new Date().toISOString(),
+            StartedBy: 'John.Doe@example.com'
+          })
         }),
       )
 
@@ -214,24 +169,16 @@ describe('the DelegatedAdminPage', () => {
       await userEvent.click(startScanButton)
 
       // ASSERT
-      await waitFor(() => {
-        expect(setNotificationsMockFn).toHaveBeenLastCalledWith([{
-          header: 'Scan failed',
-          content: `Job with ID ${newJobId} finished with failure. For details please check the Cloudwatch Logs.`,
-          type: 'error',
-          dismissible: true,
-          onDismiss: expect.any(Function)
-        }])
-      })
+      const flashbar = await screen.findByTestId('flashbar');
+      await within(flashbar).findByText(`Job with ID ${newJobId} finished with failure. For details please check the Cloudwatch Logs.`);
+
     });
 
     it('shows an error message on an error response', async () => {
       // ARRANGE
       server.use(
-        rest.post('/delegated-admins', (request, response, context) => {
-          return response(
-            context.status(400),
-            context.json({error: "SomeError", message: "Oops. Something went wrong."}),
+        http.post(MOCK_SERVER_URL + '/delegated-admins', () => {
+          return badRequest({error: "SomeError", message: "Oops. Something went wrong."}
           )
         }),
       )
@@ -242,17 +189,8 @@ describe('the DelegatedAdminPage', () => {
       await userEvent.click(startScanButton)
 
       // ASSERT
-      await waitFor(() => {
-        expect(setNotificationsMockFn).toHaveBeenLastCalledWith([{
-          header: 'Error',
-          content: `Scan could not be started`,
-          type: 'error',
-          dismissible: true,
-          onDismiss: expect.any(Function)
-        }])
-      })
+      const flashbar = await screen.findByTestId('flashbar');
+      await within(flashbar).findByText('Unexpected error');
     });
-
   })
-
 });

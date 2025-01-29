@@ -3,57 +3,72 @@
 
 import React from 'react';
 import {render, screen} from '@testing-library/react';
-import App from '../App';
 import {NotificationContext, NotificationContextProvider} from "../contexts/NotificationContext";
 import {UserContext} from "../contexts/UserContext";
-import {Auth} from "@aws-amplify/auth";
 import {newJob} from "./mocks/handlers";
-import {server} from "./mocks/server";
-import {rest} from "msw";
+import {MOCK_SERVER_URL, server} from "./mocks/server";
+import {http, HttpResponse} from 'msw';
 import userEvent from '@testing-library/user-event';
-
-jest.mock("@aws-amplify/auth");
+import sinon from 'sinon';
+import {Provider} from "react-redux";
+import {setupStore} from "../store/store.ts";
+import {AuthUser} from "aws-amplify/auth";
+import App from "../App.tsx";
+import {v4} from "uuid";
 
 describe('the landing page', () => {
 
-  let signInMockFunction: jest.Mock;
-  let signOutMockFunction: jest.Mock;
-
-  beforeEach(() => {
-    signInMockFunction = jest.fn();
-    signInMockFunction.mockReturnValue(new Promise(() => true));
-    Auth.federatedSignIn = signInMockFunction;
-
-    signOutMockFunction = jest.fn();
-    signOutMockFunction.mockReturnValue(new Promise(() => true));
-    Auth.signOut = signOutMockFunction;
-  })
-
   describe('when no user is logged in', () => {
+
     it('should redirect to login via Amplify Auth.federatedSignIn', () => {
       // ARRANGE
-
-      const userContextFalsy = null;
+      const store = setupStore();
+      let signInCalled = false;
 
       // ACT
       render(
-        <NotificationContextProvider>
-          <UserContext.Provider value={userContextFalsy}>
-            <App/>
+        <Provider store={store}>
+          <UserContext.Provider value={{
+            orgId: '',
+            user: null,
+            email: null,
+            signOut: () => {
+              return Promise.resolve();
+            },
+            signInWithRedirect: () => {
+              signInCalled = true;
+              return Promise.resolve();
+            }
+          }}>
+            <NotificationContextProvider>
+              <App></App>
+            </NotificationContextProvider>
           </UserContext.Provider>
-        </NotificationContextProvider>
-      );
+        </Provider>
+      )
 
       // ASSERT
       const redirectMessage = screen.getByText(/Redirecting to login/i);
       expect(redirectMessage).toBeInTheDocument();
-
-      expect(signInMockFunction).toHaveBeenCalledTimes(1);
+      expect(signInCalled).toBeTruthy();
     });
   })
 
   describe('when a user is logged in', () => {
     const userEmail = 'John.Doe@example.com';
+    const userContext = {
+      orgId: '',
+      user: {
+        username: v4(),
+      } as AuthUser,
+      email: userEmail,
+      signOut: () => {
+        signOutCalled = true;
+        return Promise.resolve();
+      },
+      signInWithRedirect: () => Promise.resolve(),
+    };
+    let signOutCalled = false;
 
     beforeEach(() => {
       const jobs = [
@@ -61,24 +76,23 @@ describe('the landing page', () => {
         newJob('RESOURCE_BASED_POLICY')
       ];
       server.use(
-        rest.get('/jobs', (request, response, context) => {
-
-          return response(
-            context.status(200),
-            context.json({Results: jobs}),
-          )
+        http.get(MOCK_SERVER_URL + '/jobs', () => {
+          return HttpResponse.json({Results: jobs}, {
+            status: 200,
+            headers: [['Access-Control-Allow-Origin', '*']],
+          })
         })
       )
 
-      const userContextTruthy = {attributes: {email: userEmail}} as any;
-      const notificationContext = {notifications: [], setNotifications: jest.fn()};
-      // eslint-disable-next-line testing-library/no-render-in-setup
+      const store = setupStore();
       render(
-        <NotificationContext.Provider value={notificationContext}>
-          <UserContext.Provider value={userContextTruthy}>
-            <App/>
+        <Provider store={store}>
+          <UserContext.Provider value={userContext}>
+            <NotificationContextProvider>
+              <App></App>
+            </NotificationContextProvider>
           </UserContext.Provider>
-        </NotificationContext.Provider>
+        </Provider>
       );
     })
 
@@ -91,8 +105,7 @@ describe('the landing page', () => {
         // ASSERT
         const signOutButton = await screen.findByRole('menuitem', {name: /Sign out/i});
         expect(signOutButton).toBeInTheDocument();
-
-        expect(signOutMockFunction).not.toHaveBeenCalled();
+        expect(signOutCalled).toBeFalsy();
       });
 
 
@@ -105,7 +118,7 @@ describe('the landing page', () => {
         await userEvent.click(signOutButton);
 
         // ASSERT
-        expect(signOutMockFunction).toHaveBeenCalled();
+        expect(signOutCalled).toBeTruthy();
       });
     });
 
@@ -165,22 +178,24 @@ describe('the landing page', () => {
 
     describe('when there is a notification', () => {
       it('should display the notification in the Flashbar', () => {
-        // ARRANGE
-        const userContextTruthy = {attributes: {email: 'John.Doe@example.com'}} as any;
+        // ARRANGE as any;
         const notificationContext = {
           notifications: [{
             header: 'Scan in progress',
             content: 'A scan is currently running'
-          }], setNotifications: jest.fn()
+          }], setNotifications: sinon.spy()
         };
 
         // ACT
+        const store = setupStore();
         render(
-          <NotificationContext.Provider value={notificationContext}>
-            <UserContext.Provider value={userContextTruthy}>
-              <App/>
+          <Provider store={store}>
+            <UserContext.Provider value={userContext}>
+              <NotificationContext.Provider value={notificationContext}>
+                <App></App>
+              </NotificationContext.Provider>
             </UserContext.Provider>
-          </NotificationContext.Provider>
+          </Provider>
         );
 
         // ASSERT
@@ -188,6 +203,5 @@ describe('the landing page', () => {
         expect(screen.getByText(/A scan is currently running/i)).toBeInTheDocument();
       });
     });
-
   });
 });

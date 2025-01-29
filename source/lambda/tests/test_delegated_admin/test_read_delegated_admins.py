@@ -1,14 +1,14 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 import json
 
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
-from aws_lambda_powertools.utilities.typing import LambdaContext
 from mypy_boto3_dynamodb.service_resource import Table
 
 from delegated_admins import read_delegated_admins
 from delegated_admins.delegated_admins_repository import DelegatedAdminsRepository
 from delegated_admins.read_delegated_admins import ReadDelegatedAdmins
+from tests.test_utils.testdata_factory import TestLambdaContext
 from tests.test_utils.testdata_factory import delegated_admin_create_request
 
 
@@ -26,7 +26,7 @@ def describe_read_delegated_admins():
         # ARRANGE
 
         # ACT
-        result = read_delegated_admins.lambda_handler({}, LambdaContext())
+        result = read_delegated_admins.lambda_handler({}, TestLambdaContext())
 
         # ASSERT
         assert result['statusCode'] == 200
@@ -41,7 +41,7 @@ def describe_read_delegated_admins():
         class_under_test = ReadDelegatedAdmins()
 
         # ACT
-        result = class_under_test.read_delegated_admins(APIGatewayProxyEvent({}), LambdaContext())
+        result = class_under_test.read_delegated_admins(APIGatewayProxyEvent({}), TestLambdaContext())
 
         # ASSERT
         assert created_items[0] in result['Results']

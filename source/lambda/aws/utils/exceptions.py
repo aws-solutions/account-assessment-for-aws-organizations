@@ -1,5 +1,5 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 from functools import wraps
 from os import getenv
@@ -46,7 +46,8 @@ def resource_not_found_exception_handler(func):
                 'PolicyNotFound',
                 'NotFoundException',
                 'NoSuchBucketPolicy',
-                'PolicyNotFoundException'
+                'PolicyNotFoundException',
+                'InvalidParameterException'
             ]
             if err.response['Error']['Code'] in exception_codes:
                 logger.error(str(err))

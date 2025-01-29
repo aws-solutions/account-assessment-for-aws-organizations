@@ -2,57 +2,44 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as React from "react";
-import {useContext, useEffect, useState} from "react";
-import {NotificationContext} from "../../contexts/NotificationContext";
-import {ApiResponseState, get, ResultList} from "../../util/ApiClient";
+import {useEffect} from "react";
 import {JobModel} from "./JobModel";
-import {apiPathJobs, jobHistoryColumns} from "./JobsDefinitions";
+import {jobHistoryColumns} from "./JobsDefinitions";
 import {FullPageAssessmentResultTable} from "../../util/AssessmentResultTable";
 import {Button} from "@cloudscape-design/components";
+import {useDispatch, useSelector} from "react-redux";
+import {ApiDataState, ApiDataStatus} from "../../store/types.ts";
+import {fetchJobs} from "../../store/jobs-thunks.ts";
 
 export const JobHistoryPage = () => {
 
-  const [apiData, setApiData] = useState<ApiResponseState<ResultList<JobModel>>>({
-    responseBody: {Results: []},
-    error: null,
-    loading: false
-  });
+  const dispatch = useDispatch<any>();
 
-  const {setNotifications} = useContext(NotificationContext);
+  const jobs = useSelector(
+    ({jobs}: { jobs: ApiDataState<JobModel> }) => jobs,
+  );
 
-  function loadJobHistoryFromApi() {
-    setApiData({responseBody: {Results: []}, error: null, loading: true});
-    get<ResultList<JobModel>>(`${apiPathJobs}`).then((result) => {
-      setApiData(result);
-
-      if (result.error) {
-        setNotifications([{
-          header: result.error.Error,
-          content: result.error.Message,
-          type: 'error',
-          dismissible: true,
-          onDismiss: () => setNotifications([])
-        }]);
-      } else {
-        setNotifications([]);
-      }
-    });
-  }
-
+  // if jobs haven't been fetched from backend before, fetch them on page load
   useEffect(() => {
-    loadJobHistoryFromApi();
+    if (jobs.status === ApiDataStatus.IDLE)
+      dispatch(fetchJobs());
   }, []);
 
+  const loading = jobs.status === ApiDataStatus.LOADING;
+  const data = Object.values(jobs.entities) ?? [];
   return (
     <FullPageAssessmentResultTable
       title={"Job History"}
       actions={<>
-        <Button iconName="refresh" onClick={loadJobHistoryFromApi} disabled={apiData.loading}>
+        <Button
+          iconName="refresh"
+          onClick={() => dispatch(fetchJobs())}
+          disabled={loading}>
           Refresh
         </Button>
       </>}
-      data={apiData.responseBody?.Results || []}
-      loading={apiData.loading}
+      data={data}
+      loading={loading}
       columnDefinitions={jobHistoryColumns}
       defaultSorting={{
         sortingColumn: {sortingField: 'StartedAt'},

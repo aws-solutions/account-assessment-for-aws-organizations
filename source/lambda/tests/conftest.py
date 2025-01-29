@@ -180,6 +180,13 @@ def resource_based_policies_table(dynamodb_client_resource):
 
     yield from _create_table(dynamodb_client_resource, table_name)
 
+@pytest.fixture()
+def policy_explorer_table(dynamodb_client_resource):
+    table_name = 'PolicyExplorer'
+    os.environ["COMPONENT_TABLE"] = table_name
+
+    yield from _create_table(dynamodb_client_resource, table_name)
+
 
 @pytest.fixture()
 def job_history_table(dynamodb_client_resource):

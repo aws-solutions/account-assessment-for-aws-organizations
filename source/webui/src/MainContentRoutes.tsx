@@ -1,54 +1,47 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import {Route, Routes} from "react-router-dom";
+import {Route, Routes, useNavigate} from "react-router-dom";
 import {DelegatedAdminPage} from "./components/delegated-admin/DelegatedAdminPage";
 import {TrustedAccessPage} from "./components/trusted-access/TrustedAccessPage";
-import React from "react";
 import {JobHistoryPage} from "./components/jobs/JobHistoryPage";
 import {JobPage} from "./components/jobs/JobPage";
 import {ResourceBasedPoliciesPage} from "./components/resource-based-policies/ResourceBasedPoliciesPage";
-import {BreadcrumbGroup} from "@cloudscape-design/components";
-import {ConfigureScanPage} from "./components/resource-based-policies/ConfigureScanPage";
+import {BreadcrumbGroup, Container, ContentLayout, Header} from "@cloudscape-design/components";
 import {LandingPage} from "./components/landing-page/LandingPage";
+import {PolicyExplorerPage} from "./components/policy-explorer/PolicyExplorerPage";
+import React from "react";
+import {DefaultBreadcrumbs} from "./components/navigation/DefaultBreadcrumbs.tsx";
 
-export const mainContentRoutes =
+export const MainContentRoutes = () =>
   <Routes>
     <Route path="/" element={<LandingPage/>}/>
     <Route path="/jobs" element={<JobHistoryPage/>}/>
     <Route path="/jobs/:assessmentType/:id" element={<JobPage/>}/>
-    <Route path="/assessments/delegated-admin"
+    <Route path="/delegated-admin"
            element={<DelegatedAdminPage/>}/>
-    <Route path="/assessments/trusted-access" element={<TrustedAccessPage/>}/>
-    <Route path="/assessments/resource-based-policy"
+    <Route path="/trusted-access" element={<TrustedAccessPage/>}/>
+    <Route path="/resource-based-policy"
            element={<ResourceBasedPoliciesPage/>}/>
-    <Route path="/assessments/resource-based-policy/configure-scan"
-           element={<ConfigureScanPage/>}/>
+    <Route path="/policy-explorer" element={<PolicyExplorerPage/>}/>
+    <Route
+      path="*"
+      element={
+        <ContentLayout header={<Header>Error</Header>}>
+          <Container header={<Header>Page not found 😿</Header>}></Container>
+        </ContentLayout>
+      }
+    />
   </Routes>
 
-export const breadcrumbs =
-  <Routes>
-    <Route path="/" element={<BreadcrumbGroup
-      items={[
-        {
-          href: "/",
-          text: "Home"
-        }
-      ]}
-    />}/>
-    <Route path="/jobs" element={<BreadcrumbGroup
-      items={[
-        {
-          href: "/",
-          text: "Home"
-        },
-        {
-          href: "/jobs",
-          text: "Job History"
-        }
-      ]}
-    />}/>
+export const AccountAssessmentBreadcrumbs = () => {
+  const navigate = useNavigate();
+  return <Routes>
     <Route path="/jobs/:assessmentType/:id" element={<BreadcrumbGroup
+      onFollow={function (e: CustomEvent) {
+        e.preventDefault(); // prevent page reload, use client side routing instead
+        navigate(e.detail.href);
+      }}
       items={[
         {
           href: "/",
@@ -64,56 +57,6 @@ export const breadcrumbs =
         }
       ]}
     />}/>
-    <Route path="/assessments/delegated-admin" element={<BreadcrumbGroup
-      items={[
-        {
-          href: "/",
-          text: "Home"
-        },
-        {
-          href: "/assessments/delegated-admin",
-          text: "Delegated Admin Accounts"
-        }
-      ]}
-    />}/>
-    <Route path="/assessments/trusted-access" element={<BreadcrumbGroup
-      items={[
-        {
-          href: "/",
-          text: "Home"
-        },
-        {
-          href: "/assessments/trusted-access",
-          text: "Trusted Access"
-        }
-      ]}
-    />}/>
-    <Route path="/assessments/resource-based-policy" element={<BreadcrumbGroup
-      items={[
-        {
-          href: "/",
-          text: "Home"
-        },
-        {
-          href: "/assessments/resource-based-policy",
-          text: "Resource-Based Policies"
-        }
-      ]}
-    />}/>
-    <Route path="/assessments/resource-based-policy/configure-scan" element={<BreadcrumbGroup
-      items={[
-        {
-          href: "/",
-          text: "Home"
-        },
-        {
-          href: "/assessments/resource-based-policy",
-          text: "Resource-Based Policies"
-        },
-        {
-          href: "/assessments/resource-based-policy/configure-scan",
-          text: "Configure Scan"
-        }
-      ]}
-    />}/>
+    <Route path="*" element={<DefaultBreadcrumbs/>}/>
   </Routes>;
+};

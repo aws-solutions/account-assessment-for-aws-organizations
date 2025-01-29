@@ -1,5 +1,5 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 import json
 import uuid
@@ -80,5 +80,6 @@ def handle_client_exception(error: ValueError):
 
 
 @tracer.capture_lambda_handler
+@logger.inject_lambda_context(log_event=True)
 def lambda_handler(event: dict, context: LambdaContext) -> dict:
     return app.resolve(event, context)

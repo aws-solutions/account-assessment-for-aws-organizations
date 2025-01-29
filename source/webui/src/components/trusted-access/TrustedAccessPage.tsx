@@ -2,110 +2,62 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as React from "react";
-import {useContext, useEffect, useState} from "react";
+import {useEffect} from "react";
 import {TrustedAccessModel} from "./TrustedAccessModel";
 import {Button, SpaceBetween} from "@cloudscape-design/components";
-import {NotificationContext} from "../../contexts/NotificationContext";
-import {ApiResponseState, get, post, ResultList} from "../../util/ApiClient";
 import {JobModel} from "../jobs/JobModel";
 import {FullPageAssessmentResultTable} from "../../util/AssessmentResultTable";
-import {apiPathTrustedAccess, trustedAccessColumns} from "./TrustedAccessDefinitions";
+import {trustedAccessColumns, trustedAccessCsvAttributes, trustedAccessCsvHeader} from "./TrustedAccessDefinitions";
 import {useNavigate} from "react-router-dom";
+import {useDispatch, useSelector} from "react-redux";
+import {ApiDataState, ApiDataStatus} from "../../store/types.ts";
+import {fetchTrustedAccess, startTrustedAccessScan} from "../../store/trusted-access-thunks.ts";
+import {downloadCSV} from "../policy-explorer/create-csv.ts";
 
 export const TrustedAccessPage = () => {
 
-  const [apiData, setApiData] = useState<ApiResponseState<ResultList<TrustedAccessModel>>>({
-    responseBody: {Results: []},
-    error: null,
-    loading: false
-  });
-  const [startingScan, setStartingScan] = useState(false);
-  const {setNotifications} = useContext(NotificationContext);
+  const dispatch = useDispatch<any>();
   const navigate = useNavigate();
 
-  function loadTrustedServicesFromApi() {
-    setApiData({responseBody: {Results: []}, error: null, loading: true});
-    get<ResultList<TrustedAccessModel>>(apiPathTrustedAccess).then((result) => {
-      setApiData(result);
+  const trustedAccessData = useSelector(
+    ({trustedAccess}: { trustedAccess: ApiDataState<TrustedAccessModel> }) => trustedAccess,
+  );
 
-      if (result.error) {
-        setNotifications([{
-          header: result.error.Error,
-          content: result.error.Message,
-          type: 'error',
-          dismissible: true,
-          onDismiss: () => setNotifications([])
-        }])
-      }
-    });
-  }
-
+  // if DelegatedAdmins haven't been fetched from backend before, fetch them on page load
   useEffect(() => {
-    setNotifications([]);
-    loadTrustedServicesFromApi();
+    if (trustedAccessData.status === ApiDataStatus.IDLE)
+      dispatch(fetchTrustedAccess());
   }, []);
 
-
   const startScan = () => {
-    setNotifications([]);
-    setStartingScan(true);
-    post<JobModel>(apiPathTrustedAccess, {response: true, body: {}}).then((state) => {
-        if (state.error) {
-          console.log(state.error);
-          setNotifications([{
-            header: 'Error',
-            content: 'Scan could not be started',
-            type: 'error',
-            dismissible: true,
-            onDismiss: () => setNotifications([])
-          }]);
-          setStartingScan(false);
-          return;
-        }
-
-        const job: JobModel | null = state.responseBody;
-        if (job?.JobStatus === 'SUCCEEDED') {
-          setNotifications([{
-            header: 'Scan succeeded',
-            content: `Job with ID ${job.JobId} finished successfully.`,
-            type: 'success',
-            dismissible: true,
-            onDismiss: () => setNotifications([])
-          }]);
-          navigate(`/jobs/${job.AssessmentType}/${job.JobId}`);
-        } else if (job?.JobStatus === 'FAILED') {
-          setNotifications([{
-            header: 'Scan failed',
-            content: `Job with ID ${job.JobId} finished with failure. For details please check the Cloudwatch Logs.`,
-            type: 'error',
-            dismissible: true,
-            onDismiss: () => setNotifications([])
-          }]);
-        } else {
-          setNotifications([{
-            header: 'Unexpected response',
-            content: `Job responded in an unexpected way. For details please check the Cloudwatch Logs.`,
-            dismissible: true,
-            onDismiss: () => setNotifications([])
-          }]);
-        }
-        setStartingScan(false);
+    dispatch(startTrustedAccessScan()).then(
+      ({payload}: { payload: JobModel }) => {
+        if (payload)
+          navigate(`/jobs/${payload.AssessmentType}/${payload.JobId}`)
       }
-    );
+    )
   };
 
+  const loading = trustedAccessData.status === ApiDataStatus.LOADING;
+  const data = Object.values(trustedAccessData.entities) || [];
   return (
     <FullPageAssessmentResultTable
       title={"Trusted Access"}
-      data={apiData.responseBody?.Results || []}
-      loading={apiData.loading}
+      data={data}
+      loading={loading}
       columnDefinitions={trustedAccessColumns}
       actions={
         <SpaceBetween direction="horizontal" size="xs">
-          <Button iconName="refresh" onClick={loadTrustedServicesFromApi} disabled={apiData.loading}>
+          <Button iconName="refresh" onClick={() => dispatch(fetchTrustedAccess())}
+                  disabled={loading}>
             Refresh
           </Button>
-          <Button variant={"primary"} loading={startingScan} onClick={startScan}>Start Scan</Button>
+          <Button variant={"primary"} loading={loading} onClick={startScan}>Start
+            Scan</Button>
+          <Button data-testid="download" variant="normal"
+                  onClick={() => downloadCSV(data, 'trusted-access', trustedAccessCsvHeader, trustedAccessCsvAttributes)}>
+            Download Results
+          </Button>
         </SpaceBetween>
       }
     ></FullPageAssessmentResultTable>

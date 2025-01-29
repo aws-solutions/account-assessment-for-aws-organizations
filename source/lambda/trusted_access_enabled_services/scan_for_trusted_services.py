@@ -1,6 +1,8 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
-from datetime import datetime
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+import json
+import traceback
+from datetime import datetime, timezone
 from os import getenv
 from typing import List
 
@@ -14,18 +16,36 @@ from aws.services.organizations import Organizations
 from metrics.solution_metrics import SolutionMetrics
 from trusted_access_enabled_services.trusted_access_model import TrustedAccessCreateRequest
 from trusted_access_enabled_services.trusted_services_repository import TrustedServicesRepository
-from utils.api_gateway_lambda_handler import ApiGatewayResponse, GenericApiGatewayEventHandler
+from utils.api_gateway_lambda_handler import ApiGatewayResponse, GenericApiGatewayEventHandler, default_headers
+from utils.decimal_json_encoder import DecimalJsonEncoder
 
+logger = Logger(getenv('LOG_LEVEL'))
 tracer = Tracer()
 
 
 @tracer.capture_lambda_handler
+@logger.inject_lambda_context(log_event=True)
 def lambda_handler(event: dict, context: LambdaContext) -> ApiGatewayResponse:
-    return GenericApiGatewayEventHandler().handle_and_create_response(
-        event,
-        context,
-        AssessmentRunner(TrustedAccessStrategy()).run_assessment
-    )
+    try:
+        return GenericApiGatewayEventHandler().handle_and_create_response(
+            event,
+            context,
+            AssessmentRunner(TrustedAccessStrategy()).run_assessment
+        )
+    except Exception as error:
+        logger.error(f"Error: {error}")
+        logger.error(traceback.format_exc())
+        error_type = type(error).__name__
+        body = {
+            "Error": error_type,
+            "Message": "An unexpected error occurred. Inspect CloudWatch logs for more information.",
+            "Timestamp": datetime.now(tz=timezone.utc).isoformat(),
+        }
+        return {
+            'statusCode': 400,
+            'body': json.dumps(body, cls=DecimalJsonEncoder),
+            'headers': default_headers,
+        }
 
 
 class TrustedAccessStrategy(SynchronousScanStrategy):
@@ -58,4 +78,4 @@ class TrustedAccessStrategy(SynchronousScanStrategy):
 
     def write(self, trusted_services: List[TrustedAccessCreateRequest]):
         findings = TrustedServicesRepository().create_all(trusted_services)
-        SolutionMetrics().send_metrics(self.assessment_type(), findings)
+        SolutionMetrics().send_scan_metrics(self.assessment_type(), findings)

@@ -2,11 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {AssessmentResult} from "../../util/AssessmentResultTable";
-import {ResultList} from "../../util/ApiClient";
-
-export interface ResourceBasedPolicyResultList extends ResultList<ResourceBasedPolicyModel> {
-  ScanInProgress: boolean,
-}
 
 export interface ResourceBasedPolicyModel extends AssessmentResult {
   AccountId: string,
@@ -15,6 +10,7 @@ export interface ResourceBasedPolicyModel extends AssessmentResult {
   Region: string,
   DependencyType: string,
   DependencyOn: string,
+  SortKey: string;
 }
 
 export type ConfigurationModel = {

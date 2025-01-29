@@ -45,7 +45,7 @@ def _setup_simple_state_machine(stepfunctions_client):
         name="name", definition=str(simple_definition), roleArn=_get_default_role()
     )
     print(state_machine["stateMachineArn"])
-    os.environ['SCAN_RESOURCE_POLICY_STATE_MACHINE_ARN'] = state_machine["stateMachineArn"]
+    os.environ['SCAN_POLICIES_STATE_MACHINE_ARN'] = state_machine["stateMachineArn"]
     return state_machine
 
 

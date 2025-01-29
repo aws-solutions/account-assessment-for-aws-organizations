@@ -1,5 +1,5 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 # !/bin/python
 
@@ -11,7 +11,7 @@ from aws.services.security_token_service import SecurityTokenService
 from aws.utils.boto3_session import Boto3Session
 from aws_lambda_powertools import Logger
 from mypy_boto3_efs.type_defs import FileSystemDescriptionTypeDef, DescribeFileSystemsResponseTypeDef
-import resource_based_policy.resource_based_policy_model as model
+import policy_explorer.policy_explorer_model as model
 
 
 class ElasticFileSystem:

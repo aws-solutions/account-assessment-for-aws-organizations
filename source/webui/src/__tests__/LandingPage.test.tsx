@@ -1,28 +1,11 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import {Auth} from "@aws-amplify/auth";
-import {render, screen, waitForElementToBeRemoved, within} from "@testing-library/react";
-import {NotificationContext} from "../contexts/NotificationContext";
-import {newJob} from "./mocks/handlers";
-import {server} from "./mocks/server";
-import {rest} from "msw";
-import React from "react";
-import {LandingPage} from "../components/landing-page/LandingPage";
-
-let signInMockFunction: jest.Mock;
-let signOutMockFunction: jest.Mock;
-
-beforeEach(() => {
-  signInMockFunction = jest.fn();
-  signInMockFunction.mockReturnValue(new Promise(() => true));
-  Auth.federatedSignIn = signInMockFunction;
-
-  signOutMockFunction = jest.fn();
-  signOutMockFunction.mockReturnValue(new Promise(() => true));
-  Auth.signOut = signOutMockFunction;
-})
-
+import {screen, waitForElementToBeRemoved, within} from "@testing-library/react";
+import {newJob, ok} from "./mocks/handlers";
+import {MOCK_SERVER_URL, server} from "./mocks/server";
+import {http} from 'msw';
+import {renderAppContent} from "./test-utils.tsx";
 
 describe('the landing page', () => {
   it('should display the jobs', async () => {
@@ -32,27 +15,20 @@ describe('the landing page', () => {
       newJob('RESOURCE_BASED_POLICY')
     ];
     server.use(
-      rest.get('/jobs', (request, response, context) => {
-        return response(
-          context.status(200),
-          context.json({Results: jobs}),
-        )
+      http.get(MOCK_SERVER_URL + '/jobs', () => {
+        return ok({Results: jobs})
       })
     );
 
-    const notificationContext = {notifications: [], setNotifications: jest.fn()};
-    render(
-      <NotificationContext.Provider value={notificationContext}>
-        <LandingPage/>
-      </NotificationContext.Provider>
-    );
+    renderAppContent({
+      initialRoute: '/',
+    });
 
     await screen.findByText(/Loading Assessments/i)
     await waitForElementToBeRemoved(() => screen.queryByText(/Loading Assessments/i));
 
     // ACT
     const cards = await screen.findAllByRole('listitem');
-
     // ASSERT
     expect(cards).toHaveLength(2);
     expect((within(cards[0]).getByText(/DELEGATED-ADMIN/i))).toBeInTheDocument();

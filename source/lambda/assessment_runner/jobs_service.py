@@ -1,5 +1,5 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 import os
 
@@ -20,12 +20,15 @@ class JobsService:
         job = self.repository.get_job(assessment_type, job_id)
         task_failures = self.repository.find_task_failures_by_job_id(job_id)
 
-        findings_table = self._get_findings_table(assessment_type, job_id)
+        if assessment_type == 'POLICY_EXPLORER':
+            findings = []  # policy explorer scan yields too many results to be returned
+        else:
+            findings_table = self._get_findings_table(assessment_type, job_id)
 
-        findings = findings_table.find_items_by_secondary_index(
-            index_name='JobId',
-            key='JobId',
-            index_value=job_id)
+            findings = findings_table.find_items_by_secondary_index(
+                index_name='JobId',
+                key='JobId',
+                index_value=job_id)
         return {
             'Job': job,
             'Findings': findings,

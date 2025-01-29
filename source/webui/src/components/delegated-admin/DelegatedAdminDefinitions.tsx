@@ -4,7 +4,7 @@
 import {DelegatedAdminModel} from "./DelegatedAdminModel";
 import {formattedDateTime} from "../../util/Formatter";
 import {TableProps} from "@cloudscape-design/components";
-import {Link} from "react-router-dom";
+import {RouterLink} from "../navigation/RouterLink.tsx";
 
 export const apiPathDelegatedAdmins = '/delegated-admins';
 
@@ -50,9 +50,9 @@ export const delegatedAdminDefinitions: Array<TableProps.ColumnDefinition<Delega
   {
     header: "Last Found at Job Id",
     id: "JobId",
-    cell: (item) => <Link
-      to={`/jobs/DELEGATED_ADMIN/${item.JobId}`}
-    >{item.JobId}</Link>
+    cell: (item) => <RouterLink
+      href={`/jobs/DELEGATED_ADMIN/${item.JobId}`}
+    >{item.JobId}</RouterLink>
   },
 ];
 
@@ -91,3 +91,6 @@ export const delegatedAdminColumnsForJob: Array<TableProps.ColumnDefinition<Dele
     cell: (item) => item.Status
   },
 ];
+
+export const delegatedAdminCsvHeader = "Account Id, Service Principal, Account Name, Admin Email, Joined Method, Status, Last Found at";
+export const delegatedAdminCsvAttributes = ['AccountId', 'ServicePrincipal', 'Name', 'Email', 'JoinedMethod', 'Status', 'AssessedAt'];

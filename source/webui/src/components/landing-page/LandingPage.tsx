@@ -1,63 +1,47 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import {Box, Cards, CardsProps, ContentLayout, Link} from "@cloudscape-design/components";
+import {Box, Cards, CardsProps, ContentLayout} from "@cloudscape-design/components";
 import * as React from "react";
-import {useContext, useEffect, useState} from "react";
-import {ApiResponseState, get, ResultList} from "../../util/ApiClient";
+import {useEffect} from "react";
 import {JobModel} from "../jobs/JobModel";
-import {NotificationContext} from "../../contexts/NotificationContext";
-import {apiPathJobs} from "../jobs/JobsDefinitions";
 import Header from "@cloudscape-design/components/header";
 import {formattedDateTime} from "../../util/Formatter";
+import {useDispatch, useSelector} from "react-redux";
+import {RouterLink} from "../navigation/RouterLink.tsx";
+import {ApiDataState, ApiDataStatus} from "../../store/types.ts";
+import {fetchJobs} from "../../store/jobs-thunks.ts";
 
 function HeaderComponent({item}: {
-  item: JobModel }) {
-    let assessmentType = item.AssessmentType;
-      while (assessmentType.indexOf(('_')) > -1) {
-        assessmentType = assessmentType.replace('_', '-');
-      }
-  return <>        <Link fontSize="heading-m"
-  href={`/assessments/${assessmentType}`}>{assessmentType}</Link>
+  item: JobModel
+}) {
+  let assessmentType = item.AssessmentType;
+  while (assessmentType.indexOf(('_')) > -1) {
+    assessmentType = assessmentType.replace('_', '-');
+  }
+  return <>
+    <RouterLink fontSize="heading-m" href={`/${assessmentType}`}>{assessmentType}</RouterLink>
   </>
 }
 
 export const LandingPage = () => {
 
-  const [apiData, setApiData] = useState<ApiResponseState<ResultList<JobModel>>>({
-    responseBody: {Results: []},
-    error: null,
-    loading: false
-  });
+  const dispatch = useDispatch<any>();
 
-  const {setNotifications} = useContext(NotificationContext);
+  const jobs = useSelector(
+    ({jobs}: { jobs: ApiDataState<JobModel> }) => jobs,
+  );
+  const mostRecentJobs = getMostRecentPerAssessmentType(Object.values(jobs.entities));
 
-  function loadLatestJobsFromApi() {
-    setApiData({responseBody: {Results: []}, error: null, loading: true});
-    get<ResultList<JobModel>>(`${apiPathJobs}`, {queryStringParameters: {'selection': 'latest'}}).then((result) => {
-      setApiData(result);
-
-      if (result.error) {
-        setNotifications([{
-          header: result.error.Error,
-          content: result.error.Message,
-          type: 'error',
-          dismissible: true,
-          onDismiss: () => setNotifications([])
-        }]);
-      } else {
-        setNotifications([]);
-      }
-    });
-  }
-
+  // if jobs haven't been fetched from backend before, fetch them on page load
   useEffect(() => {
-    loadLatestJobsFromApi();
+    if (jobs.status === ApiDataStatus.IDLE)
+      dispatch(fetchJobs());
   }, []);
 
-
+  const loading = jobs.status === ApiDataStatus.LOADING;
   const cardDefinition: CardsProps.CardDefinition<JobModel> = {
-    header: item => <HeaderComponent item={item}/>, //NOSONAR S6478: will be refactored in a feature release.
+    header: item => <HeaderComponent item={item}/>,
     sections: [
       {
         id: "JobStatus",
@@ -77,7 +61,7 @@ export const LandingPage = () => {
       {
         id: "JobId",
         header: "Job ID",
-        content: item => <Link href={`/jobs/${item.AssessmentType}/${item.JobId}`}>{item.JobId}</Link> //NOSONAR S6478: will be refactored in a feature release.
+        content: item => <RouterLink href={`/jobs/${item.AssessmentType}/${item.JobId}`}>{item.JobId}</RouterLink>
       }
     ]
   };
@@ -99,8 +83,8 @@ export const LandingPage = () => {
             {cards: 1},
             {minWidth: 500, cards: 2}
           ]}
-          items={apiData.responseBody?.Results || []}
-          loading={apiData.loading}
+          items={mostRecentJobs}
+          loading={loading}
           loadingText="Loading Assessments"
           empty={
             <Box textAlign="center" color="inherit">
@@ -119,4 +103,16 @@ export const LandingPage = () => {
       </div>
     </ContentLayout>
   );
+}
+
+function getMostRecentPerAssessmentType(jobs: Array<JobModel>) {
+  const reducedJobs = jobs.reduce((acc: { [key: string]: JobModel }, job: JobModel) => {
+    const existingJob = acc[job.AssessmentType];
+    if (!existingJob || existingJob.StartedAt < job.StartedAt) {
+      acc[job.AssessmentType] = job;
+    }
+    return acc;
+  }, {});
+
+  return Object.values(reducedJobs);
 }
