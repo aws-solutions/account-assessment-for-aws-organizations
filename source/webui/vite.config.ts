@@ -4,7 +4,6 @@
 import {defineConfig} from 'vite';
 import {resolve} from 'path';
 import react from '@vitejs/plugin-react'
-import browserslistToEsbuild from 'browserslist-to-esbuild'
 import {CoverageV8Options} from "vitest/node";
 
 
@@ -27,11 +26,7 @@ const config = {
   },
   build: {
     outDir: resolve(__dirname, './dist'),
-    target: browserslistToEsbuild([
-      '>0.2%',
-      'not dead',
-      'not op_mini all'
-    ]),
+    target: ['es2015', 'chrome89', 'edge89', 'firefox89', 'safari15'],
   },
   test: {
     globals: true, // makes describe, it, expect available without import

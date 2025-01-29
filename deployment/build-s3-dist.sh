@@ -330,6 +330,9 @@ echo "Run the helper to clean-up the templates and remove unnecessary CDK elemen
     fi
 } || echo "${bold}Solution Helper skipped: ${normal}run_helper=false"
 
+cd $deployment_dir/cdk-solution-helper
+rm -rf ./build
+
 # Find and replace bucket_name, solution_name, and version
 echo "Find and replace bucket_name, solution_name, and version"
 cd $template_dist_dir

@@ -1,5 +1,5 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 from resource_based_policy.read_resource_based_policies import ReadResourceBasedPolicies
 from resource_based_policy.resource_based_policies_repository import ResourceBasedPoliciesRepository

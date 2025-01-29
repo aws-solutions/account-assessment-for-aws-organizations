@@ -1,5 +1,5 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 from metrics.solution_metrics import SolutionMetrics
 from tests.test_utils.testdata_factory import delegated_admin_create_request, trusted_access_create_request, \

@@ -1,5 +1,6 @@
 {
-  "name": "account-assessment-for-aws-organizations",
+  "name": "@amzn/account-assessment-for-aws-organizations",
+  "private": "true",
   "version": "1.1.0",
   "scripts": {
     "cleanup": "./node_modules/.bin/tsc --build ./ --clean && rm -rf node_modules && rm -f package-lock.json",
@@ -14,17 +15,14 @@
     "deploySpoke": "SOLUTION_TRADEMARKEDNAME=account-assessment-for-aws-organizations cdk deploy account-assessment-for-aws-organizations-spoke",
     "deployOrgMgmt": "SOLUTION_TRADEMARKEDNAME=account-assessment-for-aws-organizations cdk deploy account-assessment-for-aws-organizations-org-management",
     "synth": "cdk synth",
-    "bootstrap": "cdk bootstrap",
-    "licenses": "tsc generate-notice.ts && cd .. && pwd && node ./infra/generate-notice.js"
+    "bootstrap": "cdk bootstrap"
   },
   "devDependencies": {
     "@aws-cdk/assert": "2.68.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.10.7",
-    "@types/sinon": "^17.0.3",
     "aws-cdk": "^2.176.0",
     "jest": "^29.7.0",
-    "sinon": "^19.0.2",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
@@ -33,10 +31,8 @@
     "@aws-cdk/aws-servicecatalogappregistry-alpha": "^2.176.0-alpha.0",
     "@aws-solutions-constructs/aws-cloudfront-s3": "2.76.0",
     "@aws-solutions-constructs/aws-eventbridge-lambda": "^2.76.0",
-    "@aws-solutions-constructs/aws-wafwebacl-apigateway": "^2.76.0",
     "@aws-solutions-constructs/core": "^2.76.0",
     "aws-cdk-lib": "^2.176.0",
-    "cdk-nag": "^2.34.23",
     "constructs": "^10.4.2"
   },
   "jest": {

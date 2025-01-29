@@ -1,6 +1,5 @@
-# Copyright Amazon.com,Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
-# !/bin/python
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
 
 from os import getenv
 from typing import TYPE_CHECKING
