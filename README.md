@@ -67,7 +67,6 @@ _Note: Following steps have been tested under above pre-requisites_
      ├── lib
        ├── account-assessment-hub-stack.ts    - the hub CDK stack.
        ├── account-assessment-spoke-stack.ts  - the spoke CDK stack.
-       ├── app-register.ts                    - integrates Hub and Spoke stacks with AppRegistry
        ├──org-management-account-stack.ts     - the AWS Organizations Management CDK stack.
        └── components                         - hub stack resources grouped into constructs for better maintainability 
          ├── api.ts                            - resources related to API Gateway

@@ -26,7 +26,22 @@ def lambda_handler(event, context):
 
     cognito_idp = boto3.client('cognito-idp')
 
-    if request_type in ['Delete', 'Update']:
+    if request_type in ['Delete']:
+        # Delete the user pool domain
+        domain_to_delete = old_domain_prefix if old_domain_prefix and old_domain_prefix != domain_prefix else domain_prefix
+        try:
+            cognito_idp.delete_user_pool_domain(
+                Domain=domain_to_delete,
+                UserPoolId=user_pool_id
+            )
+            logger.info(f"Deleted domain {domain_to_delete} for user pool {user_pool_id}")
+        except Exception as error:
+            logger.exception(f"Failed to delete domain: {error}")
+            # on stack deletion, if domain has already been deleted, proceed gracefully
+            cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
+            return
+
+    if request_type in ['Update']:
         # Delete the user pool domain
         domain_to_delete = old_domain_prefix if old_domain_prefix and old_domain_prefix != domain_prefix else domain_prefix
         try:

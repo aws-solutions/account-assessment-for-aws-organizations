@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as cdk from 'aws-cdk-lib';
-import {CfnParameter} from 'aws-cdk-lib';
+import {Aspects, Aws, CfnParameter, Fn, Tags} from 'aws-cdk-lib';
 import {Construct} from "constructs";
 import {SimpleAssessmentComponent} from "./components/simple-assessment-component";
 import {JobHistoryComponent} from "./components/job-history-component";
@@ -14,6 +14,7 @@ import {Code} from "aws-cdk-lib/aws-lambda";
 import * as path from "path";
 import * as iam from 'aws-cdk-lib/aws-iam';
 import {PolicyExplorerScanComponent} from './components/policy-explorer';
+import {CfnGuardSuppressResourceList} from "./helpers/add-cfn-guard-suppression";
 
 export const TRUSTED_ACCESS_SCAN = 'TrustedAccess'
 export const DELEGATED_ADMIN_SCAN = 'DelegatedAdmin'
@@ -30,7 +31,6 @@ export interface AccountAssessmentHubStackProps extends cdk.StackProps {
 }
 
 export class AccountAssessmentHubStack extends cdk.Stack {
-  public appRegisterData: { managementAccountId: string; orgId: string };
 
   constructor(scope: Construct, id: string, private props: AccountAssessmentHubStackProps) {
     super(scope, id, props);
@@ -43,8 +43,11 @@ export class AccountAssessmentHubStack extends cdk.Stack {
 
     const namespace = new CfnParameter(this, 'DeploymentNamespace', {
       description: 'This value is used as prefix for resource names. Same namespace must be used in spoke stack and management account stack.',
+      type: 'String',
+      minLength: 3,
       maxLength: 10,
-      type: 'String'
+      allowedPattern: '^[a-z0-9][a-z0-9-]{1,8}[a-z0-9]$',
+      constraintDescription: 'Must be 3-10 characters long, containing only lowercase letters, numbers, and hyphens. Cannot begin or end with a hyphen.'
     });
 
     const orgId = new CfnParameter(this, "OrganizationID", {
@@ -63,10 +66,6 @@ export class AccountAssessmentHubStack extends cdk.Stack {
         type: "String",
       }
     );
-    this.appRegisterData = {
-      orgId: orgId.valueAsString,
-      managementAccountId: managementAccountId.valueAsString
-    }
 
     const api = new Api(this, 'Api', {region: this.region, allowListedIPRanges, namespace});
 
@@ -169,13 +168,14 @@ export class AccountAssessmentHubStack extends cdk.Stack {
       dynamoTtlInDays,
       solutionVersion: props.solutionVersion,
       stackId: this.stackId,
-      sendAnonymousData: mappings.findInMap("SendAnonymousData", "Data")
+      sendAnonymousData: mappings.findInMap("SendAnonymousData", "Data"),
+      namespace: namespace.valueAsString
     });
 
     new SimpleAssessmentComponent(this, 'DelegatedAdmins', {
       cognitoAuthenticationResources,
       tables: {jobHistory: jobHistory.jobHistoryTable},
-      functions: {deleteJob: jobHistory.sharedFunctions.deleteJob},
+      functions: {readJob: jobHistory.sharedFunctions.readJob},
       api: api.restApi,
       componentConfig: {
         readHandlerPath: 'delegated_admins/read_delegated_admins.lambda_handler',
@@ -196,7 +196,7 @@ export class AccountAssessmentHubStack extends cdk.Stack {
     new SimpleAssessmentComponent(this, 'TrustedAccess', {
       cognitoAuthenticationResources,
       tables: {jobHistory: jobHistory.jobHistoryTable},
-      functions: {deleteJob: jobHistory.sharedFunctions.deleteJob},
+      functions: {readJob: jobHistory.sharedFunctions.readJob},
       api: api.restApi,
       componentConfig: {
         readHandlerPath: 'trusted_access_enabled_services/read_trusted_services.lambda_handler',
@@ -217,7 +217,7 @@ export class AccountAssessmentHubStack extends cdk.Stack {
     new SimpleAssessmentComponent(this, 'ResourceBasedPolicy', {
       cognitoAuthenticationResources,
       tables: {jobHistory: jobHistory.jobHistoryTable},
-      functions: {deleteJob: jobHistory.sharedFunctions.deleteJob},
+      functions: {readJob: jobHistory.sharedFunctions.readJob},
       api: api.restApi,
       componentConfig: {
         readHandlerPath: 'resource_based_policy/read_resource_based_policies.lambda_handler',
@@ -254,7 +254,7 @@ export class AccountAssessmentHubStack extends cdk.Stack {
       api: api.restApi,
       assetCode: lambdaZip,
       tables: {jobHistory: jobHistory.jobHistoryTable},
-      functions: {deleteJob: jobHistory.sharedFunctions.deleteJob},
+      functions: {readJob: jobHistory.sharedFunctions.readJob},
       apiResourcePath: 'policy-explorer',
       componentTableConfig: {
         partitionKeyName: 'PartitionKey',
@@ -277,6 +277,12 @@ export class AccountAssessmentHubStack extends cdk.Stack {
       partition: this.partition,
       accountId: this.account,
     })
-    
+
+    Aspects.of(this).add(new CfnGuardSuppressResourceList({
+          "AWS::Lambda::Function": ["LAMBDA_INSIDE_VPC", "LAMBDA_CONCURRENCY_CHECK"],
+          "AWS::DynamoDB::Table": ["DYNAMODB_TABLE_ENCRYPTED_KMS", "DYNAMODB_TABLE_ENCRYPTED_KMS_ALLOWED_ALGORITHMS"],
+          "AWS::IAM::Role": ["CFN_NO_EXPLICIT_RESOURCE_NAMES"]
+        })
+    );
   }
 }

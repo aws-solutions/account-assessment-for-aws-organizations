@@ -26,12 +26,6 @@ logger = Logger(getenv('LOG_LEVEL'))
 tracer = Tracer()
 
 
-@app.delete("/jobs/<assessment_type>/<job_id>", cors=True)
-def delete_job(assessment_type: str, job_id: str):
-    uuid.UUID(job_id)
-    return JobsService().delete_job(assessment_type, job_id)
-
-
 @app.get("/jobs/<assessment_type>/<job_id>", cors=True)
 def read_job(assessment_type: str, job_id: str) -> JobDetails:
     uuid.UUID(job_id)

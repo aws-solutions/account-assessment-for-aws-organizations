@@ -121,46 +121,4 @@ describe('the JobPage', () => {
     const table = await screen.findByTitle('FailuresTable');
     expect(await within(table).findByText(taskFailures[0].Error)).toBeInTheDocument()
   });
-
-
-  it('deletes a job', async () => {
-    // ARRANGE
-
-    renderAppContent({
-      initialRoute: `/jobs/TRUSTED_ACCESS/5ac32b0e474b44d7b9ef60e5da02eebd`,
-    });
-    const deleteButton = await screen.findByRole('button', {name: 'Delete'});
-
-    // ACT
-    await userEvent.click(deleteButton);
-
-    // ASSERT
-    expect(await screen.findByText(/Do you want to delete this job and all associated findings?/i)).toBeInTheDocument()
-
-    // ACT
-    const confirmButton = await screen.findByRole('button', {name: 'Ok'});
-    await userEvent.click(confirmButton);
-
-    // ASSERT
-    const flashbar = await screen.findByTestId('flashbar');
-    await within(flashbar).findByText(`Job with JobId 5ac32b0e474b44d7b9ef60e5da02eebd was deleted successfully.`);
-  });
-
-  it('cancels deletion of a job', async () => {
-    // ARRANGE
-    renderAppContent({
-      initialRoute: `/jobs/TRUSTED_ACCESS/5ac32b0e474b44d7b9ef60e5da02eebd`,
-    });
-
-    const deleteButton = await screen.findByRole('button', {name: 'Delete'});
-
-    // ACT
-    await userEvent.click(deleteButton);
-    const confirmButton = await screen.findByRole('button', {name: 'Cancel'});
-    await userEvent.click(confirmButton);
-
-    // ASSERT
-    const flashbar = await screen.findByTestId('flashbar');
-    expect(within(flashbar).queryByText(`deleted`)).not.toBeInTheDocument();
-  });
 });

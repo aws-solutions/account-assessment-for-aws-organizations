@@ -74,35 +74,6 @@ export const JobPage = () => {
     loadJob();
   }, []);
 
-  function deleteJob() {
-    setDeleting(true);
-    setModalVisible(false);
-
-    deleteItem<void>(`${apiPathJobs}/${assessmentType}/${id}`).then((state) => {
-        if (state.error) {
-          dispatch(addNotification({
-              id: v4(),
-              header: 'Error',
-              content: 'Job could not be deleted',
-              type: 'error',
-            }),
-          );
-          setDeleting(false);
-        } else {
-          dispatch(addNotification({
-              id: v4(),
-              header: 'Job deleted',
-              content: `Job with JobId ${id} was deleted successfully.`,
-              type: 'success',
-            }),
-          );
-          navigate('/jobs');
-          setDeleting(false);
-        }
-      }
-    );
-  }
-
   const loading = status === ApiDataStatus.LOADING;
   return (
     <ContentLayout
@@ -114,8 +85,6 @@ export const JobPage = () => {
               <Button iconName="refresh" onClick={loadJob} disabled={loading}>
                 Refresh
               </Button>
-              <Button variant="primary" loading={deleting}
-                      onClick={() => setModalVisible(true)}>Delete</Button>
             </SpaceBetween>
           }
         >
@@ -124,21 +93,6 @@ export const JobPage = () => {
       }
     >
       <SpaceBetween size={"m"}>
-        <Modal
-          visible={modalVisible}
-          closeAriaLabel="Close modal"
-          footer={
-            <Box float="right">
-              <SpaceBetween direction="horizontal" size="xs">
-                <Button variant="link" onClick={() => setModalVisible(false)}>Cancel</Button>
-                <Button variant="primary" onClick={deleteJob}>Ok</Button>
-              </SpaceBetween>
-            </Box>
-          }
-          header="Delete Job">
-          Do you want to delete this job and all associated findings?
-        </Modal>
-
         <Container
           header={
             <Header variant="h2">
