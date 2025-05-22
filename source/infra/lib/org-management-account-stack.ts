@@ -1,11 +1,12 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import {CfnParameter, Stack, StackProps} from "aws-cdk-lib";
+import {CfnParameter, CfnResource, Stack, StackProps} from "aws-cdk-lib";
 import {Construct} from "constructs";
 import {ArnPrincipal, CompositePrincipal, PolicyDocument, PolicyStatement, Role} from "aws-cdk-lib/aws-iam";
 import {addCfnSuppressRules} from '@aws-solutions-constructs/core';
 import {DELEGATED_ADMIN_SCAN, POLICY_EXPLORER_SCAN, TRUSTED_ACCESS_SCAN} from "./account-assessment-hub-stack";
+import {addCfnGuardSuppressions} from "./helpers/add-cfn-guard-suppression";
 
 
 export const ORG_MANAGEMENT_ROLE_NAME = 'AccountAssessment-OrgMgmtStackRole';
@@ -22,8 +23,11 @@ export class OrgManagementAccountStack extends Stack {
 
     const namespace = new CfnParameter(this, 'DeploymentNamespace', {
       description: 'Will be used as prefix for resource names. Same namespace must be used in hub stack.',
+      type: 'String',
+      minLength: 3,
       maxLength: 10,
-      type: 'String'
+      allowedPattern: '^[a-z0-9][a-z0-9-]{1,8}[a-z0-9]$',
+      constraintDescription: 'Must be 3-10 characters long, containing only lowercase letters, numbers, and hyphens. Cannot begin or end with a hyphen.'
     });
 
     const hubAccountIdParameter = new CfnParameter(this, 'HubAccountId', {
@@ -79,7 +83,7 @@ export class OrgManagementAccountStack extends Stack {
         })
       }
     });
-
+    addCfnGuardSuppressions(role.node.defaultChild as CfnResource, ["IAM_NO_INLINE_POLICY_CHECK"]);
     addCfnSuppressRules(role, [{
       id: 'W11',
       reason: 'Resource * is necessary for organizations:List* operations. No risk, because the role can still only access its own organization.'

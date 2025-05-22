@@ -164,8 +164,11 @@ exports[`hub stack synth doesnt crash 1`] = `
       "Type": "AWS::SSM::Parameter::Value<String>",
     },
     "DeploymentNamespace": {
+      "AllowedPattern": "^[a-z0-9][a-z0-9-]{1,8}[a-z0-9]$",
+      "ConstraintDescription": "Must be 3-10 characters long, containing only lowercase letters, numbers, and hyphens. Cannot begin or end with a hyphen.",
       "Description": "This value is used as prefix for resource names. Same namespace must be used in spoke stack and management account stack.",
       "MaxLength": 10,
+      "MinLength": 3,
       "Type": "String",
     },
     "DynamoTimeToLive": {
@@ -232,6 +235,13 @@ exports[`hub stack synth doesnt crash 1`] = `
     },
     "ApiAccountAssessmentForAWSOrganisationsApiCloudWatchRoleEF2CAC3A": {
       "DeletionPolicy": "Retain",
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
+          ],
+        },
+      },
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -263,13 +273,12 @@ exports[`hub stack synth doesnt crash 1`] = `
       "Type": "AWS::IAM::Role",
       "UpdateReplacePolicy": "Retain",
     },
-    "ApiAccountAssessmentForAWSOrganisationsApiDeployment30D1B1E644fb14b1801d259c14ebdd8999bf2454": {
+    "ApiAccountAssessmentForAWSOrganisationsApiDeployment30D1B1E6f5feea027da95752ea8ef02a45ffdc54": {
       "DependsOn": [
         "ApiAccountAssessmentForAWSOrganisationsApidelegatedadminsGET4A31FEC2",
         "ApiAccountAssessmentForAWSOrganisationsApidelegatedadminsOPTIONS001FCB8B",
         "ApiAccountAssessmentForAWSOrganisationsApidelegatedadminsPOST8B870775",
         "ApiAccountAssessmentForAWSOrganisationsApidelegatedadminsE50B22F7",
-        "ApiAccountAssessmentForAWSOrganisationsApijobsassessmentTypeidDELETE6B8A2870",
         "ApiAccountAssessmentForAWSOrganisationsApijobsassessmentTypeidGETE4BCB085",
         "ApiAccountAssessmentForAWSOrganisationsApijobsassessmentTypeidOPTIONSBA3B7ABE",
         "ApiAccountAssessmentForAWSOrganisationsApijobsassessmentTypeidC28790DF",
@@ -320,7 +329,7 @@ exports[`hub stack synth doesnt crash 1`] = `
           "Format": "{"requestId":"$context.requestId","ip":"$context.identity.sourceIp","user":"$context.identity.user","caller":"$context.identity.caller","requestTime":"$context.requestTime","httpMethod":"$context.httpMethod","resourcePath":"$context.resourcePath","status":"$context.status","protocol":"$context.protocol","responseLength":"$context.responseLength"}",
         },
         "DeploymentId": {
-          "Ref": "ApiAccountAssessmentForAWSOrganisationsApiDeployment30D1B1E644fb14b1801d259c14ebdd8999bf2454",
+          "Ref": "ApiAccountAssessmentForAWSOrganisationsApiDeployment30D1B1E6f5feea027da95752ea8ef02a45ffdc54",
         },
         "RestApiId": {
           "Ref": "ApiAccountAssessmentForAWSOrganisationsApiCC987D5A",
@@ -919,131 +928,6 @@ exports[`hub stack synth doesnt crash 1`] = `
         },
       },
       "Type": "AWS::ApiGateway::Resource",
-    },
-    "ApiAccountAssessmentForAWSOrganisationsApijobsassessmentTypeidDELETE6B8A2870": {
-      "Properties": {
-        "ApiKeyRequired": false,
-        "AuthorizationScopes": [
-          "account-assessment-api/api",
-        ],
-        "AuthorizationType": "COGNITO_USER_POOLS",
-        "AuthorizerId": {
-          "Ref": "AuthFullAccessAuthorizer1F31C21E",
-        },
-        "HttpMethod": "DELETE",
-        "Integration": {
-          "IntegrationHttpMethod": "POST",
-          "Type": "AWS_PROXY",
-          "Uri": {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition",
-                },
-                ":apigateway:",
-                {
-                  "Ref": "AWS::Region",
-                },
-                ":lambda:path/2015-03-31/functions/",
-                {
-                  "Fn::GetAtt": [
-                    "JobHistoryJobsHandler0605796C",
-                    "Arn",
-                  ],
-                },
-                "/invocations",
-              ],
-            ],
-          },
-        },
-        "ResourceId": {
-          "Ref": "ApiAccountAssessmentForAWSOrganisationsApijobsassessmentTypeidC28790DF",
-        },
-        "RestApiId": {
-          "Ref": "ApiAccountAssessmentForAWSOrganisationsApiCC987D5A",
-        },
-      },
-      "Type": "AWS::ApiGateway::Method",
-    },
-    "ApiAccountAssessmentForAWSOrganisationsApijobsassessmentTypeidDELETEApiPermissionAccountAssessmentHubStackApiAccountAssessmentForAWSOrganisationsApi1AB5A7EFDELETEjobsassessmentTypeid4EB782BE": {
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Fn::GetAtt": [
-            "JobHistoryJobsHandler0605796C",
-            "Arn",
-          ],
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Join": [
-            "",
-            [
-              "arn:",
-              {
-                "Ref": "AWS::Partition",
-              },
-              ":execute-api:",
-              {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              {
-                "Ref": "AWS::AccountId",
-              },
-              ":",
-              {
-                "Ref": "ApiAccountAssessmentForAWSOrganisationsApiCC987D5A",
-              },
-              "/",
-              {
-                "Ref": "ApiAccountAssessmentForAWSOrganisationsApiDeploymentStageprod6B748DCF",
-              },
-              "/DELETE/jobs/*/*",
-            ],
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
-    },
-    "ApiAccountAssessmentForAWSOrganisationsApijobsassessmentTypeidDELETEApiPermissionTestAccountAssessmentHubStackApiAccountAssessmentForAWSOrganisationsApi1AB5A7EFDELETEjobsassessmentTypeid9C7A3159": {
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": {
-          "Fn::GetAtt": [
-            "JobHistoryJobsHandler0605796C",
-            "Arn",
-          ],
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": {
-          "Fn::Join": [
-            "",
-            [
-              "arn:",
-              {
-                "Ref": "AWS::Partition",
-              },
-              ":execute-api:",
-              {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              {
-                "Ref": "AWS::AccountId",
-              },
-              ":",
-              {
-                "Ref": "ApiAccountAssessmentForAWSOrganisationsApiCC987D5A",
-              },
-              "/test-invoke-stage/DELETE/jobs/*/*",
-            ],
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
     },
     "ApiAccountAssessmentForAWSOrganisationsApijobsassessmentTypeidGETApiPermissionAccountAssessmentHubStackApiAccountAssessmentForAWSOrganisationsApi1AB5A7EFGETjobsassessmentTypeidA2ACEA3B": {
       "Properties": {
@@ -2173,6 +2057,13 @@ exports[`hub stack synth doesnt crash 1`] = `
     },
     "ApiProdLogsAC7A9268": {
       "DeletionPolicy": "Retain",
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CLOUDWATCH_LOG_GROUP_ENCRYPTED",
+          ],
+        },
+      },
       "Properties": {
         "RetentionInDays": 3653,
       },
@@ -2184,6 +2075,14 @@ exports[`hub stack synth doesnt crash 1`] = `
         "AuthDomainLambdaServiceRoleDefaultPolicyEF8D5B6D",
         "AuthDomainLambdaServiceRoleF1A81F0E",
       ],
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "LAMBDA_INSIDE_VPC",
+            "LAMBDA_CONCURRENCY_CHECK",
+          ],
+        },
+      },
       "Properties": {
         "Code": {
           "S3Bucket": {
@@ -2244,6 +2143,13 @@ exports[`hub stack synth doesnt crash 1`] = `
       "Type": "AWS::IAM::Policy",
     },
     "AuthDomainLambdaServiceRoleF1A81F0E": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
+          ],
+        },
+      },
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -3172,6 +3078,14 @@ Temporary Password: <strong>{####}</strong>
         "DelegatedAdminsReadServiceRoleDefaultPolicyC18A0D35",
         "DelegatedAdminsReadServiceRoleBDC7C449",
       ],
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "LAMBDA_INSIDE_VPC",
+            "LAMBDA_CONCURRENCY_CHECK",
+          ],
+        },
+      },
       "Properties": {
         "Code": {
           "S3Bucket": {
@@ -3183,6 +3097,9 @@ Temporary Password: <strong>{####}</strong>
           "Variables": {
             "COMPONENT_TABLE": {
               "Ref": "DelegatedAdminsTable29E80916",
+            },
+            "NAMESPACE": {
+              "Ref": "DeploymentNamespace",
             },
             "POWERTOOLS_SERVICE_NAME": "ReadDelegatedAdmin",
             "SEND_ANONYMOUS_DATA": {
@@ -3217,6 +3134,13 @@ Temporary Password: <strong>{####}</strong>
       "Type": "AWS::Lambda::Function",
     },
     "DelegatedAdminsReadServiceRoleBDC7C449": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
+          ],
+        },
+      },
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -3335,6 +3259,14 @@ Temporary Password: <strong>{####}</strong>
         "DelegatedAdminsStartScanServiceRoleDefaultPolicyFB859E87",
         "DelegatedAdminsStartScanServiceRole9CC01771",
       ],
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "LAMBDA_INSIDE_VPC",
+            "LAMBDA_CONCURRENCY_CHECK",
+          ],
+        },
+      },
       "Properties": {
         "Code": {
           "S3Bucket": {
@@ -3348,6 +3280,9 @@ Temporary Password: <strong>{####}</strong>
               "Ref": "DelegatedAdminsTable29E80916",
             },
             "LOG_LEVEL": "INFO",
+            "NAMESPACE": {
+              "Ref": "DeploymentNamespace",
+            },
             "ORG_MANAGEMENT_ROLE_NAME": {
               "Fn::Join": [
                 "",
@@ -3399,6 +3334,13 @@ Temporary Password: <strong>{####}</strong>
       "Type": "AWS::Lambda::Function",
     },
     "DelegatedAdminsStartScanServiceRole9CC01771": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
+          ],
+        },
+      },
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -3572,6 +3514,14 @@ Temporary Password: <strong>{####}</strong>
     },
     "DelegatedAdminsTable29E80916": {
       "DeletionPolicy": "Retain",
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "DYNAMODB_TABLE_ENCRYPTED_KMS",
+            "DYNAMODB_TABLE_ENCRYPTED_KMS_ALLOWED_ALGORITHMS",
+          ],
+        },
+      },
       "Properties": {
         "AttributeDefinitions": [
           {
@@ -3614,6 +3564,7 @@ Temporary Password: <strong>{####}</strong>
         ],
         "PointInTimeRecoverySpecification": {
           "PointInTimeRecoveryEnabled": true,
+          "RecoveryPeriodInDays": 10,
         },
         "SSESpecification": {
           "SSEEnabled": true,
@@ -3631,6 +3582,14 @@ Temporary Password: <strong>{####}</strong>
         "JobHistoryJobsHandlerServiceRoleDefaultPolicy4863DA03",
         "JobHistoryJobsHandlerServiceRole5B211282",
       ],
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "LAMBDA_INSIDE_VPC",
+            "LAMBDA_CONCURRENCY_CHECK",
+          ],
+        },
+      },
       "Properties": {
         "Code": {
           "S3Bucket": {
@@ -3640,6 +3599,9 @@ Temporary Password: <strong>{####}</strong>
         },
         "Environment": {
           "Variables": {
+            "NAMESPACE": {
+              "Ref": "DeploymentNamespace",
+            },
             "POWERTOOLS_LOGGER_LOG_EVENT": "True",
             "POWERTOOLS_SERVICE_NAME": "JobsApiHandler",
             "SEND_ANONYMOUS_DATA": {
@@ -3689,6 +3651,13 @@ Temporary Password: <strong>{####}</strong>
       "Type": "AWS::Lambda::Function",
     },
     "JobHistoryJobsHandlerServiceRole5B211282": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
+          ],
+        },
+      },
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -3929,6 +3898,14 @@ Temporary Password: <strong>{####}</strong>
     },
     "JobHistoryTableE4B293DD": {
       "DeletionPolicy": "Retain",
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "DYNAMODB_TABLE_ENCRYPTED_KMS",
+            "DYNAMODB_TABLE_ENCRYPTED_KMS_ALLOWED_ALGORITHMS",
+          ],
+        },
+      },
       "Properties": {
         "AttributeDefinitions": [
           {
@@ -3953,6 +3930,7 @@ Temporary Password: <strong>{####}</strong>
         ],
         "PointInTimeRecoverySpecification": {
           "PointInTimeRecoveryEnabled": true,
+          "RecoveryPeriodInDays": 10,
         },
         "SSESpecification": {
           "SSEEnabled": true,
@@ -3966,6 +3944,13 @@ Temporary Password: <strong>{####}</strong>
       "UpdateReplacePolicy": "Retain",
     },
     "PolicyExplorerDynamoDbRoleB7F393DE": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
+          ],
+        },
+      },
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -4013,6 +3998,14 @@ Temporary Password: <strong>{####}</strong>
         "PolicyExplorerFinishAsyncJobServiceRoleDefaultPolicy3BB1F1AC",
         "PolicyExplorerFinishAsyncJobServiceRole7B0710E4",
       ],
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "LAMBDA_INSIDE_VPC",
+            "LAMBDA_CONCURRENCY_CHECK",
+          ],
+        },
+      },
       "Properties": {
         "Code": {
           "S3Bucket": {
@@ -4061,6 +4054,13 @@ Temporary Password: <strong>{####}</strong>
       "Type": "AWS::Lambda::Function",
     },
     "PolicyExplorerFinishAsyncJobServiceRole7B0710E4": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
+          ],
+        },
+      },
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -4187,6 +4187,14 @@ Temporary Password: <strong>{####}</strong>
         "PolicyExplorerPolicyExplorerScanSingleAccountServiceRoleDefaultPolicy62631D58",
         "PolicyExplorerPolicyExplorerScanSingleAccountServiceRole14522DF7",
       ],
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "LAMBDA_INSIDE_VPC",
+            "LAMBDA_CONCURRENCY_CHECK",
+          ],
+        },
+      },
       "Properties": {
         "Code": {
           "S3Bucket": {
@@ -4200,6 +4208,9 @@ Temporary Password: <strong>{####}</strong>
               "Ref": "PolicyExplorerTable3E6DD7C7",
             },
             "LOG_LEVEL": "INFO",
+            "NAMESPACE": {
+              "Ref": "DeploymentNamespace",
+            },
             "ORG_MANAGEMENT_ROLE_NAME": {
               "Fn::Join": [
                 "",
@@ -4267,6 +4278,13 @@ Temporary Password: <strong>{####}</strong>
       "Type": "AWS::Lambda::Function",
     },
     "PolicyExplorerPolicyExplorerScanSingleAccountServiceRole14522DF7": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
+          ],
+        },
+      },
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -4428,6 +4446,14 @@ Temporary Password: <strong>{####}</strong>
         "PolicyExplorerPolicyExplorerScanSpokeResourceServiceRoleDefaultPolicy6AD79F27",
         "PolicyExplorerPolicyExplorerScanSpokeResourceServiceRole3B78E70E",
       ],
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "LAMBDA_INSIDE_VPC",
+            "LAMBDA_CONCURRENCY_CHECK",
+          ],
+        },
+      },
       "Properties": {
         "Code": {
           "S3Bucket": {
@@ -4441,6 +4467,9 @@ Temporary Password: <strong>{####}</strong>
               "Ref": "PolicyExplorerTable3E6DD7C7",
             },
             "LOG_LEVEL": "INFO",
+            "NAMESPACE": {
+              "Ref": "DeploymentNamespace",
+            },
             "ORG_MANAGEMENT_ROLE_NAME": {
               "Fn::Join": [
                 "",
@@ -4508,6 +4537,13 @@ Temporary Password: <strong>{####}</strong>
       "Type": "AWS::Lambda::Function",
     },
     "PolicyExplorerPolicyExplorerScanSpokeResourceServiceRole3B78E70E": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
+          ],
+        },
+      },
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -4689,6 +4725,14 @@ Temporary Password: <strong>{####}</strong>
         "PolicyExplorerReadServiceRoleDefaultPolicy96327407",
         "PolicyExplorerReadServiceRole0CAC9B9E",
       ],
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "LAMBDA_INSIDE_VPC",
+            "LAMBDA_CONCURRENCY_CHECK",
+          ],
+        },
+      },
       "Properties": {
         "Code": {
           "S3Bucket": {
@@ -4700,6 +4744,9 @@ Temporary Password: <strong>{####}</strong>
           "Variables": {
             "COMPONENT_TABLE": {
               "Ref": "PolicyExplorerTable3E6DD7C7",
+            },
+            "NAMESPACE": {
+              "Ref": "DeploymentNamespace",
             },
             "POWERTOOLS_SERVICE_NAME": "ReadPolicyExplorer",
             "SEND_ANONYMOUS_DATA": {
@@ -4734,6 +4781,13 @@ Temporary Password: <strong>{####}</strong>
       "Type": "AWS::Lambda::Function",
     },
     "PolicyExplorerReadServiceRole0CAC9B9E": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
+          ],
+        },
+      },
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -4834,7 +4888,7 @@ Temporary Password: <strong>{####}</strong>
           "Fn::Join": [
             "",
             [
-              "{"StartAt":"AccountIterator","States":{"AccountIterator":{"Type":"Map","ResultPath":"$.ExecutionResults","Next":"FinishJob","InputPath":"$","Parameters":{"AccountId.$":"$$.Map.Item.Value","ServiceNames.$":"$.Scan.ServiceNames","JobId.$":"$.JobId"},"Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.Error","Next":"FailJob"}],"ItemsPath":"$.Scan.AccountIds","ItemProcessor":{"ProcessorConfig":{"Mode":"DISTRIBUTED","ExecutionType":"STANDARD"},"StartAt":"AccountValidation","States":{"AccountValidation":{"Next":"ServiceIterator","Retry":[{"ErrorEquals":["Lambda.ClientExecutionTimeoutException","Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Type":"Task","ResultPath":"$.ValidationResult","ResultSelector":{"ServicesToScanForAccount.$":"$.Payload.ServicesToScanForAccount","Status.$":"$.Payload.Validation","StatusCode.$":"$.StatusCode","RequestId.$":"$.SdkResponseMetadata.RequestId","Regions.$":"$.Payload.Regions"},"Resource":"arn:",
+              "{"StartAt":"AccountIterator","States":{"AccountIterator":{"Type":"Map","ResultPath":null,"Next":"FinishJob","InputPath":"$","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.Error","Next":"FailJob"}],"ItemsPath":"$.Scan.AccountIds","ItemSelector":{"AccountId.$":"$$.Map.Item.Value","ServiceNames.$":"$.Scan.ServiceNames","JobId.$":"$.JobId"},"ItemProcessor":{"ProcessorConfig":{"Mode":"DISTRIBUTED","ExecutionType":"STANDARD"},"StartAt":"AccountValidation","States":{"AccountValidation":{"Next":"ServiceIterator","Retry":[{"ErrorEquals":["Lambda.ClientExecutionTimeoutException","Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Type":"Task","ResultPath":"$.ValidationResult","ResultSelector":{"ServicesToScanForAccount.$":"$.Payload.ServicesToScanForAccount","Status.$":"$.Payload.Validation","StatusCode.$":"$.StatusCode","RequestId.$":"$.SdkResponseMetadata.RequestId","Regions.$":"$.Payload.Regions"},"Resource":"arn:",
               {
                 "Ref": "AWS::Partition",
               },
@@ -4845,7 +4899,7 @@ Temporary Password: <strong>{####}</strong>
                   "Arn",
                 ],
               },
-              "","Payload.$":"$"}},"ServiceIterator":{"Type":"Map","End":true,"Parameters":{"ServiceName.$":"$$.Map.Item.Value","AccountId.$":"$.AccountId","Regions.$":"$.ValidationResult.Regions","JobId.$":"$.JobId"},"ItemsPath":"$.ValidationResult.ServicesToScanForAccount","ItemProcessor":{"ProcessorConfig":{"Mode":"INLINE"},"StartAt":"ScanServicePerAccount","States":{"ScanServicePerAccount":{"Next":"TaskComplete","Retry":[{"ErrorEquals":["Lambda.ClientExecutionTimeoutException","Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Type":"Task","ResultSelector":{"Status.$":"$.Payload","StatusCode.$":"$.StatusCode","RequestId.$":"$.SdkResponseMetadata.RequestId"},"Resource":"arn:",
+              "","Payload.$":"$"}},"ServiceIterator":{"Type":"Map","End":true,"ItemsPath":"$.ValidationResult.ServicesToScanForAccount","ItemSelector":{"ServiceName.$":"$$.Map.Item.Value","AccountId.$":"$.AccountId","Regions.$":"$.ValidationResult.Regions","JobId.$":"$.JobId"},"ItemProcessor":{"ProcessorConfig":{"Mode":"INLINE"},"StartAt":"ScanServicePerAccount","States":{"ScanServicePerAccount":{"Next":"TaskComplete","Retry":[{"ErrorEquals":["Lambda.ClientExecutionTimeoutException","Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Type":"Task","ResultSelector":{"Status.$":"$.Payload","StatusCode.$":"$.StatusCode","RequestId.$":"$.SdkResponseMetadata.RequestId"},"Resource":"arn:",
               {
                 "Ref": "AWS::Partition",
               },
@@ -4907,6 +4961,13 @@ Temporary Password: <strong>{####}</strong>
       "UpdateReplacePolicy": "Delete",
     },
     "PolicyExplorerScanAllSpokeAccountsRole398CEDEC": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
+          ],
+        },
+      },
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -5072,6 +5133,14 @@ Temporary Password: <strong>{####}</strong>
         "PolicyExplorerStartScanServiceRoleDefaultPolicyFF45000F",
         "PolicyExplorerStartScanServiceRole9AC79B15",
       ],
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "LAMBDA_INSIDE_VPC",
+            "LAMBDA_CONCURRENCY_CHECK",
+          ],
+        },
+      },
       "Properties": {
         "Code": {
           "S3Bucket": {
@@ -5085,6 +5154,9 @@ Temporary Password: <strong>{####}</strong>
               "Ref": "PolicyExplorerTable3E6DD7C7",
             },
             "LOG_LEVEL": "INFO",
+            "NAMESPACE": {
+              "Ref": "DeploymentNamespace",
+            },
             "ORG_MANAGEMENT_ROLE_NAME": {
               "Fn::Join": [
                 "",
@@ -5158,6 +5230,13 @@ Temporary Password: <strong>{####}</strong>
       "Type": "AWS::Lambda::Permission",
     },
     "PolicyExplorerStartScanServiceRole9AC79B15": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
+          ],
+        },
+      },
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -5338,6 +5417,14 @@ Temporary Password: <strong>{####}</strong>
     },
     "PolicyExplorerTable3E6DD7C7": {
       "DeletionPolicy": "Retain",
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "DYNAMODB_TABLE_ENCRYPTED_KMS",
+            "DYNAMODB_TABLE_ENCRYPTED_KMS_ALLOWED_ALGORITHMS",
+          ],
+        },
+      },
       "Properties": {
         "AttributeDefinitions": [
           {
@@ -5378,6 +5465,10 @@ Temporary Password: <strong>{####}</strong>
             "KeyType": "RANGE",
           },
         ],
+        "PointInTimeRecoverySpecification": {
+          "PointInTimeRecoveryEnabled": true,
+          "RecoveryPeriodInDays": 10,
+        },
         "SSESpecification": {
           "SSEEnabled": true,
         },
@@ -5394,6 +5485,14 @@ Temporary Password: <strong>{####}</strong>
         "PolicyExplorerValidateSpokeAccessServiceRoleDefaultPolicyA05D9737",
         "PolicyExplorerValidateSpokeAccessServiceRole28EA4095",
       ],
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "LAMBDA_INSIDE_VPC",
+            "LAMBDA_CONCURRENCY_CHECK",
+          ],
+        },
+      },
       "Properties": {
         "Code": {
           "S3Bucket": {
@@ -5407,6 +5506,9 @@ Temporary Password: <strong>{####}</strong>
               "Ref": "PolicyExplorerTable3E6DD7C7",
             },
             "LOG_LEVEL": "INFO",
+            "NAMESPACE": {
+              "Ref": "DeploymentNamespace",
+            },
             "POWERTOOLS_SERVICE_NAME": "ScanPolicyExplorer",
             "SEND_ANONYMOUS_DATA": {
               "Fn::FindInMap": [
@@ -5459,6 +5561,13 @@ Temporary Password: <strong>{####}</strong>
       "Type": "AWS::Lambda::Function",
     },
     "PolicyExplorerValidateSpokeAccessServiceRole28EA4095": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
+          ],
+        },
+      },
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -5599,6 +5708,14 @@ Temporary Password: <strong>{####}</strong>
         "ResourceBasedPolicyReadServiceRoleDefaultPolicy99498DE7",
         "ResourceBasedPolicyReadServiceRole96A1B85C",
       ],
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "LAMBDA_INSIDE_VPC",
+            "LAMBDA_CONCURRENCY_CHECK",
+          ],
+        },
+      },
       "Properties": {
         "Code": {
           "S3Bucket": {
@@ -5610,6 +5727,9 @@ Temporary Password: <strong>{####}</strong>
           "Variables": {
             "COMPONENT_TABLE": {
               "Ref": "ResourceBasedPolicyTable7277C643",
+            },
+            "NAMESPACE": {
+              "Ref": "DeploymentNamespace",
             },
             "POWERTOOLS_SERVICE_NAME": "ReadResourceBasedPolicy",
             "SEND_ANONYMOUS_DATA": {
@@ -5644,6 +5764,13 @@ Temporary Password: <strong>{####}</strong>
       "Type": "AWS::Lambda::Function",
     },
     "ResourceBasedPolicyReadServiceRole96A1B85C": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
+          ],
+        },
+      },
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -5759,6 +5886,14 @@ Temporary Password: <strong>{####}</strong>
     },
     "ResourceBasedPolicyTable7277C643": {
       "DeletionPolicy": "Retain",
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "DYNAMODB_TABLE_ENCRYPTED_KMS",
+            "DYNAMODB_TABLE_ENCRYPTED_KMS_ALLOWED_ALGORITHMS",
+          ],
+        },
+      },
       "Properties": {
         "AttributeDefinitions": [
           {
@@ -5801,6 +5936,7 @@ Temporary Password: <strong>{####}</strong>
         ],
         "PointInTimeRecoverySpecification": {
           "PointInTimeRecoveryEnabled": true,
+          "RecoveryPeriodInDays": 10,
         },
         "SSESpecification": {
           "SSEEnabled": true,
@@ -5818,6 +5954,14 @@ Temporary Password: <strong>{####}</strong>
         "TrustedAccessReadServiceRoleDefaultPolicy4F0CC01B",
         "TrustedAccessReadServiceRoleFED50FB8",
       ],
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "LAMBDA_INSIDE_VPC",
+            "LAMBDA_CONCURRENCY_CHECK",
+          ],
+        },
+      },
       "Properties": {
         "Code": {
           "S3Bucket": {
@@ -5829,6 +5973,9 @@ Temporary Password: <strong>{####}</strong>
           "Variables": {
             "COMPONENT_TABLE": {
               "Ref": "TrustedAccessTable495B447A",
+            },
+            "NAMESPACE": {
+              "Ref": "DeploymentNamespace",
             },
             "POWERTOOLS_SERVICE_NAME": "ReadTrustedAccess",
             "SEND_ANONYMOUS_DATA": {
@@ -5946,6 +6093,13 @@ Temporary Password: <strong>{####}</strong>
       "Type": "AWS::IAM::Policy",
     },
     "TrustedAccessReadServiceRoleFED50FB8": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
+          ],
+        },
+      },
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -5981,6 +6135,14 @@ Temporary Password: <strong>{####}</strong>
         "TrustedAccessStartScanServiceRoleDefaultPolicyBBB5BB59",
         "TrustedAccessStartScanServiceRoleA218CD44",
       ],
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "LAMBDA_INSIDE_VPC",
+            "LAMBDA_CONCURRENCY_CHECK",
+          ],
+        },
+      },
       "Properties": {
         "Code": {
           "S3Bucket": {
@@ -5994,6 +6156,9 @@ Temporary Password: <strong>{####}</strong>
               "Ref": "TrustedAccessTable495B447A",
             },
             "LOG_LEVEL": "INFO",
+            "NAMESPACE": {
+              "Ref": "DeploymentNamespace",
+            },
             "ORG_MANAGEMENT_ROLE_NAME": {
               "Fn::Join": [
                 "",
@@ -6045,6 +6210,13 @@ Temporary Password: <strong>{####}</strong>
       "Type": "AWS::Lambda::Function",
     },
     "TrustedAccessStartScanServiceRoleA218CD44": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
+          ],
+        },
+      },
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -6218,6 +6390,14 @@ Temporary Password: <strong>{####}</strong>
     },
     "TrustedAccessTable495B447A": {
       "DeletionPolicy": "Retain",
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "DYNAMODB_TABLE_ENCRYPTED_KMS",
+            "DYNAMODB_TABLE_ENCRYPTED_KMS_ALLOWED_ALGORITHMS",
+          ],
+        },
+      },
       "Properties": {
         "AttributeDefinitions": [
           {
@@ -6260,6 +6440,7 @@ Temporary Password: <strong>{####}</strong>
         ],
         "PointInTimeRecoverySpecification": {
           "PointInTimeRecoveryEnabled": true,
+          "RecoveryPeriodInDays": 10,
         },
         "SSESpecification": {
           "SSEEnabled": true,
@@ -6441,6 +6622,14 @@ Temporary Password: <strong>{####}</strong>
         "WebUIDeployerDeployWebUIServiceRoleDefaultPolicyA5CCFE46",
         "WebUIDeployerDeployWebUIServiceRole57CC2ECD",
       ],
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "LAMBDA_INSIDE_VPC",
+            "LAMBDA_CONCURRENCY_CHECK",
+          ],
+        },
+      },
       "Properties": {
         "Code": {
           "S3Bucket": {
@@ -6551,6 +6740,13 @@ Temporary Password: <strong>{####}</strong>
       "Type": "AWS::Lambda::Function",
     },
     "WebUIDeployerDeployWebUIServiceRole57CC2ECD": {
+      "Metadata": {
+        "guard": {
+          "SuppressedRules": [
+            "CFN_NO_EXPLICIT_RESOURCE_NAMES",
+          ],
+        },
+      },
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -6674,6 +6870,7 @@ Temporary Password: <strong>{####}</strong>
     "WebUIDeployerWebUIDeploymentResourceDC3D4E53": {
       "DeletionPolicy": "Delete",
       "Properties": {
+        "ServiceTimeout": "300",
         "ServiceToken": {
           "Fn::GetAtt": [
             "WebUIDeployerDeployWebUIC2B79695",
@@ -6748,8 +6945,11 @@ exports[`org management stack synth doesnt crash 1`] = `
       "Type": "AWS::SSM::Parameter::Value<String>",
     },
     "DeploymentNamespace": {
+      "AllowedPattern": "^[a-z0-9][a-z0-9-]{1,8}[a-z0-9]$",
+      "ConstraintDescription": "Must be 3-10 characters long, containing only lowercase letters, numbers, and hyphens. Cannot begin or end with a hyphen.",
       "Description": "Will be used as prefix for resource names. Same namespace must be used in hub stack.",
       "MaxLength": 10,
+      "MinLength": 3,
       "Type": "String",
     },
     "HubAccountId": {
@@ -6770,6 +6970,11 @@ exports[`org management stack synth doesnt crash 1`] = `
               "id": "W28",
               "reason": "This role needs an explicit name so that the Hub Stack can reference the role.",
             },
+          ],
+        },
+        "guard": {
+          "SuppressedRules": [
+            "IAM_NO_INLINE_POLICY_CHECK",
           ],
         },
       },
@@ -6961,8 +7166,11 @@ exports[`spoke stack synth doesnt crash 1`] = `
       "Type": "AWS::SSM::Parameter::Value<String>",
     },
     "DeploymentNamespace": {
+      "AllowedPattern": "^[a-z0-9][a-z0-9-]{1,8}[a-z0-9]$",
+      "ConstraintDescription": "Must be 3-10 characters long, containing only lowercase letters, numbers, and hyphens. Cannot begin or end with a hyphen.",
       "Description": "Will be used as prefix for resource names. Same namespace must be used in hub stack.",
       "MaxLength": 10,
+      "MinLength": 3,
       "Type": "String",
     },
     "HubAccountId": {

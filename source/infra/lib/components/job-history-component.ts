@@ -16,15 +16,16 @@ type JobHistoryComponentProps = {
   dynamoTtlInDays: CfnParameter,
   solutionVersion: string,
   stackId: string
-  sendAnonymousData: string
+  sendAnonymousData: string,
+  namespace: string
 };
 
 export class JobHistoryComponent extends Construct {
   public readonly jobHistoryTable: Table;
-  public readonly sharedFunctions: { deleteJob: lambda.Function };
+  public readonly sharedFunctions: { readJob: lambda.Function };
 
   constructor(scope: Construct, id: string, {
-    api, assetCode, cognitoAuthenticationResources, dynamoTtlInDays, solutionVersion, stackId, sendAnonymousData
+    api, assetCode, cognitoAuthenticationResources, dynamoTtlInDays, solutionVersion, stackId, sendAnonymousData, namespace
   }: JobHistoryComponentProps) {
     super(scope, id);
 
@@ -39,7 +40,10 @@ export class JobHistoryComponent extends Construct {
       },
       encryption: TableEncryption.AWS_MANAGED,
       billingMode: BillingMode.PAY_PER_REQUEST,
-      pointInTimeRecovery: true,
+      pointInTimeRecoverySpecification: {
+        pointInTimeRecoveryEnabled: true,
+        recoveryPeriodInDays: 10
+      },
       timeToLiveAttribute: 'ExpiresAt',
     });
     this.jobHistoryTable = jobHistoryTable;
@@ -52,6 +56,7 @@ export class JobHistoryComponent extends Construct {
       handler: 'assessment_runner/api_router.lambda_handler',
       environment: {
         TABLE_JOBS: jobHistoryTable.tableName,
+        NAMESPACE: namespace,
         POWERTOOLS_LOGGER_LOG_EVENT: 'True',
         POWERTOOLS_SERVICE_NAME: 'JobsApiHandler',
         TIME_TO_LIVE_IN_DAYS: dynamoTtlInDays.valueAsString,
@@ -74,10 +79,9 @@ export class JobHistoryComponent extends Construct {
     jobsResource.addMethod('GET', new LambdaIntegration(jobsApiHandler), proxyOptions);
     const jobResource = jobsResource.addResource('{assessmentType}').addResource('{id}');
     jobResource.addMethod('GET', new LambdaIntegration(jobsApiHandler), proxyOptions);
-    jobResource.addMethod('DELETE', new LambdaIntegration(jobsApiHandler), proxyOptions);
 
     this.sharedFunctions = {
-      deleteJob: jobsApiHandler
+      readJob: jobsApiHandler
     }
   }
 

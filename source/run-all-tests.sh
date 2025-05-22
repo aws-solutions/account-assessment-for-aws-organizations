@@ -85,12 +85,10 @@ run_webui_tests() {
 
 run_cdk_project_tests() {
 	local component_path=$1
-    local component_name=solutions-constructs
-
 	echo "------------------------------------------------------------------------------"
-	echo "[Test] $component_name"
+	echo "[Test] Run CDK project tests in $component_path"
 	echo "------------------------------------------------------------------------------"
-    cd $component_path
+  cd $component_path
 
 	# install and build for unit testing
 	npm install

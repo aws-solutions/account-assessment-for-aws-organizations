@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] - 2025-05-19
+
+### Added
+- Input validation for Cfn parameter "Deployment Namespace"
+- Point in time recovery to DynamoDB tables
+
+### Fixed
+- Stack deletion no longer fails if Cognito User Pool has been deleted before
+- StepFunction no longer fails when scanning large numbers of accounts due to service limit inb step output size
+
+### Removed
+- "Delete Job" feature
+- AppRegistry integration
+
+### Changed
+
+- Updated dependencies to address setuptools CVE-2025-47273
+
 ## [1.1.1] - 2025-02-10
 
 ### Changed

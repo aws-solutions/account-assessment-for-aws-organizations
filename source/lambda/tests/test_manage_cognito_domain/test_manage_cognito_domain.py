@@ -65,7 +65,7 @@ def describe_manage_cognito_domain():
         mock_cfnresponse = mocker.patch('cfnresponse.send')
         event['RequestType'] = 'Delete'
         event['ResourceProperties'] = {
-            "UserPoolId": user_pool_id,  # userpool doesn't exist
+            "UserPoolId": user_pool_id,  # userpool has already been deleted
             "DomainPrefix": 'foo'
         }
 
@@ -75,7 +75,7 @@ def describe_manage_cognito_domain():
         # ASSERT
         mock_cfnresponse.assert_called_once()
         args, kwargs = mock_cfnresponse.call_args
-        assert args[2] == 'FAILED'
+        assert args[2] == 'SUCCESS' # proceed with stack deletion
 
     @mock_aws
     def test_create_domain_on_stack_create(mocker):

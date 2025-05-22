@@ -4,20 +4,20 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
-aws-lambda-powertools = "~3.2.0"
+aws-lambda-powertools = "~3.13.0"
 aws-xray-sdk = "~2.14.0"
-botocore = "~1.35.46"
-boto3 = "~1.35.46"
-boto3-stubs = { extras = ["all"], version = "~1.35.46" }
+botocore = "~1.38.0"
+boto3 = "~1.38.0"
+boto3-stubs = { extras = ["all"], version = "~1.38.0" }
 cfnresponse = "~1.1.5"
 requests = "~2.32.3"
-pyparsing = "~3.2.0"
-pydantic = "~2.9.2"
+pyparsing = "~3.2.3"
+pydantic = "~2.11.4"
 
 [tool.poetry.group.dev.dependencies]
 python = "^3.12"
 mock = "~5.1.0"
-moto = {extras = ["sts", "organizations", "stepfunctions", "s3", "glacier", "iam", "sns", "sqs", "lambda", "efs", "secretsmanager", "iot", "kms", "apigateway", "events", "sesv2", "ecr", "config", "ssm-incidents", "opensearch", "cloudformation", "glue", "serverlessrepo", "backup", "codeartifact", "codebuild", "mediastore", "ec2"], version = "~5.0.18"}
+moto = {extras = ["sts", "organizations", "stepfunctions", "s3", "glacier", "iam", "sns", "sqs", "lambda", "efs", "secretsmanager", "iot", "kms", "apigateway", "events", "sesv2", "ecr", "config", "ssm-incidents", "opensearch", "cloudformation", "glue", "serverlessrepo", "backup", "codeartifact", "codebuild", "mediastore", "ec2"], version = "~5.1.4"}
 pytest = "~8.3.3"
 pytest-mock = "~3.14.0"
 pytest-runner = "~6.0.1"

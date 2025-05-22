@@ -35,31 +35,6 @@ class JobsService:
             'TaskFailures': task_failures
         }
 
-    def delete_job(self, assessment_type: str, job_id: str):
-        item: JobModel = self.repository.get_job(assessment_type, job_id)
-
-        if item['JobStatus'] == JobStatus.ACTIVE.value:
-            raise ClientException("Job is active", f"Job with key {assessment_type}, {job_id} is currently active and "
-                                                   f"cannot be deleted")
-
-        findings_table = self._get_findings_table(assessment_type, job_id)
-        items_to_delete = findings_table.find_items_by_secondary_index(
-            index_name='JobId',
-            key='JobId',
-            index_value=job_id)
-        for item in items_to_delete:
-            findings_table.delete_item({"PartitionKey": item["PartitionKey"], "SortKey": item["SortKey"]})
-
-        marker = self.repository.get_last_job_marker(assessment_type)
-        if marker and marker['JobId'] == job_id:
-            self.repository.delete_last_job_marker(marker)
-
-        try:
-            self.repository.delete_job(assessment_type, job_id)
-        except Exception as error:
-            self.logger.error(error)
-            raise ClientException("Delete Job failed", f"Failed to delete job {job_id}")
-
     def _get_findings_table(self, assessment_type, job_id):
         env_variable_name = 'TABLE_' + assessment_type
         findings_table_name = os.getenv(env_variable_name)

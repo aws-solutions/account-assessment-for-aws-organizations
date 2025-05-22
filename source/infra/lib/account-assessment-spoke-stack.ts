@@ -26,8 +26,11 @@ export class SpokeStack extends Stack {
 
         const namespace = new CfnParameter(this, 'DeploymentNamespace', {
             description: 'Will be used as prefix for resource names. Same namespace must be used in hub stack.',
+            type: 'String',
+            minLength: 3,
             maxLength: 10,
-            type: 'String'
+            allowedPattern: '^[a-z0-9][a-z0-9-]{1,8}[a-z0-9]$',
+            constraintDescription: 'Must be 3-10 characters long, containing only lowercase letters, numbers, and hyphens. Cannot begin or end with a hyphen.'
         });
 
         this.templateOptions.metadata = {

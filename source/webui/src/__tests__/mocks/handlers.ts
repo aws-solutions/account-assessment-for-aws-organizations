@@ -119,11 +119,6 @@ export const handlers = (apiUrl: string) => [
     return ok(newJobDetails())
   }),
 
-  http.delete(apiUrl + '/jobs/:assessmentType/:id', () => {
-    return noContent()
-  }),
-
-
   http.get(apiUrl + '/jobs', () => {
     return ok({Results: []}
     )

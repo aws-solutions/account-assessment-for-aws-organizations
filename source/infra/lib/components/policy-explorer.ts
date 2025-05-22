@@ -34,7 +34,7 @@ export interface PolicyExplorerScanComponentProps {
     jobHistory: Table,
   },
   functions: {
-    deleteJob: lambda.Function,
+    readJob: lambda.Function,
   }
   componentConfig: {
     readHandlerPath: string,
@@ -81,6 +81,10 @@ export class PolicyExplorerScanComponent extends Construct {
       encryption: TableEncryption.AWS_MANAGED,
       billingMode: BillingMode.PAY_PER_REQUEST,
       timeToLiveAttribute: "ExpiresAt",
+      pointInTimeRecoverySpecification: {
+        pointInTimeRecoveryEnabled: true,
+        recoveryPeriodInDays: 10
+      },
     });
 
     const dynamoDbRole = new iam.Role(this, props.dynamoDbRoleName, {
@@ -94,8 +98,8 @@ export class PolicyExplorerScanComponent extends Construct {
     dynamoDbRole.addToPolicy(dynamoDbPolicyStatement);
 
     // has to match AssessmentType. referenced via DynamoDB(os.getenv(assessment_type))
-    props.functions.deleteJob.addEnvironment(props.componentConfig.tableEnvVariableName, this.componentTable.tableName);
-    this.componentTable.grantReadWriteData(props.functions.deleteJob);
+    props.functions.readJob.addEnvironment(props.componentConfig.tableEnvVariableName, this.componentTable.tableName);
+    this.componentTable.grantReadWriteData(props.functions.readJob);
     this.componentTable.addGlobalSecondaryIndex({
       indexName: 'JobId',
       partitionKey: {name: 'JobId', type: AttributeType.STRING},
@@ -113,6 +117,7 @@ export class PolicyExplorerScanComponent extends Construct {
         TABLE_JOBS: props.tables.jobHistory.tableName,
         TIME_TO_LIVE_IN_DAYS: props.componentConfig.dynamoTtlInDays.valueAsString,
         SPOKE_ROLE_NAME: `${props.namespace.valueAsString}-${props.region}-${SPOKE_EXECUTION_ROLE_NAME}`,
+        NAMESPACE: props.namespace.valueAsString,
         LOG_LEVEL: 'INFO',
         POWERTOOLS_SERVICE_NAME: 'Scan' + props.componentConfig.powertoolsServiceName,
         SOLUTION_VERSION: props.componentConfig.solutionVersion,
@@ -133,6 +138,7 @@ export class PolicyExplorerScanComponent extends Construct {
         COMPONENT_TABLE: this.componentTable.tableName,
         TABLE_JOBS: props.tables.jobHistory.tableName,
         TIME_TO_LIVE_IN_DAYS: props.componentConfig.dynamoTtlInDays.valueAsString,
+        NAMESPACE: props.namespace.valueAsString,
         ORG_MANAGEMENT_ROLE_NAME: `${props.namespace.valueAsString}-${props.region}-${ORG_MANAGEMENT_ROLE_NAME}`,
         LOG_LEVEL: 'INFO',
         POWERTOOLS_SERVICE_NAME: 'Scan' + props.componentConfig.powertoolsServiceName,
@@ -154,6 +160,7 @@ export class PolicyExplorerScanComponent extends Construct {
         TABLE_JOBS: props.tables.jobHistory.tableName,
         TIME_TO_LIVE_IN_DAYS: props.componentConfig.dynamoTtlInDays.valueAsString,
         SPOKE_ROLE_NAME: `${props.namespace.valueAsString}-${props.region}-${SPOKE_EXECUTION_ROLE_NAME}`,
+        NAMESPACE: props.namespace.valueAsString,
         ORG_MANAGEMENT_ROLE_NAME: `${props.namespace.valueAsString}-${props.region}-${ORG_MANAGEMENT_ROLE_NAME}`,
         LOG_LEVEL: 'INFO',
         POWERTOOLS_SERVICE_NAME: 'ScanResourceBasedPolicyInSpokeAccount',
@@ -184,6 +191,7 @@ export class PolicyExplorerScanComponent extends Construct {
         COMPONENT_TABLE: this.componentTable.tableName,
         TABLE_JOBS: props.tables.jobHistory.tableName,
         TIME_TO_LIVE_IN_DAYS: props.componentConfig.dynamoTtlInDays.valueAsString,
+        NAMESPACE: props.namespace.valueAsString,
         SPOKE_ROLE_NAME: `${props.namespace.valueAsString}-${props.region}-${SPOKE_EXECUTION_ROLE_NAME}`,
         ORG_MANAGEMENT_ROLE_NAME: `${props.namespace.valueAsString}-${props.region}-${ORG_MANAGEMENT_ROLE_NAME}`,
         LOG_LEVEL: 'INFO',
@@ -304,6 +312,7 @@ export class PolicyExplorerScanComponent extends Construct {
       environment: {
         COMPONENT_TABLE: this.componentTable.tableName,
         TABLE_JOBS: props.tables.jobHistory.tableName,
+        NAMESPACE: props.namespace.valueAsString,
         POWERTOOLS_SERVICE_NAME: 'Read' + props.componentConfig.powertoolsServiceName,
         SOLUTION_VERSION: props.componentConfig.solutionVersion,
         STACK_ID: props.componentConfig.stackId,

@@ -24,7 +24,7 @@ export interface AssessmentComponentProps {
   tables: {
     jobHistory: Table,
   },
-  functions: { deleteJob: lambda.Function }
+  functions: { readJob: lambda.Function }
   api: RestApi,
   componentConfig: {
     readHandlerPath: string,
@@ -82,10 +82,13 @@ export class SimpleAssessmentComponent extends Construct {
       },
       encryption: TableEncryption.AWS_MANAGED,
       billingMode: BillingMode.PAY_PER_REQUEST,
-      pointInTimeRecovery: true,
+      pointInTimeRecoverySpecification: {
+        pointInTimeRecoveryEnabled: true,
+        recoveryPeriodInDays: 10
+      },
       timeToLiveAttribute: 'ExpiresAt',
     });
-    this.componentTable.grantReadWriteData(functions.deleteJob);
+    this.componentTable.grantReadWriteData(functions.readJob);
     this.componentTable.addGlobalSecondaryIndex({
       indexName: 'JobId',
       partitionKey: {name: 'JobId', type: AttributeType.STRING},
@@ -93,7 +96,7 @@ export class SimpleAssessmentComponent extends Construct {
 
 
     // has to match AssessmentType. referenced via DynamoDB(os.getenv(assessment_type))
-    functions.deleteJob.addEnvironment(tableEnvVariableName, this.componentTable.tableName);
+    functions.readJob.addEnvironment(tableEnvVariableName, this.componentTable.tableName);
 
     const readFunction = new lambda.Function(this, 'Read', {
       runtime: Runtime.PYTHON_3_12,
@@ -104,6 +107,7 @@ export class SimpleAssessmentComponent extends Construct {
       environment: {
         COMPONENT_TABLE: this.componentTable.tableName,
         TABLE_JOBS: tables.jobHistory.tableName,
+        NAMESPACE: namespace.valueAsString,
         POWERTOOLS_SERVICE_NAME: 'Read' + powertoolsServiceName,
         SOLUTION_VERSION: componentConfig.solutionVersion,
         STACK_ID: componentConfig.stackId,
@@ -123,6 +127,7 @@ export class SimpleAssessmentComponent extends Construct {
         environment: {
           COMPONENT_TABLE: this.componentTable.tableName,
           TABLE_JOBS: tables.jobHistory.tableName,
+          NAMESPACE: namespace.valueAsString,
           TIME_TO_LIVE_IN_DAYS: componentConfig.dynamoTtlInDays.valueAsString,
           ORG_MANAGEMENT_ROLE_NAME: `${namespace.valueAsString}-${region}-${ORG_MANAGEMENT_ROLE_NAME}`,
           LOG_LEVEL: 'INFO',

@@ -1,6 +1,7 @@
 #  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #  SPDX-License-Identifier: Apache-2.0
 import re
+from datetime import datetime
 from os import getenv
 from typing import Dict, List
 
@@ -37,7 +38,7 @@ class ScanSingleServiceStrategy(SynchronousScanStrategy):
         self.logger = Logger(service=self.__class__.__name__, level=getenv('LOG_LEVEL'))
 
     def assessment_type(self) -> str:
-        return str(AssessmentType.POLICY_EXPLORER.value + "_SINGLE")
+        return str(AssessmentType.POLICY_EXPLORER.value + "_SINGLE_" + datetime.now().timestamp())
 
     def scan(self, job_id, request_body: Dict) -> List[DynamoDBPolicyItem]:
         scan_config: ScanServiceRequestModel = self.parse_request(job_id, request_body)

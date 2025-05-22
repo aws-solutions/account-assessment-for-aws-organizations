@@ -100,6 +100,7 @@ export class WebUIDeployer extends Construct {
 
     new CustomResource(this, 'WebUIDeploymentResource', {
       serviceToken: webUIDeploymentFunction.functionArn,
+      serviceTimeout: cdk.Duration.minutes(5),
       properties:{
         SolutionVersion: solutionVersion,
       }

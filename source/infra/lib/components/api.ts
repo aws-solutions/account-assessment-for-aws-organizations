@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {Construct} from "constructs";
-import {CfnOutput, CfnParameter} from "aws-cdk-lib";
+import {CfnOutput, CfnParameter, CfnResource} from "aws-cdk-lib";
 import {LogGroup, RetentionDays} from "aws-cdk-lib/aws-logs";
 import {
   AccessLogFormat,
@@ -13,6 +13,7 @@ import {
 } from "aws-cdk-lib/aws-apigateway";
 import {CfnIPSet, CfnWebACL, CfnWebACLAssociation} from "aws-cdk-lib/aws-wafv2";
 import {wrapManagedRuleSet} from "@aws-solutions-constructs/core";
+import {addCfnGuardSuppressions} from "../helpers/add-cfn-guard-suppression";
 
 
 type ApiProps = {
@@ -31,6 +32,8 @@ export class Api extends Construct {
     const prodLogGroup = new LogGroup(this, "ProdLogs", {
       retention: RetentionDays.TEN_YEARS
     });
+    addCfnGuardSuppressions(prodLogGroup.node.defaultChild as CfnResource, ['CLOUDWATCH_LOG_GROUP_ENCRYPTED']);
+
     const api = new RestApi(this, 'AccountAssessmentForAWSOrganisationsApi', {
       restApiName: `AccountAssessmentForAWSOrganisationsApi-${namespace.valueAsString}`,
       deployOptions: {

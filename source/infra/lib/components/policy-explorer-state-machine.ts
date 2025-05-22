@@ -5,7 +5,7 @@ import {
   DefinitionBody,
   Fail,
   JsonPath,
-  Map,
+  Map, MapProps,
   Pass,
   ProcessorMode,
   ProcessorType,
@@ -92,16 +92,16 @@ function stateMachineTaskProps(
   validateAccountAccessFunction: lambda.Function,
   finishAsyncJob: lambda.Function
 ) {
-  const accountIteratorProps = {
+  const accountIteratorProps: MapProps = {
     maxConcurrency: 10,
     inputPath: "$",
     itemsPath: JsonPath.stringAt("$.Scan.AccountIds"),
-    parameters: {
+    itemSelector: {
       "AccountId.$": "$$.Map.Item.Value",
       "ServiceNames.$": "$.Scan.ServiceNames",
       "JobId.$": "$.JobId",
     },
-    resultPath: "$.ExecutionResults",
+    resultPath: JsonPath.DISCARD,
   };
   
   const accountValidationProps = {
@@ -120,7 +120,7 @@ function stateMachineTaskProps(
   const serviceIteratorProps = {
     maxConcurrency: 10,
     itemsPath: JsonPath.stringAt("$.ValidationResult.ServicesToScanForAccount"),
-    parameters: {
+    itemSelector: {
       "ServiceName.$": "$$.Map.Item.Value",
       "AccountId.$": "$.AccountId",
       "Regions.$": "$.ValidationResult.Regions",

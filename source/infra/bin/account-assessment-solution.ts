@@ -8,7 +8,6 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import {AccountAssessmentHubStack, AccountAssessmentHubStackProps} from "../lib/account-assessment-hub-stack";
 import {OrgManagementAccountStack} from "../lib/org-management-account-stack";
 import {SpokeStack} from "../lib/account-assessment-spoke-stack";
-import {AppRegister} from "../lib/app-register";
 import {IConstruct} from "constructs";
 import {CfnPolicy} from "aws-cdk-lib/aws-iam";
 import {addCfnSuppressRules} from "@aws-solutions-constructs/core";
@@ -26,7 +25,7 @@ const SOLUTION_BUCKET_NAME = getEnvElement('DIST_OUTPUT_BUCKET');
 const SOLUTION_TMN = getEnvElement('SOLUTION_TRADEMARKEDNAME');
 const SOLUTION_PROVIDER = 'AWS Solution Development';
 
-let accountAssessmentHubStackProperties: AccountAssessmentHubStackProps = {
+const accountAssessmentHubStackProperties: AccountAssessmentHubStackProps = {
   solutionId: SOLUTION_ID,
   solutionTradeMarkName: SOLUTION_TMN,
   solutionProvider: SOLUTION_PROVIDER,
@@ -42,13 +41,13 @@ let accountAssessmentHubStackProperties: AccountAssessmentHubStackProps = {
 
 const app = new cdk.App();
 
-const accountAssessmentHubStack = new AccountAssessmentHubStack(
+new AccountAssessmentHubStack(
   app,
   'account-assessment-for-aws-organizations-hub',
   accountAssessmentHubStackProperties
 );
 
-const orgManagementAccountStack = new OrgManagementAccountStack(
+new OrgManagementAccountStack(
   app,
   'account-assessment-for-aws-organizations-org-management',
   {
@@ -60,7 +59,7 @@ const orgManagementAccountStack = new OrgManagementAccountStack(
   }
 );
 
-const spokeStack = new SpokeStack(
+new SpokeStack(
   app,
   'account-assessment-for-aws-organizations-spoke',
   {
@@ -92,17 +91,6 @@ class SuppressCfnNagW12ForLambdaFunctions implements IAspect {
 }
 
 cdk.Aspects.of(app).add(new SuppressCfnNagW12ForLambdaFunctions());
-
-export const APP_REGISTER = new AppRegister({
-  solutionId: SOLUTION_ID,
-  solutionName: SOLUTION_NAME.replace(/\s/g, ''),
-  solutionDomain: "CloudFoundations",
-  solutionVersion: SOLUTION_VERSION,
-  appRegistryApplicationName: SOLUTION_NAME.replace(/\s/g, ''),
-  applicationType: "AWS-Solutions",
-});
-
-APP_REGISTER.applyAppRegistryToStacks(accountAssessmentHubStack, [spokeStack, orgManagementAccountStack], [], accountAssessmentHubStack.appRegisterData);
 
 app.synth();
 
