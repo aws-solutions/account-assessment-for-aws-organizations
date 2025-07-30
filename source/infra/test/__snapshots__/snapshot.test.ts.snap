@@ -306,6 +306,9 @@ exports[`hub stack synth doesnt crash 1`] = `
         "ApiCORSResponse4xxFE19E5DC",
         "ApiCORSResponse5xxF5A162EC",
       ],
+      "Metadata": {
+        "aws:cdk:do-not-refactor": true,
+      },
       "Properties": {
         "Description": "Automatically created by the RestApi construct",
         "RestApiId": {
