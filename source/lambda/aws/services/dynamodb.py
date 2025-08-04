@@ -121,7 +121,7 @@ class DynamoDB:
               pagination: DdbPagination = dict(Limit=5000)
               ) -> List[Dict]:
         self.logger.debug(
-            f"Querying DynamoDB table {self.table.table_name} for Keys {partition_key}/{sort_key_prefix}:")
+            f"Querying DynamoDB table {self.table.table_name} for Keys {partition_key}/{sort_key_prefix}")
 
         # Start with the KeyConditionExpression
         key_condition_expression = Key('PartitionKey').eq(partition_key) & Key('SortKey').begins_with(sort_key_prefix)

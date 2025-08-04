@@ -86,10 +86,13 @@ class SolutionMetrics(object):
         headers = {'content-type': 'application/json'}
         url = getenv('METRICS_URL', 'https://metrics.awssolutionsbuilder.com/generic')
         self.logger.debug(f"sending metrics: {json_data}")
-        r = requests.post(url, data=json_data, headers=headers, timeout=90)
-        code = r.status_code
-        self.logger.debug(f"metrics sent: {code}")
-        return code
+        # Create a session with trust_env=False to prevent .netrc credential leakage
+        with requests.Session() as session:
+            session.trust_env = False
+            r = session.post(url, data=json_data, headers=headers, timeout=90)
+            code = r.status_code
+            self.logger.debug(f"metrics sent: {code}")
+            return code
 
     def _denormalize_to_metrics_model(self, data: dict) -> MetricResponseModel:
         solution_id = getenv('SOLUTION_ID', 'SO0217')

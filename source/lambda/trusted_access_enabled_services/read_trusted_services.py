@@ -13,7 +13,7 @@ tracer = Tracer()
 
 
 @tracer.capture_lambda_handler
-@logger.inject_lambda_context(log_event=True)
+@logger.inject_lambda_context(log_event=False)
 def lambda_handler(event: dict, context: LambdaContext) -> ApiGatewayResponse:
     return GenericApiGatewayEventHandler().handle_and_create_response(
         event,

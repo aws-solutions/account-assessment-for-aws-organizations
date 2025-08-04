@@ -40,8 +40,10 @@ The default deployment of solution pre-packaged template deploys following infra
 
 ### Setup
 
-- Python Prerequisite: python=3.12 | pip3=21.3.1
-- Javascript Prerequisite: node=v18.10.0 | npm=8.19.2
+- Python 3.12+ with pip
+- AWS CDK 2.1021.0+
+- Node.js 22+ with npm
+- Poetry v2 with plugin to export
 
 Clone the repository and make desired code changes.
 

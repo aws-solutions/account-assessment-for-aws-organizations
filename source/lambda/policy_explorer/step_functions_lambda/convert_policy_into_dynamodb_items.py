@@ -22,7 +22,7 @@ class ConvertPolicyIntoDynamoDBItems:
         self.clock = Clock()
 
     def get_seconds_to_live(self):
-        days_to_live = int(getenv('TIME_TO_LIVE_IN_DAYS') or 2)
+        days_to_live = int(getenv('POLICY_ITEM_TTL_IN_DAYS') or 2)
         return days_to_live * 24 * 60 * 60
 
     def _calculate_expires_at(self):
