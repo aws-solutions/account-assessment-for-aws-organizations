@@ -1257,7 +1257,7 @@ mypy-boto3-gameliftstreams under the MIT license.
 mypy-boto3-iot-managed-integrations under the MIT license.
 mypy-boto3-ssm-guiconnect under the MIT license.
 pyyaml under the MIT license.
-typing-inspection 
+typing-inspection under the MIT license.
 werkzeug under the 0BSD license.
 
 ********************
