@@ -23,7 +23,7 @@ tracer = Tracer()
 
 
 @tracer.capture_lambda_handler
-@logger.inject_lambda_context(log_event=True)
+@logger.inject_lambda_context(log_event=False)
 def lambda_handler(event: Dict, context: LambdaContext) -> ApiGatewayResponse:
     return GenericApiGatewayEventHandler().handle_and_create_response(
         event,
@@ -38,7 +38,8 @@ class ScanSingleServiceStrategy(SynchronousScanStrategy):
         self.logger = Logger(service=self.__class__.__name__, level=getenv('LOG_LEVEL'))
 
     def assessment_type(self) -> str:
-        return str(AssessmentType.POLICY_EXPLORER.value + "_SINGLE_" + datetime.now().timestamp())
+        timestamp = str(datetime.now().timestamp())
+        return f"{AssessmentType.POLICY_EXPLORER.value}_SINGLE_{timestamp}"
 
     def scan(self, job_id, request_body: Dict) -> List[DynamoDBPolicyItem]:
         scan_config: ScanServiceRequestModel = self.parse_request(job_id, request_body)

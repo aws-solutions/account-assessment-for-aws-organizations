@@ -16,6 +16,42 @@ logger = Logger()
 # The purpose of handling the Domain through a custom resource instead of a CDK resource
 # is to support a change of the domain on stack update,
 # as is required when customers update the solution from <v1.1.0 to v1.1.0
+def _delete_user_pool_domain(cognito_idp, domain, user_pool_id, event, context, fail_on_error=True):
+    try:
+        cognito_idp.delete_user_pool_domain(
+            Domain=domain,
+            UserPoolId=user_pool_id
+        )
+        logger.info(f"Deleted domain {domain} for user pool {user_pool_id}")
+        return True
+    except Exception as error:
+        logger.exception(f"Failed to delete domain: {error}")
+        if fail_on_error:
+            cfnresponse.send(event, context, cfnresponse.FAILED, {"error": "An error occurred"})
+        else:
+            # on stack deletion, if domain has already been deleted, proceed gracefully
+            cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
+        return False
+
+
+def _create_user_pool_domain(cognito_idp, domain, user_pool_id, event, context):
+    try:
+        cognito_idp.create_user_pool_domain(
+            Domain=domain,
+            UserPoolId=user_pool_id
+        )
+        logger.info(f"Created domain {domain} for user pool {user_pool_id}")
+        return True
+    except Exception as error:
+        logger.exception(f"Failed to create domain: {error}")
+        cfnresponse.send(event, context, cfnresponse.FAILED, {"error": "An error occurred"})
+        return False
+
+
+def _get_domain_to_delete(domain_prefix, old_domain_prefix):
+    return old_domain_prefix if old_domain_prefix and old_domain_prefix != domain_prefix else domain_prefix
+
+
 def lambda_handler(event, context):
     request_type = event.get('RequestType')
     resource_properties = event.get('ResourceProperties', {})
@@ -26,46 +62,18 @@ def lambda_handler(event, context):
 
     cognito_idp = boto3.client('cognito-idp')
 
-    if request_type in ['Delete']:
-        # Delete the user pool domain
-        domain_to_delete = old_domain_prefix if old_domain_prefix and old_domain_prefix != domain_prefix else domain_prefix
-        try:
-            cognito_idp.delete_user_pool_domain(
-                Domain=domain_to_delete,
-                UserPoolId=user_pool_id
-            )
-            logger.info(f"Deleted domain {domain_to_delete} for user pool {user_pool_id}")
-        except Exception as error:
-            logger.exception(f"Failed to delete domain: {error}")
-            # on stack deletion, if domain has already been deleted, proceed gracefully
-            cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
+    if request_type == 'Delete':
+        domain_to_delete = _get_domain_to_delete(domain_prefix, old_domain_prefix)
+        if not _delete_user_pool_domain(cognito_idp, domain_to_delete, user_pool_id, event, context, fail_on_error=False):
             return
 
-    if request_type in ['Update']:
-        # Delete the user pool domain
-        domain_to_delete = old_domain_prefix if old_domain_prefix and old_domain_prefix != domain_prefix else domain_prefix
-        try:
-            cognito_idp.delete_user_pool_domain(
-                Domain=domain_to_delete,
-                UserPoolId=user_pool_id
-            )
-            logger.info(f"Deleted domain {domain_to_delete} for user pool {user_pool_id}")
-        except Exception as error:
-            logger.exception(f"Failed to delete domain: {error}")
-            cfnresponse.send(event, context, cfnresponse.FAILED, {"error": "An error occurred"})
+    if request_type == 'Update':
+        domain_to_delete = _get_domain_to_delete(domain_prefix, old_domain_prefix)
+        if not _delete_user_pool_domain(cognito_idp, domain_to_delete, user_pool_id, event, context, fail_on_error=True):
             return
 
     if request_type in ['Create', 'Update']:
-        # (Re-)Create the user pool domain
-        try:
-            cognito_idp.create_user_pool_domain(
-                Domain=domain_prefix,
-                UserPoolId=user_pool_id
-            )
-            logger.info(f"Created domain {domain_prefix} for user pool {user_pool_id}")
-        except Exception as error:
-            logger.exception(f"Failed to create domain: {error}")
-            cfnresponse.send(event, context, cfnresponse.FAILED, {"error": "An error occurred"})
+        if not _create_user_pool_domain(cognito_idp, domain_prefix, user_pool_id, event, context):
             return
 
     cfnresponse.send(event, context, cfnresponse.SUCCESS, {})

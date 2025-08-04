@@ -55,7 +55,7 @@ class S3BucketPolicy:
             self.logger.error(f"Error getting bucket location for bucket {bucket_name}: {e}")
             write_task_failure(
                 self.event['JobId'],
-                'RESOURCE_BASED_POLICIES',
+                'POLICY_EXPLORER',
                 self.event['AccountId'],
                 'n/a',
                 's3',
@@ -79,15 +79,18 @@ class S3BucketPolicy:
                     policy_details.update({'Policy': policy.get('Policy')})
                     policy_details.update({'PolicyType': model.PolicyType.RESOURCE_BASED_POLICY})
                     bucket_policies.append(policy_details)
+            except s3_client.exceptions.NoSuchBucketPolicy:
+                # This is normal - bucket exists but has no policy attached
+                self.logger.debug(f"No bucket policy exists for bucket {bucket_name}")
             except Exception as e:
-                self.logger.error(f"Error getting bucket location for bucket {bucket_name}: {e}")
+                self.logger.error(f"Error getting bucket policy for bucket {bucket_name}: {e}")
                 write_task_failure(
                     self.event['JobId'],
-                    'RESOURCE_BASED_POLICIES',
+                    'POLICY_EXPLORER',
                     self.event['AccountId'],
                     s3['BucketRegion'],
                     's3',
-                    f'Unable to get_bucket_location for bucket {bucket_name}: {e}'
+                    f'Unable to get_bucket_policy for bucket {bucket_name}: {e}'
                 )
         return bucket_policies
 
