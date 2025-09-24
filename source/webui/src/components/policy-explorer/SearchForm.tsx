@@ -44,7 +44,10 @@ export const SearchForm = ({resetTableState}: { resetTableState: () => void }) =
 
   const searchParams: PolicySearchModel = {
     policyType: policyTypeSelected,
-    filters
+    filters,
+    pagination: {
+      maxResults: 100  // Default page size
+    }
   };
 
   const startSearch = () => {

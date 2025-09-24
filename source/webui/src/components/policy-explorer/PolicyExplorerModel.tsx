@@ -10,6 +10,22 @@ export enum PolicyTypes {
 export type PolicySearchModel = {
     policyType: PolicyTypes, 
     filters: FiltersForPolicySearch,
+    pagination?: PaginationParams,
+}
+
+export type PaginationParams = {
+    maxResults?: number,
+    nextToken?: string,
+}
+
+export type PaginationMetadata = {
+    nextToken?: string,
+    hasMoreResults: boolean,
+}
+
+export type PolicySearchResponse = {
+    Results: PolicyModel[],
+    Pagination: PaginationMetadata,
 }
 
 export type FiltersForPolicySearch = {
@@ -24,7 +40,10 @@ export type FiltersForPolicySearch = {
     effect?: 'Allow' | 'Deny'
 }
 
-export type QueryStringParams = FiltersForPolicySearch;
+export type QueryStringParams = FiltersForPolicySearch & {
+    maxResults?: string,
+    nextToken?: string,
+};
 
 export type PolicyModel = {
     PartitionKey: string,

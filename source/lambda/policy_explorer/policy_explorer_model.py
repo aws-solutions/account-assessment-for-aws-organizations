@@ -279,3 +279,13 @@ class PolicyFilters(TypedDict):
 class DdbPagination(TypedDict):
     Limit: int
     ExclusiveStartKey: str | None
+
+
+class PaginationMetadata(TypedDict):
+    nextToken: str | None
+    hasMoreResults: bool
+
+
+class PolicySearchResponse(TypedDict):
+    Results: List[PolicyItem]
+    Pagination: PaginationMetadata

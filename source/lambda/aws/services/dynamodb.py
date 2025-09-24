@@ -85,6 +85,32 @@ class DynamoDB:
                               f"items in the DynamoDB: {value}")
             raise
 
+    def find_items_by_partition_key_paginated(self, value: str, pagination: DdbPagination = dict()) -> Dict:
+
+        try:
+
+            limit = pagination.get('Limit', 100)
+            query_params = {
+                'KeyConditionExpression': Key('PartitionKey').eq(value),
+                'Limit': limit
+            }
+            
+            if pagination.get('ExclusiveStartKey'):
+                query_params['ExclusiveStartKey'] = pagination['ExclusiveStartKey']
+            
+            response: QueryOutputTableTypeDef = self.table.query(**query_params)
+            
+            return {
+                'Items': response.get('Items', []),
+                'LastEvaluatedKey': response.get('LastEvaluatedKey'),
+                'Count': response.get('Count', 0),
+                'ScannedCount': response.get('ScannedCount', 0)
+            }
+        except Exception:
+            self.logger.error(f"AWS_Solution_Error: Error while getting paginated "
+                              f"items from DynamoDB: {value}")
+            raise
+
     def find_all(self) -> List[Dict]:
         self.logger.debug(f"Getting all items from DynamoDB table {self.table.table_name}:")
         response: ScanOutputTableTypeDef = self.table.scan()
@@ -118,7 +144,7 @@ class DynamoDB:
     def query(self, partition_key,
               sort_key_prefix='',
               filters: Dict = dict(),
-              pagination: DdbPagination = dict(Limit=5000)
+              pagination: DdbPagination = dict()
               ) -> List[Dict]:
         self.logger.debug(
             f"Querying DynamoDB table {self.table.table_name} for Keys {partition_key}/{sort_key_prefix}")
@@ -136,10 +162,10 @@ class DynamoDB:
             else:
                 filter_expression = filter_expression & Attr(attr_name).contains(attr_value)
 
-        # Build the query parameters
+        limit = pagination.get('Limit', 5000)  # Use old default for backward compatibility
         query_params: dict = dict(
             KeyConditionExpression=key_condition_expression,
-            Limit=pagination['Limit'],
+            Limit=limit,
         )
         if pagination.get('ExclusiveStartKey'):
             query_params['ExclusiveStartKey'] = pagination['ExclusiveStartKey']
@@ -150,6 +176,41 @@ class DynamoDB:
         response: QueryOutputTableTypeDef = self.table.query(**query_params)
 
         return response['Items']
+
+    def query_paginated(self, partition_key,
+                       sort_key_prefix='',
+                       filters: Dict = dict(),
+                       pagination: DdbPagination = dict()
+                       ) -> Dict:
+
+        key_condition_expression = Key('PartitionKey').eq(partition_key) & Key('SortKey').begins_with(sort_key_prefix)
+
+        filter_expression = None
+        for attr_name, attr_value in filters.items():
+            self.logger.debug(f"Adding filter {attr_name} with value {attr_value}")
+            if filter_expression is None:
+                filter_expression = Attr(attr_name).contains(attr_value)
+            else:
+                filter_expression = filter_expression & Attr(attr_name).contains(attr_value)
+
+        limit = pagination.get('Limit', 100)
+        query_params: dict = dict(
+            KeyConditionExpression=key_condition_expression,
+            Limit=limit,
+        )
+        if pagination.get('ExclusiveStartKey'):
+            query_params['ExclusiveStartKey'] = pagination['ExclusiveStartKey']
+        if filter_expression is not None:
+            query_params['FilterExpression'] = filter_expression
+
+        response: QueryOutputTableTypeDef = self.table.query(**query_params)
+
+        return {
+            'Items': response['Items'],
+            'LastEvaluatedKey': response.get('LastEvaluatedKey'),
+            'Count': response.get('Count', 0),
+            'ScannedCount': response.get('ScannedCount', 0)
+        }
 
     def delete_item(self, key):
         self.logger.debug(f"Trying to delete item from table {self.table.table_name}: {key}")

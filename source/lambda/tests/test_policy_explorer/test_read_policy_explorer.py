@@ -35,6 +35,8 @@ def describe_read_policies():
         assert result['statusCode'] == 200
         body = json.loads(result['body'])
         assert body['Results'] == []
+        assert 'Pagination' in body
+        assert body['Pagination']['hasMoreResults'] == False
 
     def test_that_it_returns_all_service_control_policies(policy_explorer_table):
         # ARRANGE
@@ -282,3 +284,192 @@ def describe_read_policies():
         # ASSERT
         body = json.loads(result['body'])['Results']
         assert len(body) == 2
+
+    def test_that_it_supports_pagination_with_max_results(policy_explorer_table):
+        repository = PoliciesRepository()
+        rbp1 = policy_create_request('ResourceBasedPolicy')
+        rbp2 = policy_create_request('ResourceBasedPolicy')
+        rbp3 = policy_create_request('ResourceBasedPolicy')
+
+        created_rbps = repository.create_all([rbp1, rbp2, rbp3])
+
+        result = read_policies.lambda_handler({
+            "path": "/policy-explorer/ResourceBasedPolicy",
+            'pathParameters': {'partitionKey': 'ResourceBasedPolicy'},
+            'queryStringParameters': {
+                'region': 'GLOBAL',
+                'maxResults': '2',
+            },
+            "httpMethod": "GET"
+        }, TestLambdaContext())
+
+        body = json.loads(result['body'])
+        assert len(body['Results']) == 2
+        assert 'Pagination' in body
+        assert body['Pagination']['hasMoreResults'] in [True, False]
+
+    def test_that_it_handles_default_max_results(policy_explorer_table):
+        repository = PoliciesRepository()
+        rbps = [policy_create_request('ResourceBasedPolicy') for _ in range(5)]
+        created_rbps = repository.create_all(rbps)
+
+        result = read_policies.lambda_handler({
+            "path": "/policy-explorer/ResourceBasedPolicy",
+            'pathParameters': {'partitionKey': 'ResourceBasedPolicy'},
+            'queryStringParameters': {
+                'region': 'GLOBAL',
+            },
+            "httpMethod": "GET"
+        }, TestLambdaContext())
+
+        body = json.loads(result['body'])
+        assert len(body['Results']) == 5
+        assert 'Pagination' in body
+        assert body['Pagination']['hasMoreResults'] == False
+
+    def test_pagination_parameter_priority_max_results_over_limit(policy_explorer_table):
+        repository = PoliciesRepository()
+        rbps = [policy_create_request('ResourceBasedPolicy') for _ in range(5)]
+        repository.create_all(rbps)
+
+        result = read_policies.lambda_handler({
+            "path": "/policy-explorer/ResourceBasedPolicy",
+            'pathParameters': {'partitionKey': 'ResourceBasedPolicy'},
+            'queryStringParameters': {
+                'region': 'GLOBAL',
+                'limit': '3',
+                'maxResults': '2',  # This should take priority
+            },
+            "httpMethod": "GET"
+        }, TestLambdaContext())
+
+        body = json.loads(result['body'])
+        assert len(body['Results']) == 2  # Should use maxResults, not limit
+        assert 'Pagination' in body
+
+    def test_pagination_with_string_vs_integer_parameters(policy_explorer_table):
+        # ARRANGE
+        repository = PoliciesRepository()
+        rbps = [policy_create_request('ResourceBasedPolicy') for _ in range(5)]
+        repository.create_all(rbps)
+
+        result1 = read_policies.lambda_handler({
+            "path": "/policy-explorer/ResourceBasedPolicy",
+            'pathParameters': {'partitionKey': 'ResourceBasedPolicy'},
+            'queryStringParameters': {
+                'region': 'GLOBAL',
+                'limit': 2,  # Integer
+            },
+            "httpMethod": "GET"
+        }, TestLambdaContext())
+
+        result2 = read_policies.lambda_handler({
+            "path": "/policy-explorer/ResourceBasedPolicy",
+            'pathParameters': {'partitionKey': 'ResourceBasedPolicy'},
+            'queryStringParameters': {
+                'region': 'GLOBAL',
+                'maxResults': '2',  # String
+            },
+            "httpMethod": "GET"
+        }, TestLambdaContext())
+
+        body1 = json.loads(result1['body'])
+        body2 = json.loads(result2['body'])
+        assert len(body1['Results']) == 2
+        assert len(body2['Results']) == 2
+        assert 'Pagination' in body1
+        assert 'Pagination' in body2
+
+    def test_pagination_boundary_conditions(policy_explorer_table):
+        repository = PoliciesRepository()
+        rbps = [policy_create_request('ResourceBasedPolicy') for _ in range(5)]
+        repository.create_all(rbps)
+
+        result1 = read_policies.lambda_handler({
+            "path": "/policy-explorer/ResourceBasedPolicy",
+            'pathParameters': {'partitionKey': 'ResourceBasedPolicy'},
+            'queryStringParameters': {
+                'region': 'GLOBAL',
+                'maxResults': '0',
+            },
+            "httpMethod": "GET"
+        }, TestLambdaContext())
+
+        result2 = read_policies.lambda_handler({
+            "path": "/policy-explorer/ResourceBasedPolicy",
+            'pathParameters': {'partitionKey': 'ResourceBasedPolicy'},
+            'queryStringParameters': {
+                'region': 'GLOBAL',
+                'maxResults': '2000',
+            },
+            "httpMethod": "GET"
+        }, TestLambdaContext())
+
+        result3 = read_policies.lambda_handler({
+            "path": "/policy-explorer/ResourceBasedPolicy",
+            'pathParameters': {'partitionKey': 'ResourceBasedPolicy'},
+            'queryStringParameters': {
+                'region': 'GLOBAL',
+                'maxResults': 'invalid',
+            },
+            "httpMethod": "GET"
+        }, TestLambdaContext())
+
+        body1 = json.loads(result1['body'])
+        body2 = json.loads(result2['body'])
+        body3 = json.loads(result3['body'])
+
+        assert len(body1['Results']) == 5
+        assert len(body2['Results']) == 5
+        assert len(body3['Results']) == 5
+
+    def test_invalid_next_token_handling(policy_explorer_table):
+        repository = PoliciesRepository()
+        rbps = [policy_create_request('ResourceBasedPolicy') for _ in range(3)]
+        repository.create_all(rbps)
+
+        result = read_policies.lambda_handler({
+            "path": "/policy-explorer/ResourceBasedPolicy",
+            'pathParameters': {'partitionKey': 'ResourceBasedPolicy'},
+            'queryStringParameters': {
+                'region': 'GLOBAL',
+                'maxResults': '2',
+                'nextToken': 'invalid-token',
+            },
+            "httpMethod": "GET"
+        }, TestLambdaContext())
+
+        assert result['statusCode'] == 200
+        body = json.loads(result['body'])
+        assert 'Results' in body
+        assert 'Pagination' in body
+
+    def test_pagination_response_structure(policy_explorer_table):
+        repository = PoliciesRepository()
+        rbps = [policy_create_request('ResourceBasedPolicy') for _ in range(3)]
+        repository.create_all(rbps)
+
+        # ACT
+        result = read_policies.lambda_handler({
+            "path": "/policy-explorer/ResourceBasedPolicy",
+            'pathParameters': {'partitionKey': 'ResourceBasedPolicy'},
+            'queryStringParameters': {
+                'region': 'GLOBAL',
+                'maxResults': '2',
+            },
+            "httpMethod": "GET"
+        }, TestLambdaContext())
+
+        body = json.loads(result['body'])
+
+        assert 'Results' in body
+        assert isinstance(body['Results'], list)
+        assert len(body['Results']) == 2
+
+        assert 'Pagination' in body
+        assert isinstance(body['Pagination'], dict)
+        assert 'hasMoreResults' in body['Pagination']
+        assert isinstance(body['Pagination']['hasMoreResults'], bool)
+
+        if 'nextToken' in body['Pagination']:
+            assert isinstance(body['Pagination']['nextToken'], (str, type(None)))
