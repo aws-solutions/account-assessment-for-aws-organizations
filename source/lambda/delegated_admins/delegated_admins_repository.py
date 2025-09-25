@@ -3,11 +3,13 @@
 
 import os
 from logging import Logger
-from typing import List
+from typing import List, Tuple
 
 from aws.services.dynamodb import DynamoDB
 from delegated_admins.delegated_admin_model import DelegatedAdminModel, DelegatedAdminCreateRequest
 from utils.base_repository import BaseRepository
+from utils.pagination_model import PaginationMetadata, DdbPagination
+from utils.pagination_helper import build_pagination_metadata
 
 PARTITION_KEY_DELEGATED_ADMINS = 'delegated-admins'
 
@@ -24,6 +26,21 @@ class DelegatedAdminsRepository(BaseRepository[DelegatedAdminModel]):
 
     def find_all_delegated_admins(self) -> List[DelegatedAdminModel]:
         return self.table.find_items_by_partition_key(PARTITION_KEY_DELEGATED_ADMINS)
+
+    def find_all_delegated_admins_paginated(self, pagination: DdbPagination) -> Tuple[List[DelegatedAdminModel], PaginationMetadata]:
+        try:
+            query_result = self.table.find_items_by_partition_key_paginated(PARTITION_KEY_DELEGATED_ADMINS, pagination)
+            
+            items = query_result.get('Items', [])
+            last_evaluated_key = query_result.get('LastEvaluatedKey')
+            
+            pagination_metadata = build_pagination_metadata(last_evaluated_key)
+            
+            return items, pagination_metadata
+            
+        except Exception as error:
+            self.logger.error(f"Error querying delegated admins: {error}")
+            raise error
 
     def create_all(self, requests: List[DelegatedAdminCreateRequest]) -> List[DelegatedAdminModel]:
         delegated_admins: List[DelegatedAdminModel] = list(

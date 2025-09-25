@@ -3,11 +3,13 @@
 
 import os
 from logging import Logger
-from typing import List
+from typing import List, Tuple
 
 from aws.services.dynamodb import DynamoDB
 from trusted_access_enabled_services.trusted_access_model import TrustedAccessModel, TrustedAccessCreateRequest
 from utils.base_repository import BaseRepository
+from utils.pagination_model import PaginationMetadata, DdbPagination
+from utils.pagination_helper import build_pagination_metadata
 
 PARTITION_KEY_TRUSTED_SERVICES = 'trusted-services'
 
@@ -24,6 +26,21 @@ class TrustedServicesRepository(BaseRepository[TrustedAccessModel]):
 
     def find_all_trusted_services(self) -> List[TrustedAccessModel]:
         return self.table.find_items_by_partition_key(PARTITION_KEY_TRUSTED_SERVICES)
+
+    def find_all_trusted_services_paginated(self, pagination: DdbPagination) -> Tuple[List[TrustedAccessModel], PaginationMetadata]:
+        try:
+            query_result = self.table.find_items_by_partition_key_paginated(PARTITION_KEY_TRUSTED_SERVICES, pagination)
+            
+            items = query_result.get('Items', [])
+            last_evaluated_key = query_result.get('LastEvaluatedKey')
+            
+            pagination_metadata = build_pagination_metadata(last_evaluated_key)
+            
+            return items, pagination_metadata
+            
+        except Exception as error:
+            self.logger.error(f"Error querying trusted services: {error}")
+            raise error
 
     def create_all(self, requests: List[TrustedAccessCreateRequest]) -> List[TrustedAccessModel]:
         trusted_services: List[TrustedAccessModel] = list(

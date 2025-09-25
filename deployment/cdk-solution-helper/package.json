@@ -11,13 +11,9 @@
   "devDependencies": {
     "@types/node": "^20.8.7",
     "@types/jest": "^29.5.6",
-    "fs": "0.0.1-security",
     "typescript": "^5.2.2",
     "jest": "^29.7.0",
     "ts-jest": "^29.1.1"
-  },
-  "dependencies": {
-    "fs": "0.0.1-security"
   },
   "scripts": {
     "cleanup": "node_modules/typescript/bin/tsc --build ./ --clean && rm -rf node_modules && rm -f package-lock.json",

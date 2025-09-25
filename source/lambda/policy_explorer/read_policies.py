@@ -1,17 +1,16 @@
 #  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #  SPDX-License-Identifier: Apache-2.0
 from os import getenv
-from typing import List
 
 from aws_lambda_powertools import Tracer, Logger
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 from aws_lambda_powertools.utilities.typing import LambdaContext
 
 from metrics.solution_metrics import SolutionMetrics
-from policy_explorer.policy_explorer_model import PolicyFilters, DdbPagination, PolicyItem
+from policy_explorer.policy_explorer_model import PolicyFilters, DdbPagination, PolicySearchResponse
 from policy_explorer.policy_explorer_repository import PoliciesRepository
-from utils.api_gateway_lambda_handler import GenericApiGatewayEventHandler, ApiGatewayResponse, ResultListWrapper, \
-    ClientException
+from utils.api_gateway_lambda_handler import GenericApiGatewayEventHandler, ApiGatewayResponse, ClientException
+from utils.pagination_helper import validate_max_results, decode_next_token
 
 tracer = Tracer()
 logger = Logger(getenv('LOG_LEVEL'))
@@ -29,7 +28,7 @@ def lambda_handler(event: dict, context: LambdaContext) -> ApiGatewayResponse:
 
 class ReadPolicies:
 
-    def read_policies(self, _event: APIGatewayProxyEvent, _context: LambdaContext) -> ResultListWrapper:
+    def read_policies(self, _event: APIGatewayProxyEvent, _context: LambdaContext) -> PolicySearchResponse:
         repository = PoliciesRepository()
 
         policy_type = _event.path_parameters.get('partitionKey')
@@ -59,16 +58,22 @@ class ReadPolicies:
         if query.get('condition'):
             filters['Condition'] = query.get('condition')
 
-        queryLimit = query.get('limit')
+        max_results_param = query.get('maxResults') or query.get('limit')
+        max_results = validate_max_results(max_results_param)
+        exclusive_start_key = decode_next_token(query.get('nextToken'))
+
         pagination: DdbPagination = dict(
-            Limit=queryLimit if queryLimit else 5000,
-            ExclusiveStartKey=query.get('exclusiveStartKey') if query.get('exclusiveStartKey') else None
+            Limit=max_results,
+            ExclusiveStartKey=exclusive_start_key
         )
 
-        results: List[PolicyItem] = repository.find_all_by_policy_type(policy_type, region, filters, pagination)
+        results, pagination_metadata = repository.find_all_by_policy_type(policy_type, region, filters, pagination)
 
         SolutionMetrics().send_search_metrics(policy_type, region, filters, len(results))
 
-        return {
-            'Results': results
+        response: PolicySearchResponse = {
+            'Results': results,
+            'Pagination': pagination_metadata
         }
+
+        return response

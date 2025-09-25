@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.4] - 2025-09-24
+
+### Security
+
+- Removed deprecated NPM package "fs" has been identified as potentially vulnerable to package takeover
+- Updated Vite to v6.3.6 to mitigate [CVE-2025-58751](https://nvd.nist.gov/vuln/detail/CVE-2025-58751)
+
+### Changed
+
+- Modified pagination for policy browsing to apply the 5000 item limit after filtering
+
 ## [1.1.3] - 2025-08-04
 
 ### Changed
