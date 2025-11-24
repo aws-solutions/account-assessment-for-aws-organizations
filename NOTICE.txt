@@ -1259,6 +1259,8 @@ mypy-boto3-ssm-guiconnect under the MIT license.
 pyyaml under the MIT license.
 typing-inspection under the MIT license.
 werkzeug under the 0BSD license.
+@isaacs/balanced-match under the MIT license.
+@isaacs/brace-expansion under the MIT license.
 
 ********************
 OPEN SOURCE LICENSES
@@ -1276,3 +1278,4 @@ BlueOak-1.0.0 - https://spdx.org/licenses/BlueOak-1.0.0.html
 MIT-0 - https://spdx.org/licenses/MIT-0.html
 MPL-2.0 - https://spdx.org/licenses/MPL-2.0.html
 PSF-2.0 - https://spdx.org/licenses/PSF-2.0.html
+Python-2.0 - https://spdx.org/licenses/Python-2.0.html
