@@ -33,6 +33,11 @@
     "aws-cdk-lib": "^2.206.0",
     "constructs": "^10.4.2"
   },
+  "overrides": {
+    "js-yaml": "^4.1.1",
+    "glob": "^11.1.0",
+    "test-exclude": "^7.0.1"
+  },
   "jest": {
     "preset": "ts-jest",
     "roots": [

@@ -1,31 +1,30 @@
 {
   "compilerOptions": {
-    "outDir": "dist",
+    "allowImportingTsExtensions": true,
     /* see https://www.typescriptlang.org/docs/handbook/modules/guides/choosing-compiler-options.html#im-using-a-bundler */
-    "module": "esnext",
-    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "noEmit": true,
-
-    "target": "ESNext",
+    "jsx": "react-jsx",
     "lib": [
       "ESNext",
       "DOM",
       "DOM.Iterable"
     ],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "outDir": "dist",
+    "resolveJsonModule": true,
     "skipLibCheck": true,
+    "strict": true,
+    "target": "ESNext",
     "types": [
       "vite/client",
       "vitest/globals"
-    ],
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "jsx": "react-jsx",
-    "strict": true,
-    "noFallthroughCasesInSwitch": true,
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true
+    ]
   },
   "include": [
     "src"

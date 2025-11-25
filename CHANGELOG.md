@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.5] - 2025-11-25
+
+### Security
+
+- Updated js-yaml to v4.1.1 to mitigate [CVE-2025-64718](https://avd.aquasec.com/nvd/cve-2025-64718)
+- Updated glob to v11.1.0 to mitigate [CVE-2025-64756](https://avd.aquasec.com/nvd/cve-2025-64756)
+- Updated Vite to v6.4.1 to mitigate [CVE-2025-62522](https://nvd.nist.gov/vuln/detail/CVE-2025-62522)
+
 ## [1.1.4] - 2025-09-24
 
 ### Security
