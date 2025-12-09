@@ -74,7 +74,9 @@ def test_mock_backup_scan_policy(mocker):
 
 def mock_backup(mocker,
                 list_backup_vaults_response=None,
-                get_backup_vault_access_policy_response=None):
+                get_backup_vault_access_policy_response=None,
+                list_backup_plans_response=None,
+                get_backup_plan_response=None):
 
     # ARRANGE
     if list_backup_vaults_response is None:
@@ -82,6 +84,12 @@ def mock_backup(mocker,
 
     if get_backup_vault_access_policy_response is None:
         get_backup_vault_access_policy_response = []
+
+    if list_backup_plans_response is None:
+        list_backup_plans_response = []
+
+    if get_backup_plan_response is None:
+        get_backup_plan_response = {}
 
     def mock_list_backup_vaults(self):
         return list_backup_vaults_response
@@ -98,3 +106,67 @@ def mock_backup(mocker,
         "aws.services.backup.Backup.get_backup_vault_access_policy",
         mock_get_backup_vault_access_policy
     )
+
+    def mock_list_backup_plans(self):
+        return list_backup_plans_response
+
+    mocker.patch(
+        "aws.services.backup.Backup.list_backup_plans",
+        mock_list_backup_plans
+    )
+
+    def mock_get_backup_plan(self, backup_plan_id: str):
+        return get_backup_plan_response
+
+    mocker.patch(
+        "aws.services.backup.Backup.get_backup_plan",
+        mock_get_backup_plan
+    )
+
+
+@mock_aws
+def test_backup_plan_with_cross_account_copy_rule(mocker):
+    # ARRANGE
+    list_backup_vaults_response: list[BackupVaultListMemberTypeDef] = []
+    get_backup_vault_access_policy_response: GetBackupVaultAccessPolicyOutputTypeDef = {}
+
+    list_backup_plans_response = [
+        {
+            "BackupPlanId": "plan-123",
+            "BackupPlanArn": "arn:aws:backup:us-east-2:111111111111:backup-plan:plan-123",
+            "BackupPlanName": "DailyBackup",
+        }
+    ]
+
+    get_backup_plan_response = {
+        "BackupPlan": {
+            "BackupPlanName": "DailyBackup",
+            "Rules": [
+                {
+                    "RuleName": "DailyRule",
+                    "TargetBackupVaultName": "source_vault",
+                    "CopyActions": [
+                        {
+                            "DestinationBackupVaultArn": "arn:aws:backup:us-west-2:222222222222:backup-vault:destination_vault",
+                            "Lifecycle": {}
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+
+    mock_backup(mocker,
+                list_backup_vaults_response,
+                get_backup_vault_access_policy_response,
+                list_backup_plans_response,
+                get_backup_plan_response)
+
+    # ACT
+    response = BackupVaultAccessPolicy(event).scan()
+    logger.info(response)
+
+    # ASSERT
+    assert len(list(response)) > 0
+    found_cross_account_copy = any('222222222222' in str(item) for item in response)
+    assert found_cross_account_copy, "Should detect backup plan with cross-account copy to account 222222222222"

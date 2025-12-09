@@ -47,8 +47,7 @@ class BackupVaultAccessPolicy:
         }
         return data
 
-    @staticmethod
-    def _get_backup_policies(backup_data: list[model.BackupData],
+    def _get_backup_policies(self, backup_data: list[model.BackupData],
                              backup_client) -> list[model.PolicyDetails]:
         backup_policies = []
         for vault in backup_data:
@@ -60,4 +59,40 @@ class BackupVaultAccessPolicy:
             policy_details.update({'Policy': policy.get('Policy')})
             policy_details.update({'PolicyType': model.PolicyType.RESOURCE_BASED_POLICY})
             backup_policies.append(policy_details)
+
+        backup_policies.extend(self._check_backup_plans_with_cross_account_copy(backup_client))
         return backup_policies
+
+    def _check_backup_plans_with_cross_account_copy(self, backup_client) -> list[model.PolicyDetails]:
+        policies = []
+        try:
+            plans = backup_client.list_backup_plans()
+            for plan_summary in plans:
+                plan_id = plan_summary.get('BackupPlanId')
+                plan_arn = plan_summary.get('BackupPlanArn')
+
+                plan_details = backup_client.get_backup_plan(plan_id)
+                backup_plan = plan_details.get('BackupPlan', {})
+
+                for rule in backup_plan.get('Rules', []):
+                    copy_actions = rule.get('CopyActions', [])
+                    for copy_action in copy_actions:
+                        dest_vault_arn = copy_action.get('DestinationBackupVaultArn', '')
+                        if dest_vault_arn and ':' in dest_vault_arn:
+                            dest_account = dest_vault_arn.split(':')[4]
+                            if dest_account != self.account_id:
+                                policy_details: model.PolicyDetails = get_policy_details_from_arn(plan_arn)
+                                policy_statement = {
+                                    "Effect": "Allow",
+                                    "Action": "backup:CopyIntoBackupVault",
+                                    "Resource": dest_vault_arn,
+                                    "Condition": {"StringEquals": {"aws:SourceAccount": self.account_id}}
+                                }
+                                policy_details.update({
+                                    'Policy': '{"Version":"2012-10-17","Statement":[' + str(policy_statement).replace("'", '"') + ']}',
+                                    'PolicyType': model.PolicyType.RESOURCE_BASED_POLICY
+                                })
+                                policies.append(policy_details)
+        except Exception as e:
+            self.logger.warning(f"Could not check backup plans: {e}")
+        return policies
