@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.6] - 2025-12-29
+
+### Security
+
+- Updated urllib3 to v2.6.1 to mitigate [CVE-2025-66418](https://nvd.nist.gov/vuln/detail/CVE-2025-66418) and [CVE-2025-66471](https://nvd.nist.gov/vuln/detail/CVE-2025-66471)
+- Updated werkzeug to v3.1.4 to mitigate [CVE-2025-66221](https://nvd.nist.gov/vuln/detail/CVE-2025-66221)
+
 ## [1.1.5] - 2025-11-25
 
 ### Security
