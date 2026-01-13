@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.7] - 2026-01-14
+
+### Security
+
+- Updated urllib3 to v2.6.3 to mitigate [CVE-2026-21441](https://avd.aquasec.com/nvd/cve-2026-21441)
+- Updated werkzeug to v3.1.5 to mitigate [CVE-2026-21860](https://avd.aquasec.com/nvd/cve-2026-21860)
+- Updated react-router-dom to v6.30.3 to mitigate [CVE-2025-68470](https://avd.aquasec.com/nvd/cve-2025-68470)
+- Updated @remix-run/router to 1.23.2 to mitigate [CVE-2026-22029](https://avd.aquasec.com/nvd/cve-2026-22029)
+
 ## [1.1.6] - 2025-12-29
 
 ### Security
