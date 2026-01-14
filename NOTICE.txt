@@ -1261,6 +1261,11 @@ typing-inspection under the MIT license.
 werkzeug under the 0BSD license.
 @isaacs/balanced-match under the MIT license.
 @isaacs/brace-expansion under the MIT license.
+mypy-boto3-aiops under the MIT license.
+mypy-boto3-evs under the MIT license.
+mypy-boto3-keyspacesstreams under the MIT license.
+mypy-boto3-mpa under the MIT license.
+mypy-boto3-workspaces-instances under the MIT license.
 
 ********************
 OPEN SOURCE LICENSES
