@@ -30,13 +30,18 @@
     "@aws-solutions-constructs/aws-cloudfront-s3": "2.79.0",
     "@aws-solutions-constructs/aws-eventbridge-lambda": "^2.79.0",
     "@aws-solutions-constructs/core": "^2.79.0",
-    "aws-cdk-lib": "^2.206.0",
+    "aws-cdk-lib": "^2.238.0",
     "constructs": "^10.4.2"
   },
   "overrides": {
     "js-yaml": "^4.1.1",
     "glob": "^11.1.0",
-    "test-exclude": "^7.0.1"
+    "test-exclude": "^7.0.1",
+    "@isaacs/brace-expansion": "^5.0.1",
+    "ajv": "^8.18.0",
+    "diff": "^5.2.2",
+    "@aws-cdk/cloud-assembly-schema": "^48.20.0",
+    "minimatch": "10.2.1"
   },
   "jest": {
     "preset": "ts-jest",

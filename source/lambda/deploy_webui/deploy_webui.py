@@ -24,7 +24,7 @@ def lambda_handler(event, context):
         cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
     except Exception as err:
         logger.error(err)
-        cfnresponse.send(event, context, cfnresponse.FAILED, "An error occurred")
+        cfnresponse.send(event, context, cfnresponse.FAILED, {"Error": str(err)})
 
 
 class WebUIDeployer:

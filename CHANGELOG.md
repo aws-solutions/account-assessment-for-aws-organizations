@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.8] - 2026-02-19
+
+### Security
+
+- Updated cryptography to v46.0.5 to address OpenSSL vulnerabilities
+- Updated fast-xml-parser to v5.3.6 to mitigate DoS through entity expansion in DOCTYPE
+- Updated @isaacs/brace-expansion to v5.0.1 to mitigate DoS via unbounded brace range expansion
+- Updated diff to v8.0.3 to mitigate DoS in parsePatch and applyPatch
+- Updated ajv to v8.18.0 to mitigate ReDoS when using $data option
+- Updated lodash to v4.17.23
+- Updated minimatch to v10.2.1
+
+### Fixed
+
+- Fixed Policy Explorer pagination returning incomplete results when filtering produces sparse matches across DynamoDB pages
+- Added "Load More" button to Policy Explorer UI for incremental result loading
+
 ## [1.1.7] - 2026-01-14
 
 ### Security

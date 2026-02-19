@@ -6,7 +6,7 @@ from os import getenv
 from typing import Dict, List
 
 from aws_lambda_powertools import Logger
-from boto3.dynamodb.conditions import Key, Attr
+from boto3.dynamodb.conditions import Key, Attr, ConditionBase
 from mypy_boto3_dynamodb.service_resource import DynamoDBServiceResource, Table
 from mypy_boto3_dynamodb.type_defs import QueryOutputTableTypeDef, ScanOutputTableTypeDef, \
     UpdateItemInputTableUpdateItemTypeDef, GetItemOutputTableTypeDef
@@ -182,7 +182,6 @@ class DynamoDB:
                        filters: Dict = dict(),
                        pagination: DdbPagination = dict()
                        ) -> Dict:
-
         key_condition_expression = Key('PartitionKey').eq(partition_key) & Key('SortKey').begins_with(sort_key_prefix)
 
         filter_expression = None
@@ -193,15 +192,25 @@ class DynamoDB:
             else:
                 filter_expression = filter_expression & Attr(attr_name).contains(attr_value)
 
-        limit = pagination.get('Limit', 100)
+        requested_limit = pagination.get('Limit', 100)
+        start_key = pagination.get('ExclusiveStartKey')
+        
+        # When filters are present, iterate through pages to collect enough filtered results
+        if filter_expression is not None:
+            return self._query_with_filter_pagination(
+                key_condition_expression,
+                filter_expression,
+                requested_limit,
+                start_key
+            )
+        
+        # No filters - simple query with limit
         query_params: dict = dict(
             KeyConditionExpression=key_condition_expression,
-            Limit=limit,
+            Limit=requested_limit,
         )
-        if pagination.get('ExclusiveStartKey'):
-            query_params['ExclusiveStartKey'] = pagination['ExclusiveStartKey']
-        if filter_expression is not None:
-            query_params['FilterExpression'] = filter_expression
+        if start_key:
+            query_params['ExclusiveStartKey'] = start_key
 
         response: QueryOutputTableTypeDef = self.table.query(**query_params)
 
@@ -210,6 +219,65 @@ class DynamoDB:
             'LastEvaluatedKey': response.get('LastEvaluatedKey'),
             'Count': response.get('Count', 0),
             'ScannedCount': response.get('ScannedCount', 0)
+        }
+
+    def _query_with_filter_pagination(
+        self,
+        key_condition_expression: ConditionBase,
+        filter_expression: ConditionBase,
+        requested_limit: int,
+        start_key: Dict = None
+    ) -> Dict:
+        collected_items: List[Dict] = []
+        last_evaluated_key = start_key
+        total_scanned = 0
+        
+        # Use larger batch size for internal pagination to reduce API calls
+        batch_size = 1000
+        
+        while len(collected_items) < requested_limit:
+            query_params: dict = dict(
+                KeyConditionExpression=key_condition_expression,
+                FilterExpression=filter_expression,
+                Limit=batch_size,
+            )
+            if last_evaluated_key:
+                query_params['ExclusiveStartKey'] = last_evaluated_key
+
+            response: QueryOutputTableTypeDef = self.table.query(**query_params)
+            
+            collected_items.extend(response.get('Items', []))
+            total_scanned += response.get('ScannedCount', 0)
+            last_evaluated_key = response.get('LastEvaluatedKey')
+            
+            self.logger.debug(f"Filter pagination: collected {len(collected_items)} items, scanned {total_scanned}")
+            
+            # No more items to scan
+            if not last_evaluated_key:
+                break
+        
+        result_items = collected_items[:requested_limit]
+        has_more_collected = len(collected_items) > requested_limit
+        has_more_in_table = last_evaluated_key is not None
+        
+        next_page_key = None
+        if has_more_collected or has_more_in_table:
+            if has_more_collected and result_items:
+
+                last_item = result_items[-1]
+                next_page_key = {
+                    'PartitionKey': last_item['PartitionKey'],
+                    'SortKey': last_item['SortKey']
+                }
+            else:
+                # We didn't trim, use DynamoDB's LastEvaluatedKey
+                next_page_key = last_evaluated_key
+        
+        return {
+            'Items': result_items,
+            'LastEvaluatedKey': next_page_key,
+            'Count': len(result_items),
+            'ScannedCount': total_scanned
         }
 
     def delete_item(self, key):

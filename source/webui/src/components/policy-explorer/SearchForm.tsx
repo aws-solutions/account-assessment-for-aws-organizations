@@ -22,7 +22,14 @@ import {useLocation} from "react-router-dom";
 
 type Effect = 'Allow' | 'Deny';
 
-export const SearchForm = ({resetTableState}: { resetTableState: () => void }) => {
+export type LastSearchParams = {
+  policyType: PolicyTypes;
+  filters: FiltersForPolicySearch;
+};
+
+export const SearchForm = ({onSearchParamsChange}: { 
+  onSearchParamsChange?: (params: LastSearchParams) => void
+}) => {
   const dispatch = useDispatch<any>();
   const {orgId} = useContext(UserContext);
   const location = useLocation();
@@ -46,13 +53,19 @@ export const SearchForm = ({resetTableState}: { resetTableState: () => void }) =
     policyType: policyTypeSelected,
     filters,
     pagination: {
-      maxResults: 100  // Default page size
+      maxResults: 1000  // Max page size per request
     }
   };
 
   const startSearch = () => {
     dispatch(fetchPolicyModels(searchParams));
-    resetTableState();
+    // Store search params for "load more" functionality
+    if (onSearchParamsChange) {
+      onSearchParamsChange({
+        policyType: policyTypeSelected,
+        filters
+      });
+    }
   };
 
   function addOrgIdToCondition() {
