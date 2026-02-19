@@ -104,6 +104,12 @@ export class PolicyExplorerScanComponent extends Construct {
       indexName: 'JobId',
       partitionKey: {name: 'JobId', type: AttributeType.STRING},
     });
+    // Grant read access to the JobId GSI — grantReadWriteData only covers the base table ARN,
+    // not index ARNs. The readJob function queries the GSI to find findings by JobId.
+    props.functions.readJob.addToRolePolicy(new PolicyStatement({
+      actions: ['dynamodb:Query'],
+      resources: [`${this.componentTable.tableArn}/index/*`],
+    }));
 
     const validateAccountAccessFunction = new lambda.Function(this, 'ValidateSpokeAccess', {
       runtime: lambda.Runtime.PYTHON_3_12,

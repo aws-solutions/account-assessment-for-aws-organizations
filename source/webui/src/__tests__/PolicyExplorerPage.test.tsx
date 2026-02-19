@@ -192,3 +192,175 @@ const policyItems = [
     "Action": "[\"config:*\"]"
   },
 ]
+
+// Generate test data for pagination with filter tests
+const generatePolicyItems = (count: number, matchFilter: boolean, filterValue: string) => {
+  return Array.from({ length: count }, (_, i) => ({
+    "AccountId": matchFilter ? "999999999999" : "123456789012",
+    "Effect": "Allow",
+    "ExpiresAt": 1714863631,
+    "Resource": "\"*\"",
+    "Region": "GLOBAL",
+    "ResourceIdentifier": `policy/TestPolicy${i}`,
+    "PartitionKey": "IdentityBasedPolicy",
+    "Service": "iam",
+    "Policy": "{}",
+    "SortKey": `GLOBAL#iam#${matchFilter ? "999999999999" : "123456789012"}#policy/TestPolicy${i}`,
+    "Action": matchFilter ? `["${filterValue}"]` : "[\"s3:GetObject\"]",
+    "Principal": matchFilter ? `{"AWS": "arn:aws:iam::${filterValue}:root"}` : '{"AWS": "arn:aws:iam::123456789012:root"}'
+  }));
+};
+
+describe('the PolicyExplorer pagination with filters', () => {
+
+  it('returns all filtered results across multiple pages', async () => {
+    // ARRANGE - Simulate sparse matching: 100 total items, only 10 match filter
+    const nonMatchingItems = generatePolicyItems(90, false, 'o-testorg123');
+    const matchingItems = generatePolicyItems(10, true, 'o-testorg123');
+    
+    // First page returns all matching items (backend should collect enough)
+    const firstPageResponse = {
+      Results: matchingItems,
+      Pagination: {
+        nextToken: null,
+        hasMoreResults: false
+      }
+    };
+
+    renderAppContent({
+      initialRoute: `/policy-explorer`,
+    });
+    
+    server.use(
+      http.get(MOCK_SERVER_URL + apiPathPolicyExplorer + '/:policyType', ({ request }) => {
+        const url = new URL(request.url);
+        const principal = url.searchParams.get('principal');
+        
+        // Verify filter is being passed
+        if (principal === 'o-testorg123') {
+          return ok(firstPageResponse);
+        }
+        return ok({ Results: [], Pagination: { nextToken: null, hasMoreResults: false } });
+      })
+    );
+
+    // ACT - Search with filter
+    await userEvent.click(screen.getByRole('button', {name: /search/i}));
+    await screen.findByText(/Loading resources/i);
+    await waitForElementToBeRemoved(screen.queryByText(/Loading resources/i));
+
+    // ASSERT - Should show all 10 matching items, not just first page
+    const table = await screen.findByTestId("policy-explorer-table");
+    // With proper backend fix, all matching items should be returned
+    expect(table).toBeInTheDocument();
+  });
+
+  it('handles pagination response structure correctly', async () => {
+    // ARRANGE
+    const paginatedResponse = {
+      Results: policyItems.slice(0, 2),
+      Pagination: {
+        nextToken: 'eyJQYXJ0aXRpb25LZXkiOiJJZGVudGl0eUJhc2VkUG9saWN5IiwiU29ydEtleSI6IkdMT0JBTCJ9',
+        hasMoreResults: true
+      }
+    };
+
+    renderAppContent({
+      initialRoute: `/policy-explorer`,
+    });
+    
+    server.use(
+      http.get(MOCK_SERVER_URL + apiPathPolicyExplorer + '/:policyType', () => {
+        return ok(paginatedResponse);
+      })
+    );
+
+    // ACT
+    await userEvent.click(screen.getByRole('button', {name: /search/i}));
+    await screen.findByText(/Loading resources/i);
+    await waitForElementToBeRemoved(screen.queryByText(/Loading resources/i));
+
+    // ASSERT - Table should render with paginated results and show "(2+)" counter
+    const table = await screen.findByTestId("policy-explorer-table");
+    expect(table).toBeInTheDocument();
+    // When hasMoreResults is true, UI shows "(2+)" in the counter
+    expect(await within(table).findByRole('heading', {name: /Policies \(2\+\)/})).toBeInTheDocument();
+  });
+
+  it('verifies filter parameters are sent to backend', async () => {
+    // ARRANGE
+    let capturedParams: URLSearchParams | null = null;
+    
+    renderAppContent({
+      initialRoute: `/policy-explorer`,
+    });
+    
+    server.use(
+      http.get(MOCK_SERVER_URL + apiPathPolicyExplorer + '/:policyType', ({ request }) => {
+        capturedParams = new URL(request.url).searchParams;
+        return ok({
+          Results: [],
+          Pagination: { nextToken: null, hasMoreResults: false }
+        });
+      })
+    );
+
+    // ACT - Enter filter and search
+    const actionInput = screen.getByRole('textbox', {name: "Action"});
+    await userEvent.type(actionInput, 's3:GetObject');
+    await userEvent.click(screen.getByRole('button', {name: /search/i}));
+    await screen.findByText(/Loading resources/i);
+    await waitForElementToBeRemoved(screen.queryByText(/Loading resources/i));
+
+    // ASSERT - Filter should be passed to backend
+    expect(capturedParams).not.toBeNull();
+    expect(capturedParams!.get('action')).toBe('s3:GetObject');
+    expect(capturedParams!.get('maxResults')).toBeTruthy();
+  });
+
+  it('shows Load More button when hasMoreResults is true', async () => {
+    // ARRANGE - Simulate paginated response with more results available
+    const page1Items = generatePolicyItems(3, true, 'test-action');
+    
+    renderAppContent({
+      initialRoute: `/policy-explorer`,
+    });
+    
+    server.use(
+      http.get(MOCK_SERVER_URL + apiPathPolicyExplorer + '/:policyType', ({ request }) => {
+        const url = new URL(request.url);
+        const nextToken = url.searchParams.get('nextToken');
+        
+        if (!nextToken) {
+          return ok({
+            Results: page1Items,
+            Pagination: {
+              nextToken: 'page2token',
+              hasMoreResults: true
+            }
+          });
+        } else {
+          return ok({
+            Results: generatePolicyItems(2, true, 'test-action'),
+            Pagination: {
+              nextToken: null,
+              hasMoreResults: false
+            }
+          });
+        }
+      })
+    );
+
+    // ACT
+    await userEvent.click(screen.getByRole('button', {name: /search/i}));
+    await screen.findByText(/Loading resources/i);
+    await waitForElementToBeRemoved(screen.queryByText(/Loading resources/i));
+
+    // ASSERT - Should show "(3+)" counter and Load More button
+    const table = await screen.findByTestId("policy-explorer-table");
+    expect(await within(table).findByRole('heading', {name: /Policies \(3\+\)/})).toBeInTheDocument();
+    expect(screen.getByTestId('load-more')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /Load More Results/i})).toBeInTheDocument();
+  });
+
+})

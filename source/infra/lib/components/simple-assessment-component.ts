@@ -93,6 +93,12 @@ export class SimpleAssessmentComponent extends Construct {
       indexName: 'JobId',
       partitionKey: {name: 'JobId', type: AttributeType.STRING},
     });
+    // Grant read access to the JobId GSI — grantReadWriteData only covers the base table ARN,
+    // not index ARNs (table/*/index/*). The readJob function queries the GSI to find findings by JobId.
+    functions.readJob.addToRolePolicy(new PolicyStatement({
+      actions: ['dynamodb:Query'],
+      resources: [`${this.componentTable.tableArn}/index/*`],
+    }));
 
 
     // has to match AssessmentType. referenced via DynamoDB(os.getenv(assessment_type))

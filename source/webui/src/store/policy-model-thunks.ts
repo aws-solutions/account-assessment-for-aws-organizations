@@ -43,7 +43,7 @@ export const fetchPolicyModels = createAsyncThunk<PolicySearchResponse, PolicySe
       return Promise.reject();
     }
 
-    return response.responseBody!;
+    return response.responseBody;
   }
 );
 
@@ -72,6 +72,6 @@ export const fetchMorePolicyModels = createAsyncThunk<PolicySearchResponse, Poli
       return Promise.reject();
     }
 
-    return response.responseBody!;
+    return response.responseBody;
   }
 );
