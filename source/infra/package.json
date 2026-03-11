@@ -41,7 +41,7 @@
     "ajv": "^8.18.0",
     "diff": "^5.2.2",
     "@aws-cdk/cloud-assembly-schema": "^48.20.0",
-    "minimatch": "10.2.1"
+    "minimatch": "10.2.3"
   },
   "jest": {
     "preset": "ts-jest",

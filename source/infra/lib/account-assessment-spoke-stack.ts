@@ -78,6 +78,7 @@ export class SpokeStack extends Stack {
                         "ses:ListEmailIdentities",
                         "apigateway:GET",
                         "config:DescribeOrganizationConfigRules",
+                        "config:GetOrganizationCustomRulePolicy",
                         "ssm-incidents:ListResponsePlans",
                         "es:ListDomainNames",
                         "cloudformation:ListStacks",
