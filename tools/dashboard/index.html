@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account Assessment // Mission Control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ================================================================
+   MISSION CONTROL — Account Assessment Dashboard
+   Aesthetic: Industrial Cyberpunk / War Room
+   ================================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-void:       #0c0d10;
+  --bg-panel:      #131519;
+  --bg-panel-alt:  #181b20;
+  --bg-surface:    #1e2128;
+  --bg-hover:      #252830;
+  --border-dim:    #2a2e38;
+  --border-med:    #333844;
+  --border-bright: #414958;
+
+  --cyan:          #22e8ff;
+  --cyan-dim:      #22e8ff66;
+  --cyan-glow:     #22e8ff22;
+  --green:         #2bff96;
+  --green-dim:     #2bff9666;
+  --amber:         #ffc233;
+  --amber-dim:     #ffc23344;
+  --red:           #ff4d6a;
+  --red-dim:       #ff4d6a44;
+  --purple:        #b471f7;
+
+  --text-primary:  #f0f2f5;
+  --text-secondary:#a3aab8;
+  --text-dim:      #6b7488;
+
+  --font-mono:     'IBM Plex Mono', 'Menlo', monospace;
+  --font-display:  'Space Mono', monospace;
+
+  --radius:        3px;
+  --transition:    180ms ease;
+}
+
+html {
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: var(--font-mono);
+  background: var(--bg-void);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Scanline overlay — very subtle so it doesn't hurt readability */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0, 229, 255, 0.005) 3px,
+    rgba(0, 229, 255, 0.005) 6px
+  );
+}
+
+/* Grid background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(var(--border-dim) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-dim) 1px, transparent 1px);
+  background-size: 60px 60px;
+  opacity: 0.15;
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-void); }
+::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--cyan-dim); }
+
+/* ---- Layout ---- */
+.shell {
+  position: relative;
+  z-index: 1;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 24px 32px 60px;
+}
+
+/* ---- Header ---- */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0 24px;
+  border-bottom: 1px solid var(--border-dim);
+  margin-bottom: 28px;
+}
+
+.header-left { display: flex; align-items: baseline; gap: 14px; }
+
+.header h1 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  text-shadow: 0 0 20px var(--cyan-dim);
+}
+
+.header .tag {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green-dim);
+  display: inline-block;
+  animation: pulse-dot 2.5s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ---- Section titles ---- */
+.section-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+  padding-left: 2px;
+}
+
+/* ---- Scan Cards Grid ---- */
+.scan-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.scan-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--transition);
+}
+
+.scan-card:hover { border-color: var(--border-bright); }
+
+.scan-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 2px;
+  background: linear-gradient(90deg, var(--cyan), transparent);
+  opacity: 0.6;
+}
+
+.scan-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.scan-card-title {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+}
+
+.scan-card-desc {
+  font-size: 0.73rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+.scan-card-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  min-height: 24px;
+}
+
+.scan-card-status .count {
+  color: var(--cyan);
+  font-weight: 600;
+}
+
+/* ---- Badges ---- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 2px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.badge--ok     { background: #00ff8818; color: var(--green); border: 1px solid #00ff8833; }
+.badge--warn   { background: #ffb80012; color: var(--amber); border: 1px solid #ffb80033; }
+.badge--err    { background: #ff335512; color: var(--red);   border: 1px solid #ff335533; }
+.badge--active { background: #00e5ff12; color: var(--cyan);  border: 1px solid #00e5ff33; }
+.badge--idle   { background: var(--bg-surface); color: var(--text-dim); border: 1px solid var(--border-dim); }
+
+/* ---- Buttons ---- */
+.btn {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 7px 16px;
+  border: 1px solid var(--cyan-dim);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--cyan);
+  cursor: pointer;
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:hover {
+  background: var(--cyan-glow);
+  border-color: var(--cyan);
+  box-shadow: 0 0 16px var(--cyan-glow);
+}
+
+.btn:active { transform: scale(0.97); }
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn--sm { padding: 4px 10px; font-size: 0.65rem; }
+
+.btn--amber {
+  border-color: var(--amber-dim);
+  color: var(--amber);
+}
+.btn--amber:hover {
+  background: var(--amber-dim);
+  border-color: var(--amber);
+}
+
+.btn--green {
+  border-color: var(--green-dim);
+  color: var(--green);
+}
+.btn--green:hover {
+  background: rgba(0,255,136,0.08);
+  border-color: var(--green);
+}
+
+/* ---- Spinner ---- */
+.spinner {
+  width: 14px; height: 14px;
+  border: 2px solid var(--border-bright);
+  border-top-color: var(--cyan);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---- Spoke Section ---- */
+.spoke-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  margin-bottom: 28px;
+  position: relative;
+}
+
+.spoke-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 2px;
+  background: linear-gradient(90deg, var(--amber), transparent);
+  opacity: 0.6;
+}
+
+.spoke-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.field-group { display: flex; flex-direction: column; gap: 4px; }
+
+.field-group label {
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+input[type="text"], select {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius);
+  padding: 7px 12px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+input[type="text"]:focus, select:focus {
+  border-color: var(--cyan-dim);
+  box-shadow: 0 0 0 2px var(--cyan-glow);
+}
+
+input[type="text"]::placeholder { color: var(--text-dim); }
+
+.spoke-result {
+  margin-top: 14px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  min-height: 20px;
+}
+
+.spoke-services {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.svc-chip {
+  font-size: 0.62rem;
+  padding: 3px 8px;
+  border-radius: 2px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-dim);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: var(--font-mono);
+}
+
+.svc-chip:hover {
+  border-color: var(--cyan-dim);
+  color: var(--cyan);
+}
+
+.svc-chip.active { border-color: var(--green); color: var(--green); background: rgba(0,255,136,0.06); }
+.svc-chip.scanning { border-color: var(--amber); color: var(--amber); }
+.svc-chip.done { border-color: var(--green); color: var(--green); opacity: 0.5; }
+.svc-chip.error { border-color: var(--red); color: var(--red); }
+
+/* ---- Tabs ---- */
+.tabs-bar {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border-dim);
+  margin-bottom: 0;
+}
+
+.tab-btn {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.tab-btn:hover { color: var(--text-secondary); }
+
+.tab-btn.active {
+  color: var(--cyan);
+  border-bottom-color: var(--cyan);
+}
+
+.tab-content {
+  display: none;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-dim);
+  border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+  padding: 16px;
+  max-height: 600px;
+  overflow: auto;
+}
+
+.tab-content.active { display: block; }
+
+/* ---- Filters bar ---- */
+.filters-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-dim);
+}
+
+.filters-bar input[type="text"], .filters-bar select {
+  font-size: 0.72rem;
+  padding: 5px 10px;
+}
+
+/* ---- Tables ---- */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.74rem;
+}
+
+.data-table thead th {
+  text-align: left;
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-med);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  background: var(--bg-panel);
+  z-index: 2;
+}
+
+.data-table thead th:hover { color: var(--text-secondary); }
+.data-table thead th .sort-arrow { margin-left: 4px; opacity: 0.4; }
+.data-table thead th.sorted .sort-arrow { opacity: 1; color: var(--cyan); }
+
+.data-table tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-dim);
+  color: #b0b7c5;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+.data-table tbody tr:hover td {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.data-table tbody td.mono {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+
+.data-table tbody td.wrap {
+  white-space: normal;
+  word-break: break-all;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+}
+
+.empty-state .icon {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  opacity: 0.3;
+}
+
+.row-count {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  margin-top: 8px;
+  text-align: right;
+  letter-spacing: 0.05em;
+}
+
+/* ---- Animations ---- */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in {
+  animation: fade-in 0.4s ease both;
+}
+
+.delay-1 { animation-delay: 0.06s; }
+.delay-2 { animation-delay: 0.12s; }
+.delay-3 { animation-delay: 0.18s; }
+
+/* ---- Guidance callouts ---- */
+.guidance {
+  background: #1c2028;
+  border-left: 3px solid var(--cyan-dim);
+  padding: 14px 18px;
+  margin-bottom: 14px;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 0.78rem;
+  line-height: 1.75;
+  color: #b8bfcc;
+}
+
+.guidance strong { color: var(--text-primary); font-weight: 600; }
+.guidance code {
+  background: #252a34;
+  padding: 1px 6px;
+  border-radius: 2px;
+  font-size: 0.72rem;
+  color: var(--cyan);
+}
+.guidance .g-label {
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 8px;
+  display: block;
+  font-weight: 600;
+}
+
+.guidance ul {
+  margin: 8px 0 2px 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.guidance ul li {
+  position: relative;
+  padding-left: 14px;
+  margin-bottom: 5px;
+}
+
+.guidance ul li::before {
+  content: '\25B8';
+  position: absolute;
+  left: 0;
+  color: var(--cyan-dim);
+}
+
+.guidance.g-amber { border-left-color: var(--amber); background: #1f1d18; }
+.guidance.g-amber .g-label { color: var(--amber); }
+.guidance.g-amber ul li::before { color: var(--amber-dim); }
+
+.guidance.g-red { border-left-color: var(--red); background: #1f181b; }
+.guidance.g-red .g-label { color: var(--red); }
+.guidance.g-red ul li::before { color: var(--red-dim); }
+
+.guidance.g-green { border-left-color: var(--green); background: #181f1c; }
+.guidance.g-green .g-label { color: var(--green); }
+
+.guidance-toggle {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 0;
+  transition: color var(--transition);
+}
+
+.guidance-toggle:hover { color: var(--text-secondary); }
+
+/* ---- Responsive ---- */
+@media (max-width: 900px) {
+  .scan-grid { grid-template-columns: 1fr; }
+  .shell { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Header -->
+  <header class="header animate-in">
+    <div class="header-left">
+      <h1>Account Assessment</h1>
+      <span class="tag">// AWS Organizations</span>
+    </div>
+    <div class="header-right">
+      <span class="status-dot"></span>
+      <span>593521253524 &middot; us-east-2</span>
+      <span style="color:var(--text-dim)">|</span>
+      <span id="clock"></span>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       SECTION 1: DESTINATION ORG OVERVIEW
+       Data from the NEW org (990148762065) — what migrating accounts will land in
+       ============================================================ -->
+  <div class="section-label animate-in delay-1">Destination Org Overview <span style="color:var(--text-dim);font-weight:400">&mdash; new org (990148762065)</span></div>
+  <div class="guidance animate-in delay-1" style="margin-bottom:14px">
+    <span class="g-label">Reference data &mdash; not migration risks</span>
+    This section shows what the <strong>destination organization</strong> looks like today. Use it to verify that the new org has the delegated admin registrations, trusted access integrations, and SCP guardrails that migrating accounts will need. This data is informational &mdash; it does not need to be changed before migration.
+  </div>
+
+  <div class="scan-grid">
+    <div class="scan-card animate-in delay-1" id="card-delegated">
+      <div class="scan-card-header">
+        <div>
+          <div class="scan-card-title">Delegated Admins</div>
+          <div class="scan-card-desc">Accounts registered as delegated administrators in the new org. Verify migrating accounts that need delegated admin status are re-registered here after migration.</div>
+        </div>
+        <button class="btn btn--sm" onclick="runScan('delegated-admins')">Run Scan</button>
+      </div>
+      <div class="scan-card-status" id="status-delegated-admins">
+        <span class="badge badge--idle">Idle</span>
+      </div>
+    </div>
+
+    <div class="scan-card animate-in delay-2" id="card-trusted">
+      <div class="scan-card-header">
+        <div>
+          <div class="scan-card-title">Trusted Access</div>
+          <div class="scan-card-desc">AWS services with org-level integration enabled in the new org. Verify the services your migrating accounts depend on (CloudTrail, Config, SSO, etc.) are enabled here.</div>
+        </div>
+        <button class="btn btn--sm" onclick="runScan('trusted-access')">Run Scan</button>
+      </div>
+      <div class="scan-card-status" id="status-trusted-access">
+        <span class="badge badge--idle">Idle</span>
+      </div>
+    </div>
+
+    <div class="scan-card animate-in delay-3" id="card-policy">
+      <div class="scan-card-header">
+        <div>
+          <div class="scan-card-title">SCPs</div>
+          <div class="scan-card-desc">Service Control Policies in the new org. Migrating accounts will inherit these guardrails. Verify they provide equivalent protections to the source org's SCPs.</div>
+        </div>
+        <button class="btn btn--sm" onclick="runScan('policy-explorer')">Run Scan</button>
+      </div>
+      <div class="scan-card-status" id="status-policy-explorer">
+        <span class="badge badge--idle">Idle</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Destination org results tabs -->
+  <div class="tabs-bar animate-in delay-2" style="margin-top:4px">
+    <button class="tab-btn active" onclick="switchTab('tab-delegated')">Delegated Admins</button>
+    <button class="tab-btn" onclick="switchTab('tab-trusted')">Trusted Access</button>
+    <button class="tab-btn" onclick="switchTab('tab-scps')">SCPs</button>
+  </div>
+
+  <div class="tab-content active" id="tab-delegated">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="font-size:0.72rem;color:var(--text-dim)">Accounts with delegated admin privileges in the destination org. Re-register any missing accounts post-migration.</span>
+      <button class="btn btn--sm" onclick="loadResults('delegated-admins')">Refresh</button>
+    </div>
+    <div id="table-delegated"><div class="empty-state"><div class="icon">&mdash;</div>No data loaded. Run a scan or click Refresh.</div></div>
+  </div>
+
+  <div class="tab-content" id="tab-trusted">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="font-size:0.72rem;color:var(--text-dim)">Services with org-level integration. Ensure the services your workloads depend on are enabled before migrating accounts.</span>
+      <button class="btn btn--sm" onclick="loadResults('trusted-access')">Refresh</button>
+    </div>
+    <div id="table-trusted"><div class="empty-state"><div class="icon">&mdash;</div>No data loaded. Run a scan or click Refresh.</div></div>
+  </div>
+
+  <div class="tab-content" id="tab-scps">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="font-size:0.72rem;color:var(--text-dim)">Guardrails migrating accounts will inherit. Compare with the source org's SCPs to identify gaps.</span>
+      <button class="btn btn--sm" onclick="loadSCPs()">Refresh</button>
+    </div>
+    <div id="table-scps"><div class="empty-state"><div class="icon">&mdash;</div>No data loaded. Run an SCP scan or click Refresh.</div></div>
+  </div>
+
+  <!-- ============================================================
+       SECTION 2: MIGRATION RISK SCANNER
+       Scan source org accounts for policies that will break
+       ============================================================ -->
+  <div class="section-label animate-in delay-2" style="margin-top:36px">Migration Risk Scanner <span style="color:var(--red);font-weight:400">&mdash; source org accounts</span></div>
+  <div class="guidance g-red animate-in delay-2" style="margin-bottom:14px">
+    <span class="g-label">This is where you find what breaks</span>
+    Scan accounts in the <strong>source (old) org</strong> to discover resource-based policies that reference organization-specific conditions. These policies will <strong>silently stop working</strong> after migration because the account's org ID changes.
+    <ul>
+      <li><code>aws:PrincipalOrgID</code> / <code>aws:PrincipalOrgPaths</code> &mdash; condition checks the caller's org membership. Fails when the account moves to a different org.</li>
+      <li><code>aws:ResourceOrgID</code> / <code>aws:ResourceOrgPaths</code> &mdash; condition checks the resource's org. Same issue.</li>
+      <li>Org ID literals (e.g. <code>o-xxxxxxxxxx</code>) hardcoded anywhere in the policy.</li>
+    </ul>
+    <strong>Remediation:</strong> Before migration, update flagged policies to include both old and new org IDs, or replace org conditions with explicit account-based principals. Prioritize <strong>KMS key policies</strong> and <strong>S3 bucket policies</strong> &mdash; broken access can lock you out of encrypted data.
+  </div>
+
+  <!-- Spoke Scanner -->
+  <div class="spoke-panel animate-in delay-2">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px">
+      <div class="scan-card-title">Scan Account</div>
+      <span style="font-size:0.65rem;color:var(--text-dim)">Requires spoke IAM role deployed in the target account</span>
+    </div>
+    <div class="spoke-row">
+      <div class="field-group">
+        <label>Account ID</label>
+        <input type="text" id="spoke-account" placeholder="123456789012" style="width:170px" maxlength="12">
+      </div>
+      <div class="field-group">
+        <label>Regions</label>
+        <input type="text" id="spoke-regions" value="us-east-2,us-west-2" style="width:220px">
+      </div>
+      <button class="btn btn--amber btn--sm" onclick="validateSpoke()">Validate Access</button>
+      <button class="btn btn--green btn--sm" id="btn-scan-all" onclick="scanAllSpoke()" disabled>Scan All Services</button>
+    </div>
+    <div class="spoke-result" id="spoke-result"></div>
+    <div class="spoke-services" id="spoke-services"></div>
+  </div>
+
+  <!-- Migration risk results -->
+  <div class="tabs-bar animate-in delay-3">
+    <button class="tab-btn active" onclick="switchTab('tab-policies')">Resource-Based Policies</button>
+    <button class="tab-btn" onclick="switchTab('tab-jobs')">Jobs</button>
+  </div>
+
+  <div class="tab-content active" id="tab-policies">
+    <div class="filters-bar">
+      <div class="field-group">
+        <label>Account ID</label>
+        <input type="text" id="filter-account" placeholder="All accounts" style="width:150px">
+      </div>
+      <div class="field-group">
+        <label>Region</label>
+        <input type="text" id="filter-region" placeholder="All regions" style="width:130px">
+      </div>
+      <div class="field-group">
+        <label>Service</label>
+        <input type="text" id="filter-service" placeholder="All services" style="width:120px">
+      </div>
+      <div class="field-group">
+        <label>Effect</label>
+        <select id="filter-effect" style="width:100px">
+          <option value="">All</option>
+          <option value="Allow">Allow</option>
+          <option value="Deny">Deny</option>
+        </select>
+      </div>
+      <button class="btn btn--sm" onclick="loadPolicies()">Search</button>
+      <button class="btn btn--sm btn--amber" id="btn-risks-only" onclick="toggleRisksOnly()">Risks Only</button>
+    </div>
+    <div id="policy-risk-summary" style="margin-bottom:10px"></div>
+    <div id="table-policies"><div class="empty-state"><div class="icon">&mdash;</div>Scan a source org account above, then click Search to view resource-based policies.</div></div>
+  </div>
+
+  <div class="tab-content" id="tab-jobs">
+    <div class="guidance g-green">
+      <span class="g-label">Scan history</span>
+      Shows all scan jobs. Jobs with status <strong>SUCCEEDED_WITH_FAILED_TASKS</strong> indicate some accounts or services couldn't be scanned &mdash; typically due to missing spoke roles or insufficient permissions.
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+      <button class="btn btn--sm" onclick="loadResults('jobs')">Refresh</button>
+    </div>
+    <div id="table-jobs"><div class="empty-state"><div class="icon">&mdash;</div>No data loaded. Click Refresh to view job history.</div></div>
+  </div>
+
+</div>
+
+<script>
+/* ================================================================
+   Dashboard Logic
+   ================================================================ */
+const API = '';
+
+// ---- Clock ----
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('en-US', { hour12: false }) + ' UTC' + (now.getTimezoneOffset() > 0 ? '-' : '+') + Math.abs(now.getTimezoneOffset() / 60);
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ---- Tabs ----
+// Two separate tab groups: destination org and migration risks
+const destTabs = ['tab-delegated', 'tab-trusted', 'tab-scps'];
+const riskTabs = ['tab-policies', 'tab-jobs'];
+
+function switchTab(id) {
+  // Figure out which group this tab belongs to
+  const group = destTabs.includes(id) ? destTabs : riskTabs;
+  // Only deactivate tabs in the same group
+  group.forEach(tid => document.getElementById(tid).classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  // Update tab buttons — find the clicked one's parent tabs-bar
+  const btn = event.target;
+  const bar = btn.closest('.tabs-bar');
+  if (bar) {
+    bar.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+}
+
+// ---- Status helpers ----
+function statusBadge(status) {
+  if (!status) return '<span class="badge badge--idle">Unknown</span>';
+  const s = status.toUpperCase();
+  if (s === 'SUCCEEDED') return '<span class="badge badge--ok">Succeeded</span>';
+  if (s === 'SUCCEEDED_WITH_FAILED_TASKS') return '<span class="badge badge--warn">Partial</span>';
+  if (s === 'FAILED') return '<span class="badge badge--err">Failed</span>';
+  if (s === 'ACTIVE' || s === 'QUEUED') return '<span class="badge badge--active">Active</span>';
+  return `<span class="badge badge--idle">${status}</span>`;
+}
+
+function formatTimestamp(ts) {
+  if (!ts) return '&mdash;';
+  try {
+    const d = new Date(ts);
+    if (isNaN(d)) return ts;
+    return d.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+  } catch { return ts; }
+}
+
+// ---- Scan triggers ----
+async function runScan(type) {
+  const el = document.getElementById(`status-${type}`);
+  el.innerHTML = '<span class="spinner"></span> <span style="color:var(--cyan)">Invoking Lambda...</span>';
+
+  try {
+    const resp = await fetch(`${API}/api/scan/${type}`, { method: 'POST' });
+    const data = await resp.json();
+
+    // Parse body if present (Lambda returns API GW format)
+    let body = data;
+    if (data.body) {
+      try { body = JSON.parse(data.body); } catch { body = data; }
+    }
+
+    const status = body.JobStatus || body.jobStatus || 'SUBMITTED';
+    el.innerHTML = `${statusBadge(status)} <span style="font-size:0.68rem;color:var(--text-dim)">${formatTimestamp(body.StartedAt || body.FinishedAt || new Date().toISOString())}</span>`;
+
+    // Auto-load results for the matching tab
+    setTimeout(() => loadResults(type), 2000);
+  } catch (err) {
+    el.innerHTML = `<span class="badge badge--err">Error</span> <span style="font-size:0.68rem;color:var(--red)">${err.message}</span>`;
+  }
+}
+
+// ---- Spoke validation ----
+let spokeValidated = false;
+let spokeRegions = [];
+
+async function validateSpoke() {
+  const acct = document.getElementById('spoke-account').value.trim();
+  if (!/^\d{12}$/.test(acct)) {
+    document.getElementById('spoke-result').innerHTML = '<span style="color:var(--red)">Enter a valid 12-digit account ID</span>';
+    return;
+  }
+
+  const resultEl = document.getElementById('spoke-result');
+  resultEl.innerHTML = '<span class="spinner"></span> Validating spoke access...';
+  document.getElementById('btn-scan-all').disabled = true;
+  document.getElementById('spoke-services').innerHTML = '';
+
+  try {
+    const resp = await fetch(`${API}/api/scan/spoke-validate?account_id=${acct}`, { method: 'POST' });
+    const data = await resp.json();
+
+    if (data.Validation === 'SUCCEEDED') {
+      spokeValidated = true;
+      spokeRegions = data.Regions || [];
+      const svcCount = (data.ServicesToScanForAccount || []).length;
+      resultEl.innerHTML = `<span class="badge badge--ok">Access Validated</span> <span style="margin-left:8px">${spokeRegions.length} regions &middot; ${svcCount} services available</span>`;
+      document.getElementById('btn-scan-all').disabled = false;
+
+      // Render service chips
+      renderServiceChips(data.ServicesToScanForAccount || []);
+    } else {
+      spokeValidated = false;
+      resultEl.innerHTML = '<span class="badge badge--err">Access Denied</span> <span style="margin-left:8px;color:var(--text-dim)">Cannot assume spoke role in this account</span>';
+    }
+  } catch (err) {
+    resultEl.innerHTML = `<span class="badge badge--err">Error</span> <span style="color:var(--red)">${err.message}</span>`;
+  }
+}
+
+function renderServiceChips(services) {
+  const el = document.getElementById('spoke-services');
+  el.innerHTML = services.map(s =>
+    `<span class="svc-chip" data-svc="${s}" onclick="scanSingleService('${s}', this)">${s}</span>`
+  ).join('');
+}
+
+async function scanSingleService(service, chipEl) {
+  const acct = document.getElementById('spoke-account').value.trim();
+  const regions = document.getElementById('spoke-regions').value.trim();
+  if (!acct) return;
+
+  chipEl.classList.add('scanning');
+  chipEl.classList.remove('done', 'error');
+
+  try {
+    await fetch(`${API}/api/scan/spoke-resource?account_id=${acct}&service=${service}&regions=${encodeURIComponent(regions)}`, { method: 'POST' });
+    chipEl.classList.remove('scanning');
+    chipEl.classList.add('done');
+  } catch {
+    chipEl.classList.remove('scanning');
+    chipEl.classList.add('error');
+  }
+}
+
+async function scanAllSpoke() {
+  const acct = document.getElementById('spoke-account').value.trim();
+  const regions = document.getElementById('spoke-regions').value.trim();
+  if (!acct || !spokeValidated) return;
+
+  const resultEl = document.getElementById('spoke-result');
+  resultEl.innerHTML = '<span class="spinner"></span> Scanning all services...';
+  document.getElementById('btn-scan-all').disabled = true;
+
+  try {
+    const resp = await fetch(`${API}/api/scan/spoke-all?account_id=${acct}&regions=${encodeURIComponent(regions)}`, { method: 'POST' });
+    const data = await resp.json();
+
+    if (data.status === 'ok') {
+      const ok = data.scans.filter(s => s.status === 'ok').length;
+      const fail = data.scans.filter(s => s.status === 'error').length;
+      resultEl.innerHTML = `<span class="badge badge--ok">Complete</span> <span style="margin-left:8px">${ok}/${data.totalServices} services scanned${fail > 0 ? `, <span style="color:var(--red)">${fail} errors</span>` : ''}</span>`;
+
+      // Update chips
+      data.scans.forEach(s => {
+        const chip = document.querySelector(`.svc-chip[data-svc="${s.service}"]`);
+        if (chip) {
+          chip.classList.remove('scanning');
+          chip.classList.add(s.status === 'ok' ? 'done' : 'error');
+        }
+      });
+
+      // Auto-load policy results
+      setTimeout(() => loadPolicies(), 1000);
+    } else {
+      resultEl.innerHTML = `<span class="badge badge--err">Failed</span>`;
+    }
+  } catch (err) {
+    resultEl.innerHTML = `<span class="badge badge--err">Error</span> <span style="color:var(--red)">${err.message}</span>`;
+  }
+  document.getElementById('btn-scan-all').disabled = false;
+}
+
+// ---- Results loading ----
+
+const tableConfigs = {
+  'delegated-admins': {
+    columns: ['AccountId', 'Name', 'Email', 'ServicePrincipal', 'Status', 'DelegationEnabledDate'],
+    container: 'table-delegated'
+  },
+  'trusted-access': {
+    columns: ['ServicePrincipal', 'DateEnabled'],
+    container: 'table-trusted'
+  },
+  'jobs': {
+    columns: ['AssessmentType', 'JobId', 'JobStatus', 'StartedBy', 'StartedAt', 'FinishedAt'],
+    container: 'table-jobs'
+  }
+};
+
+async function loadResults(type) {
+  const config = tableConfigs[type];
+  if (!config) return;
+
+  const container = document.getElementById(config.container);
+  container.innerHTML = '<div style="text-align:center;padding:20px"><span class="spinner"></span></div>';
+
+  try {
+    const resp = await fetch(`${API}/api/results/${type}`);
+    const data = await resp.json();
+    renderTable(container, config.columns, data.items || [], type);
+  } catch (err) {
+    container.innerHTML = `<div class="empty-state"><span style="color:var(--red)">${err.message}</span></div>`;
+  }
+}
+
+// ---- Risk detection ----
+const ORG_RISK_PATTERNS = [
+  /aws:PrincipalOrgID/i,
+  /aws:PrincipalOrgPaths/i,
+  /aws:ResourceOrgID/i,
+  /aws:ResourceOrgPaths/i,
+  /o-[a-z0-9]{10,}/i,
+];
+
+function classifyRisk(item) {
+  // Check all text fields for org-specific patterns
+  const fields = [
+    item.Policy || '',
+    item.Condition || '',
+    item.Principal || '',
+    item.Action || '',
+    item.ResourceIdentifier || '',
+  ].join(' ');
+
+  for (const pattern of ORG_RISK_PATTERNS) {
+    if (pattern.test(fields)) {
+      // Determine which pattern matched for the reason
+      if (/aws:PrincipalOrgID/i.test(fields)) return { risk: true, reason: 'Uses aws:PrincipalOrgID' };
+      if (/aws:PrincipalOrgPaths/i.test(fields)) return { risk: true, reason: 'Uses aws:PrincipalOrgPaths' };
+      if (/aws:ResourceOrgID/i.test(fields)) return { risk: true, reason: 'Uses aws:ResourceOrgID' };
+      if (/aws:ResourceOrgPaths/i.test(fields)) return { risk: true, reason: 'Uses aws:ResourceOrgPaths' };
+      if (/o-[a-z0-9]{10,}/i.test(fields)) return { risk: true, reason: 'References org ID literal' };
+      return { risk: true, reason: 'Org-specific condition' };
+    }
+  }
+  return { risk: false, reason: '' };
+}
+
+let risksOnlyMode = false;
+let cachedPolicyItems = [];
+
+function toggleRisksOnly() {
+  risksOnlyMode = !risksOnlyMode;
+  const btn = document.getElementById('btn-risks-only');
+  if (risksOnlyMode) {
+    btn.style.background = 'var(--amber-dim)';
+    btn.style.borderColor = 'var(--amber)';
+    btn.textContent = 'Show All';
+  } else {
+    btn.style.background = '';
+    btn.style.borderColor = '';
+    btn.textContent = 'Risks Only';
+  }
+  // Re-render from cache
+  if (cachedPolicyItems.length) {
+    renderPolicyTable(cachedPolicyItems);
+  }
+}
+
+function renderPolicyTable(items) {
+  const container = document.getElementById('table-policies');
+
+  // Classify each item
+  items.forEach(item => {
+    if (item._risk === undefined) {
+      const result = classifyRisk(item);
+      item._risk = result.risk;
+      item._riskReason = result.reason;
+    }
+  });
+
+  const riskCount = items.filter(i => i._risk).length;
+  const safeCount = items.length - riskCount;
+
+  // Summary bar
+  const summaryEl = document.getElementById('policy-risk-summary');
+  if (items.length > 0) {
+    summaryEl.innerHTML = `
+      <span style="font-size:0.72rem">
+        <span style="color:var(--text-secondary)">${items.length} policies found</span>
+        &nbsp;&middot;&nbsp;
+        <span style="color:${riskCount > 0 ? 'var(--red)' : 'var(--text-dim)'};font-weight:600">${riskCount} migration risk${riskCount !== 1 ? 's' : ''}</span>
+        &nbsp;&middot;&nbsp;
+        <span style="color:var(--green)">${safeCount} safe</span>
+      </span>`;
+  } else {
+    summaryEl.innerHTML = '';
+  }
+
+  // Filter if risks-only mode
+  let displayItems = risksOnlyMode ? items.filter(i => i._risk) : items;
+
+  if (!displayItems.length) {
+    container.innerHTML = risksOnlyMode
+      ? '<div class="empty-state"><div class="icon" style="color:var(--green)">&#10003;</div>No migration risks detected in current results.</div>'
+      : '<div class="empty-state"><div class="icon">&mdash;</div>No results found.</div>';
+    return;
+  }
+
+  const cols = ['_riskBadge', 'AccountId', 'Region', 'Service', 'ResourceIdentifier', 'Effect', 'Action', 'Principal'];
+  const colLabels = { '_riskBadge': 'Risk' };
+
+  // Sort
+  const sort = sortState['policies'];
+  if (sort) {
+    displayItems.sort((a, b) => {
+      let va, vb;
+      if (sort.col === '_riskBadge') {
+        va = a._risk ? '0' : '1';
+        vb = b._risk ? '0' : '1';
+      } else {
+        va = (a[sort.col] || '').toString();
+        vb = (b[sort.col] || '').toString();
+      }
+      return sort.dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+    });
+  }
+
+  let html = '<table class="data-table"><thead><tr>';
+  cols.forEach(col => {
+    const label = colLabels[col] || col;
+    const isSorted = sort && sort.col === col;
+    const arrow = isSorted ? (sort.dir === 'asc' ? '\u25B2' : '\u25BC') : '\u25B4';
+    html += `<th class="${isSorted ? 'sorted' : ''}" onclick="sortPolicyTable('${col}')">${label}<span class="sort-arrow">${arrow}</span></th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  displayItems.forEach(item => {
+    const rowStyle = item._risk ? 'border-left: 2px solid var(--red-dim);' : '';
+    html += `<tr style="${rowStyle}">`;
+    cols.forEach(col => {
+      if (col === '_riskBadge') {
+        if (item._risk) {
+          html += `<td><span class="badge badge--err" title="${escHtml(item._riskReason)}">Risk</span></td>`;
+        } else {
+          html += `<td><span class="badge badge--ok" style="opacity:0.5">Safe</span></td>`;
+        }
+        return;
+      }
+
+      let val = item[col];
+      if (val && typeof val === 'object') val = val.S || val.N || JSON.stringify(val);
+      if (val == null || val === 'null' || val === '') val = '\u2014';
+
+      if (col === 'Effect') {
+        const cls = val === 'Allow' ? 'badge--ok' : val === 'Deny' ? 'badge--err' : 'badge--idle';
+        html += `<td><span class="badge ${cls}">${val}</span></td>`;
+      } else if (col === 'Principal' || col === 'Action') {
+        const display = val.length > 60 ? val.substring(0, 60) + '...' : val;
+        html += `<td class="mono wrap" title="${escHtml(val)}">${escHtml(display)}</td>`;
+      } else {
+        html += `<td class="mono" title="${escHtml(String(val))}">${escHtml(String(val))}</td>`;
+      }
+    });
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+  html += `<div class="row-count">${displayItems.length} record${displayItems.length !== 1 ? 's' : ''}${risksOnlyMode ? ' (risks only)' : ''}</div>`;
+  container.innerHTML = html;
+}
+
+function sortPolicyTable(col) {
+  const current = sortState['policies'];
+  if (current && current.col === col) {
+    sortState['policies'] = { col, dir: current.dir === 'asc' ? 'desc' : 'asc' };
+  } else {
+    sortState['policies'] = { col, dir: 'asc' };
+  }
+  renderPolicyTable(cachedPolicyItems);
+}
+
+async function loadPolicies() {
+  const container = document.getElementById('table-policies');
+  container.innerHTML = '<div style="text-align:center;padding:20px"><span class="spinner"></span></div>';
+
+  const params = new URLSearchParams();
+  const acct = document.getElementById('filter-account').value.trim();
+  const rgn  = document.getElementById('filter-region').value.trim();
+  const svc  = document.getElementById('filter-service').value.trim();
+  const eff  = document.getElementById('filter-effect').value;
+  if (acct) params.set('account_id', acct);
+  if (rgn)  params.set('region', rgn);
+  if (svc)  params.set('service', svc);
+  if (eff)  params.set('effect', eff);
+
+  try {
+    const resp = await fetch(`${API}/api/results/policy-explorer?${params}`);
+    const data = await resp.json();
+    // Filter OUT SCPs — this tab only shows resource-based policies from spoke scans
+    cachedPolicyItems = (data.items || []).filter(i => i.PartitionKey !== 'ServiceControlPolicy');
+    cachedPolicyItems.forEach(i => { delete i._risk; delete i._riskReason; });
+    renderPolicyTable(cachedPolicyItems);
+  } catch (err) {
+    container.innerHTML = `<div class="empty-state"><span style="color:var(--red)">${err.message}</span></div>`;
+  }
+}
+
+// ---- SCPs tab (destination org) ----
+async function loadSCPs() {
+  const container = document.getElementById('table-scps');
+  container.innerHTML = '<div style="text-align:center;padding:20px"><span class="spinner"></span></div>';
+
+  try {
+    const resp = await fetch(`${API}/api/results/policy-explorer`);
+    const data = await resp.json();
+    // Filter to ONLY SCPs
+    const scps = (data.items || []).filter(i => i.PartitionKey === 'ServiceControlPolicy');
+    const cols = ['ResourceIdentifier', 'Effect', 'Action', 'Condition'];
+    renderTable(container, cols, scps, 'scps');
+  } catch (err) {
+    container.innerHTML = `<div class="empty-state"><span style="color:var(--red)">${err.message}</span></div>`;
+  }
+}
+
+// ---- Table rendering ----
+let sortState = {};
+
+function renderTable(container, columns, items, tableId) {
+  if (!items.length) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">&mdash;</div>No results found.</div>';
+    return;
+  }
+
+  // Sort if state exists
+  const sort = sortState[tableId];
+  if (sort) {
+    items.sort((a, b) => {
+      const va = (a[sort.col] || '').toString();
+      const vb = (b[sort.col] || '').toString();
+      return sort.dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+    });
+  }
+
+  let html = '<table class="data-table"><thead><tr>';
+  columns.forEach(col => {
+    const isSorted = sort && sort.col === col;
+    const arrow = isSorted ? (sort.dir === 'asc' ? '\u25B2' : '\u25BC') : '\u25B4';
+    html += `<th class="${isSorted ? 'sorted' : ''}" onclick="sortTable('${tableId}', '${col}', ${JSON.stringify(columns).replace(/"/g, '&quot;')})">${col}<span class="sort-arrow">${arrow}</span></th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  items.forEach(item => {
+    html += '<tr>';
+    columns.forEach(col => {
+      let val = item[col];
+
+      // Render DynamoDB format if needed
+      if (val && typeof val === 'object') {
+        val = val.S || val.N || JSON.stringify(val);
+      }
+
+      if (val == null || val === 'null' || val === '') val = '\u2014';
+
+      // Special formatting
+      if (col === 'JobStatus') {
+        html += `<td>${statusBadge(val)}</td>`;
+      } else if (col === 'Effect') {
+        const cls = val === 'Allow' ? 'badge--ok' : val === 'Deny' ? 'badge--err' : 'badge--idle';
+        html += `<td><span class="badge ${cls}">${val}</span></td>`;
+      } else if (col.includes('At') || col.includes('Date') || col.includes('Enabled')) {
+        html += `<td>${formatTimestamp(val)}</td>`;
+      } else if (col === 'Principal' || col === 'Action' || col === 'Policy') {
+        // Truncate long JSON
+        const display = val.length > 80 ? val.substring(0, 80) + '...' : val;
+        html += `<td class="mono wrap" title="${val.replace(/"/g, '&quot;')}">${escHtml(display)}</td>`;
+      } else {
+        html += `<td class="mono" title="${String(val).replace(/"/g, '&quot;')}">${escHtml(String(val))}</td>`;
+      }
+    });
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+  html += `<div class="row-count">${items.length} record${items.length !== 1 ? 's' : ''}</div>`;
+  container.innerHTML = html;
+}
+
+function sortTable(tableId, col, columns) {
+  const current = sortState[tableId];
+  if (current && current.col === col) {
+    sortState[tableId] = { col, dir: current.dir === 'asc' ? 'desc' : 'asc' };
+  } else {
+    sortState[tableId] = { col, dir: 'asc' };
+  }
+  // Re-fetch (or re-render from cache)
+  if (tableId === 'policies') loadPolicies();
+  else {
+    const map = { 'delegated-admins': 'delegated-admins', 'trusted-access': 'trusted-access', 'jobs': 'jobs' };
+    const type = Object.entries(tableConfigs).find(([k, v]) => v.container === `table-${tableId}`);
+    // Simplify: just reload
+    const typeKey = tableId.replace('table-', '');
+    loadResults(typeKey);
+  }
+}
+
+function escHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+// ---- Auto-load jobs on start ----
+document.addEventListener('DOMContentLoaded', () => {
+  loadResults('jobs');
+});
+</script>
+</body>
+</html>
