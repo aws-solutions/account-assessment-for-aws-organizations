@@ -7609,6 +7609,7 @@ exports[`spoke stack synth doesnt crash 1`] = `
                 "ses:ListEmailIdentities",
                 "apigateway:GET",
                 "config:DescribeOrganizationConfigRules",
+                "config:GetOrganizationCustomRulePolicy",
                 "ssm-incidents:ListResponsePlans",
                 "es:ListDomainNames",
                 "cloudformation:ListStacks",

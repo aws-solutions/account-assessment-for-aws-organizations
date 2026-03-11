@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.9] - 2026-03-11
+
+### Security
+
+- Updated minimatch to v10.2.3 to mitigate [CVE-2026-27904](https://avd.aquasec.com/nvd/cve-2026-27904) and [CVE-2026-27903](https://avd.aquasec.com/nvd/cve-2026-27903)
+- Updated joserfc to v1.6.3 to mitigate [CVE-2026-27932](https://avd.aquasec.com/nvd/cve-2026-27932)
+- Updated werkzeug to v3.1.6 to mitigate [CVE-2026-27199](https://avd.aquasec.com/nvd/cve-2026-27199)
+- Updated rollup to v4.59.0 to mitigate [CVE-2026-27606](https://avd.aquasec.com/nvd/cve-2026-27606)
+
+### Fixed
+
+- Added missing `config:GetOrganizationCustomRulePolicy` IAM permission to spoke execution role, resolving AccessDeniedException during Policy Explorer scans of AWS Config organization rules
+
 ## [1.1.8] - 2026-02-19
 
 ### Security

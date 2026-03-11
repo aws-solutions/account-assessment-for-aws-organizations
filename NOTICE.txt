@@ -395,6 +395,7 @@ expect-type under the Apache-2.0 license.
 fast-deep-equal under the MIT license.
 fast-json-stable-stringify under the MIT license.
 fast-uri under the BSD-3-Clause license.
+fast-xml-builder under the MIT license.
 fast-xml-parser under the MIT license.
 fastjsonschema under the BSD license.
 fastparse under the MIT license.
