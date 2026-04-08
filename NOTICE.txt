@@ -553,6 +553,7 @@ package-json-from-dist under the BlueOak-1.0.0 license.
 parse-json under the MIT license.
 parse5 under the MIT license.
 path-exists under the MIT license.
+path-expression-matcher under the MIT license.
 path-is-absolute under the MIT license.
 path-key under the MIT license.
 path-parse under the MIT license.
