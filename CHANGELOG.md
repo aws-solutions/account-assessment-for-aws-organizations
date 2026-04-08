@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.10] - 2026-04-08
+
+### Security
+
+- Updated aws-cdk-lib to v2.248.0 to mitigate [CVE-2026-33532](https://nvd.nist.gov/vuln/detail/CVE-2026-33532) and [CVE-2026-33750](https://nvd.nist.gov/vuln/detail/CVE-2026-33750)
+- Updated handlebars to v4.7.9 to mitigate [CVE-2026-33937](https://nvd.nist.gov/vuln/detail/CVE-2026-33937), [CVE-2026-33938](https://nvd.nist.gov/vuln/detail/CVE-2026-33938), [CVE-2026-33939](https://nvd.nist.gov/vuln/detail/CVE-2026-33939), [CVE-2026-33940](https://nvd.nist.gov/vuln/detail/CVE-2026-33940), [CVE-2026-33941](https://nvd.nist.gov/vuln/detail/CVE-2026-33941), and [CVE-2026-33916](https://nvd.nist.gov/vuln/detail/CVE-2026-33916)
+- Updated path-to-regexp to v8.4.1 to mitigate [CVE-2026-4926](https://nvd.nist.gov/vuln/detail/CVE-2026-4926) and [CVE-2026-4923](https://nvd.nist.gov/vuln/detail/CVE-2026-4923)
+- Updated brace-expansion to v5.0.5/v2.0.3 to mitigate [CVE-2026-33750](https://nvd.nist.gov/vuln/detail/CVE-2026-33750)
+- Updated lodash to v4.18.1 to mitigate [CVE-2026-4800](https://nvd.nist.gov/vuln/detail/CVE-2026-4800) and [CVE-2026-2950](https://nvd.nist.gov/vuln/detail/CVE-2026-2950)
+- Updated cryptography to v46.0.6 to mitigate [CVE-2026-34073](https://nvd.nist.gov/vuln/detail/CVE-2026-34073)
+- Updated Vite to v6.4.2 to mitigate [CVE-2026-39363](https://github.com/advisories/GHSA-p9ff-h696-f583) and [GHSA-4w7w-66w2-5vf9](https://github.com/advisories/GHSA-4w7w-66w2-5vf9)
+
 ## [1.1.9] - 2026-03-11
 
 ### Security

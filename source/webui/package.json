@@ -26,7 +26,7 @@
     "react-router-dom": "^6.30.3",
     "typescript": "^5.8.2",
     "uuid": "^11.0.5",
-    "vite": "6.4.1"
+    "vite": "6.4.2"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",
@@ -50,13 +50,9 @@
     "test:coverage": "vitest run --coverage --watch=false"
   },
   "overrides": {
-    "js-yaml": "^4.1.1",
     "glob": "^11.1.0",
     "test-exclude": "^7.0.1",
-    "@isaacs/brace-expansion": "^5.0.1",
-    "ajv": "^8.18.0",
     "lodash": "^4.17.23",
-    "fast-xml-parser": "^5.3.6",
     "diff": "^8.0.3",
     "minimatch": "10.2.3"
   },

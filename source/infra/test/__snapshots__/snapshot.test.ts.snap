@@ -3258,12 +3258,14 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:DescribeTable",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JobHistoryTableE4B293DD",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "JobHistoryTableE4B293DD",
+                    "Arn",
+                  ],
+                },
+              ],
             },
             {
               "Action": [
@@ -3271,12 +3273,14 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:GetShardIterator",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JobHistoryTableE4B293DD",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "JobHistoryTableE4B293DD",
+                    "Arn",
+                  ],
+                },
+              ],
             },
           ],
           "Version": "2012-10-17",
@@ -3549,12 +3553,14 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:DescribeTable",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JobHistoryTableE4B293DD",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "JobHistoryTableE4B293DD",
+                    "Arn",
+                  ],
+                },
+              ],
             },
             {
               "Action": [
@@ -3562,12 +3568,14 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:GetShardIterator",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JobHistoryTableE4B293DD",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "JobHistoryTableE4B293DD",
+                    "Arn",
+                  ],
+                },
+              ],
             },
           ],
           "Version": "2012-10-17",
@@ -3783,12 +3791,14 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:DescribeTable",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JobHistoryTableE4B293DD",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "JobHistoryTableE4B293DD",
+                    "Arn",
+                  ],
+                },
+              ],
             },
             {
               "Action": [
@@ -3796,12 +3806,14 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:GetShardIterator",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JobHistoryTableE4B293DD",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "JobHistoryTableE4B293DD",
+                    "Arn",
+                  ],
+                },
+              ],
             },
             {
               "Action": [
@@ -3817,12 +3829,28 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:DescribeTable",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "DelegatedAdminsTable29E80916",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "DelegatedAdminsTable29E80916",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "DelegatedAdminsTable29E80916",
+                          "Arn",
+                        ],
+                      },
+                      "/index/*",
+                    ],
+                  ],
+                },
+              ],
             },
             {
               "Action": [
@@ -3830,12 +3858,28 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:GetShardIterator",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "DelegatedAdminsTable29E80916",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "DelegatedAdminsTable29E80916",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "DelegatedAdminsTable29E80916",
+                          "Arn",
+                        ],
+                      },
+                      "/index/*",
+                    ],
+                  ],
+                },
+              ],
             },
             {
               "Action": "dynamodb:Query",
@@ -3869,12 +3913,28 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:DescribeTable",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "TrustedAccessTable495B447A",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "TrustedAccessTable495B447A",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "TrustedAccessTable495B447A",
+                          "Arn",
+                        ],
+                      },
+                      "/index/*",
+                    ],
+                  ],
+                },
+              ],
             },
             {
               "Action": [
@@ -3882,12 +3942,28 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:GetShardIterator",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "TrustedAccessTable495B447A",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "TrustedAccessTable495B447A",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "TrustedAccessTable495B447A",
+                          "Arn",
+                        ],
+                      },
+                      "/index/*",
+                    ],
+                  ],
+                },
+              ],
             },
             {
               "Action": "dynamodb:Query",
@@ -3921,12 +3997,28 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:DescribeTable",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "ResourceBasedPolicyTable7277C643",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "ResourceBasedPolicyTable7277C643",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "ResourceBasedPolicyTable7277C643",
+                          "Arn",
+                        ],
+                      },
+                      "/index/*",
+                    ],
+                  ],
+                },
+              ],
             },
             {
               "Action": [
@@ -3934,12 +4026,28 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:GetShardIterator",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "ResourceBasedPolicyTable7277C643",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "ResourceBasedPolicyTable7277C643",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "ResourceBasedPolicyTable7277C643",
+                          "Arn",
+                        ],
+                      },
+                      "/index/*",
+                    ],
+                  ],
+                },
+              ],
             },
             {
               "Action": "dynamodb:Query",
@@ -3973,12 +4081,28 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:DescribeTable",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "PolicyExplorerTable3E6DD7C7",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "PolicyExplorerTable3E6DD7C7",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "PolicyExplorerTable3E6DD7C7",
+                          "Arn",
+                        ],
+                      },
+                      "/index/*",
+                    ],
+                  ],
+                },
+              ],
             },
             {
               "Action": [
@@ -3986,12 +4110,28 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:GetShardIterator",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "PolicyExplorerTable3E6DD7C7",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "PolicyExplorerTable3E6DD7C7",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "PolicyExplorerTable3E6DD7C7",
+                          "Arn",
+                        ],
+                      },
+                      "/index/*",
+                    ],
+                  ],
+                },
+              ],
             },
             {
               "Action": "dynamodb:Query",
@@ -4244,12 +4384,14 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:DescribeTable",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JobHistoryTableE4B293DD",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "JobHistoryTableE4B293DD",
+                    "Arn",
+                  ],
+                },
+              ],
             },
             {
               "Action": [
@@ -4257,12 +4399,14 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:GetShardIterator",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JobHistoryTableE4B293DD",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "JobHistoryTableE4B293DD",
+                    "Arn",
+                  ],
+                },
+              ],
             },
             {
               "Action": [
@@ -4603,12 +4747,14 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:DescribeTable",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JobHistoryTableE4B293DD",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "JobHistoryTableE4B293DD",
+                    "Arn",
+                  ],
+                },
+              ],
             },
             {
               "Action": [
@@ -4616,12 +4762,14 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:GetShardIterator",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JobHistoryTableE4B293DD",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "JobHistoryTableE4B293DD",
+                    "Arn",
+                  ],
+                },
+              ],
             },
           ],
           "Version": "2012-10-17",
@@ -4896,12 +5044,14 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:DescribeTable",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JobHistoryTableE4B293DD",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "JobHistoryTableE4B293DD",
+                    "Arn",
+                  ],
+                },
+              ],
             },
             {
               "Action": [
@@ -4909,12 +5059,14 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:GetShardIterator",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JobHistoryTableE4B293DD",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "JobHistoryTableE4B293DD",
+                    "Arn",
+                  ],
+                },
+              ],
             },
             {
               "Action": "sts:AssumeRole",
@@ -5671,12 +5823,14 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:DescribeTable",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JobHistoryTableE4B293DD",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "JobHistoryTableE4B293DD",
+                    "Arn",
+                  ],
+                },
+              ],
             },
             {
               "Action": [
@@ -5684,12 +5838,14 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:GetShardIterator",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JobHistoryTableE4B293DD",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "JobHistoryTableE4B293DD",
+                    "Arn",
+                  ],
+                },
+              ],
             },
           ],
           "Version": "2012-10-17",
@@ -5927,12 +6083,14 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:DescribeTable",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JobHistoryTableE4B293DD",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "JobHistoryTableE4B293DD",
+                    "Arn",
+                  ],
+                },
+              ],
             },
             {
               "Action": [
@@ -5940,12 +6098,14 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:GetShardIterator",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JobHistoryTableE4B293DD",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "JobHistoryTableE4B293DD",
+                    "Arn",
+                  ],
+                },
+              ],
             },
             {
               "Action": "sts:AssumeRole",
@@ -6179,12 +6339,14 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:DescribeTable",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JobHistoryTableE4B293DD",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "JobHistoryTableE4B293DD",
+                    "Arn",
+                  ],
+                },
+              ],
             },
             {
               "Action": [
@@ -6192,12 +6354,14 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:GetShardIterator",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JobHistoryTableE4B293DD",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "JobHistoryTableE4B293DD",
+                    "Arn",
+                  ],
+                },
+              ],
             },
           ],
           "Version": "2012-10-17",
@@ -6420,12 +6584,14 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:DescribeTable",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JobHistoryTableE4B293DD",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "JobHistoryTableE4B293DD",
+                    "Arn",
+                  ],
+                },
+              ],
             },
             {
               "Action": [
@@ -6433,12 +6599,14 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:GetShardIterator",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JobHistoryTableE4B293DD",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "JobHistoryTableE4B293DD",
+                    "Arn",
+                  ],
+                },
+              ],
             },
           ],
           "Version": "2012-10-17",
@@ -6749,12 +6917,14 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:DescribeTable",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JobHistoryTableE4B293DD",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "JobHistoryTableE4B293DD",
+                    "Arn",
+                  ],
+                },
+              ],
             },
             {
               "Action": [
@@ -6762,12 +6932,14 @@ Temporary Password: <strong>{####}</strong>
                 "dynamodb:GetShardIterator",
               ],
               "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JobHistoryTableE4B293DD",
-                  "Arn",
-                ],
-              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "JobHistoryTableE4B293DD",
+                    "Arn",
+                  ],
+                },
+              ],
             },
           ],
           "Version": "2012-10-17",
