@@ -164,6 +164,7 @@ This software includes third party software subject to the following copyrights:
 @jridgewell/trace-mapping under the MIT license.
 @juggle/resize-observer under the Apache-2.0 license.
 @mswjs/interceptors under the MIT license.
+@nodable/entities under the MIT license.
 @open-draft/deferred-promise under the MIT license.
 @open-draft/logger under the MIT license.
 @open-draft/until under the MIT license.
@@ -581,6 +582,7 @@ punycode under the MIT license.
 pure-rand under the MIT license.
 pycparser under the BSD-3-Clause license.
 pydantic-core under the MIT license.
+pygments under the BSD-2-Clause license.
 pyrsistent under the MIT license.
 python-dateutil under the BSD License license.
 querystringify under the MIT license.
@@ -706,6 +708,7 @@ write-file-atomic under the ISC license.
 ws under the MIT license.
 xattr under the This is the MIT license.  This software may also be distributed under the same terms as Python the PSF license. license.
 xml-name-validator under the Apache-2.0 license.
+xml-naming under the MIT license.
 xmlchars under the MIT license.
 y18n under the ISC license.
 yallist under the ISC license.
