@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.11] - 2026-05-19
+
+### Security
+
+- Updated pytest to mitigate [CVE-2025-71176](https://avd.aquasec.com/nvd/cve-2025-71176)
+- Updated cryptography to v48.0.0 to mitigate [CVE-2026-39892](https://avd.aquasec.com/nvd/cve-2026-39892)
+- Updated urllib3 to v2.7.0 to mitigate [CVE-2026-44431](https://nvd.nist.gov/vuln/detail/CVE-2026-44431)
+
 ## [1.1.10] - 2026-04-08
 
 ### Security
