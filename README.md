@@ -43,7 +43,8 @@ The default deployment of solution pre-packaged template deploys following infra
 - Python 3.12+ with pip
 - AWS CDK 2.1021.0+
 - Node.js 22+ with npm
-- Poetry v2 with plugin to export
+- Poetry v2 with plugin to export (*May have to install `poetry export1` and create `requirements.txt`)
+- Create CLI profiles for hub, spoke and management account.
 
 Clone the repository and make desired code changes.
 
@@ -184,7 +185,7 @@ _✅ All assets are now staged on your S3 bucket. You or any user may use S3 lin
 
 Determine the parameter values that you want to deploy the stacks with:
 
-- DeploymentNamespace: An arbitrary value that is shared by Hub Stack and OrgMgmt Stack and Spoke Stack.
+- DeploymentNamespace: An arbitrary value that is shared by Hub Stack and OrgMgmt Stack and Spoke Stack. Use a short name in order to avoid errors.
 - UserEmail: The email address for the first Cognito User which the deployment creates.
 - AllowListedIPRanges: CIDR blocks to permit API access. To allow any IP, use 0.0.0.0/1,128.0.0.0/1
 - HubAccountId: The AccountId of your AWS Account you are deploying the Hub Stack to.
@@ -198,7 +199,7 @@ deployment of the spoke template.
 In case your accounts have not been bootstrapped for cdk yet, run:
 
 ```
-cd ./source
+cd ./source/infra
 npm run bootstrap -- --profile <PROFILE_HUB>
 npm run bootstrap -- --profile <PROFILE_SPOKE>
 npm run bootstrap -- --profile <PROFILE_ORG_MGMT>
@@ -209,7 +210,7 @@ With the values determined above, run the following commands:
 
 ```
 cd ./source/infra
-npm run deploy -- --parameters DeploymentNamespace=<NAMESPACE> --parameters UserEmail=<EMAIL>  --parameters AllowListedIPRanges=<IP-RANGES> --parameters OrganizationID=<ORD_ID> --profile <PROFILE_HUB>
+npm run deploy -- --parameters DeploymentNamespace=<NAMESPACE> --parameters UserEmail=<EMAIL>  --parameters AllowListedIPRanges=<IP-RANGES> --parameters OrganizationID=<ORD_ID> --parameters ManagementAccountId=<MGMT_ACCOUNT_ID> --profile <PROFILE_HUB>
 npm run deploySpoke -- --parameters DeploymentNamespace=<NAMESPACE> --parameters HubAccountId=<HUB_ACCOUNT_ID> --profile <PROFILE_SPOKE>
 npm run deployOrgMgmt -- --parameters DeploymentNamespace=<NAMESPACE> --parameters HubAccountId=<HUB_ACCOUNT_ID> --profile <PROFILE_ORG_MGMT>
 cd ../..
