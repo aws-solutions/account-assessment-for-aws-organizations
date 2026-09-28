@@ -41,7 +41,7 @@
     "diff": "^5.2.2",
     "@aws-cdk/cloud-assembly-schema": "^48.20.0",
     "minimatch": "10.2.3",
-    "fast-uri": "^3.1.5"
+    "fast-uri": "^3.1.7"
   },
   "jest": {
     "preset": "ts-jest",
