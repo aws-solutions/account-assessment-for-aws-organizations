@@ -50,3 +50,20 @@ class Backup:
         self.logger.debug(f"Backup Vault Access Policy: {response}")
         return response
 
+    @service_exception_handler
+    def list_backup_plans(self):
+        response = self.backup_client.list_backup_plans()
+        plans = response.get('BackupPlansList', [])
+        next_token = response.get('NextToken', None)
+
+        while next_token is not None:
+            response = self.backup_client.list_backup_plans(NextToken=next_token)
+            plans.extend(response.get('BackupPlansList', []))
+            next_token = response.get('NextToken', None)
+
+        return plans
+
+    @service_exception_handler
+    def get_backup_plan(self, backup_plan_id: str):
+        return self.backup_client.get_backup_plan(BackupPlanId=backup_plan_id)
+
